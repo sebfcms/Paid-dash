@@ -820,8 +820,7 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygHAciNYReephV
 async function main() {
   try {
     // Passe le token Google en paramètre → Apps Script valide côté serveur
-    const url = APPS_SCRIPT_URL + '?token=' + encodeURIComponent(_idToken);
-    const res = await fetch(url);
+    const res = await fetch(APPS_SCRIPT_URL);
     if (!res.ok) throw new Error('Erreur HTTP ' + res.status);
     const { rows, error } = await res.json();
     if (error) throw new Error(error);
