@@ -815,11 +815,10 @@ function renderDetailTabs(rows, allMois, selMois) {
 // ═══════════════════════════════════════════════
 // MAIN — appelé après connexion réussie
 // ═══════════════════════════════════════════════
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygHAciNYReephVxDHJr_QwkO92BA9MmLXY6h-zlJ5UUe7Ypfom4O6aahKCWmOQEqz64g/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxc64I1H3_zc30tLuaTMizABbPJ8fNFCVw3nfdJGYZES01IBCAN4KGK5gPkq0JDN0_PJg/exec';
 
 async function main() {
   try {
-    // Passe le token Google en paramètre → Apps Script valide côté serveur
     const res = await fetch(APPS_SCRIPT_URL);
     if (!res.ok) throw new Error('Erreur HTTP ' + res.status);
     const { rows, error } = await res.json();
