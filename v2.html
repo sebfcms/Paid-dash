@@ -55,27 +55,27 @@
       max-height: calc(100vh - 120px); overflow-y: auto;
     }
     .sidebar {
-      width: 200px; background: white;
+      width: 360px; background: white;
       border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden;
     }
     .sidebar-hdr { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 1px; background: #f8fafc; }
     .sidebar-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #94a3b8; }
-    .sidebar-mois { font-size: 12px; font-weight: 700; color: #0f172a; }
-    .sidebar-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
-    .sidebar-empty { font-size: 11px; color: #94a3b8; text-align: center; padding: 16px 0; line-height: 1.6; }
-    .ctx-item { border-left: 3px solid #bfdbfe; padding: 4px 0 4px 10px; border-radius: 0; }
+    .sidebar-mois { font-size: 14px; font-weight: 700; color: #0f172a; }
+    .sidebar-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; }
+    .sidebar-empty { font-size: 12px; color: #94a3b8; text-align: center; padding: 16px 0; line-height: 1.6; }
+    .ctx-item { border-left: 3px solid #bfdbfe; padding: 6px 0 6px 12px; border-radius: 0; }
     .ctx-item.alerte   { border-color: #fca5a5; }
     .ctx-item.produit  { border-color: #6ee7b7; }
     .ctx-item.marche   { border-color: #c4b5fd; }
     .ctx-item.resultat { border-color: #fcd34d; }
-    .ctx-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #3b82f6; }
+    .ctx-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #3b82f6; }
     .ctx-item.alerte .ctx-lbl   { color: #dc2626; }
     .ctx-item.produit .ctx-lbl  { color: #059669; }
     .ctx-item.marche .ctx-lbl   { color: #7c3aed; }
     .ctx-item.resultat .ctx-lbl { color: #d97706; }
-    .ctx-titre  { font-size: 11px; font-weight: 600; color: #0f172a; line-height: 1.35; margin-top: 2px; }
-    .ctx-detail { font-size: 10px; color: #64748b; margin-top: 3px; line-height: 1.45; }
-    .sidebar-hint { font-size: 9px; color: #94a3b8; padding: 10px 14px; border-top: 1px solid #f1f5f9; line-height: 1.5; }
+    .ctx-titre  { font-size: 13px; font-weight: 600; color: #0f172a; line-height: 1.35; margin-top: 3px; }
+    .ctx-detail { font-size: 11px; color: #64748b; margin-top: 4px; line-height: 1.5; }
+    .sidebar-hint { font-size: 10px; color: #94a3b8; padding: 10px 16px; border-top: 1px solid #f1f5f9; line-height: 1.5; }
 
     /* ── Content ── */
     .content { padding: 20px 24px; }
@@ -108,7 +108,7 @@
 
     /* ── Tables ── */
     .table-wrap { background: white; border-radius: 10px; border: 1px solid #e2e8f0; overflow: auto; margin-bottom: 20px; }
-    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    table { width: auto; border-collapse: collapse; table-layout: fixed; }
     thead th { background: #f8fafc; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #64748b; padding: 6px 6px; text-align: right; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
     thead th.left { text-align: left; }
     thead th.group { background: #f1f5f9; text-align: center; color: #475569; }
@@ -294,12 +294,12 @@ function signOut() {
 const MONTH_NAMES = ['','Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
 const MONTH_FULL  = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 
-// Colgroup compact — Canal 110px, colonnes data réduites
+// Colgroup compact — largeurs minimales, table width:auto pour ne pas s'étirer
 const COLGROUP = `<colgroup>
-  <col style="width:110px">
-  <col style="width:56px"><col style="width:62px"><col style="width:36px"><col style="width:48px"><col style="width:48px">
-  <col style="width:56px"><col style="width:48px"><col style="width:48px">
-  <col style="width:58px"><col style="width:48px"><col style="width:48px">
+  <col style="width:88px">
+  <col style="width:48px"><col style="width:52px"><col style="width:28px"><col style="width:38px"><col style="width:38px">
+  <col style="width:48px"><col style="width:38px"><col style="width:38px">
+  <col style="width:52px"><col style="width:38px"><col style="width:38px">
 </colgroup>`;
 
 const CAT_COLORS = {
