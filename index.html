@@ -30,8 +30,12 @@
     .header { background: #1e293b; color: white; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
     .header-title { font-size: 16px; font-weight: 700; }
     .header-meta { font-size: 11px; color: #94a3b8; margin-top: 3px; }
-    .header-user { font-size: 11px; color: #94a3b8; text-align: right; }
-    .btn-signout { background: none; border: 1px solid #475569; color: #94a3b8; border-radius: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer; margin-top: 4px; }
+    .header-user { display: flex; align-items: center; gap: 12px; }
+    .user-info { display: flex; align-items: center; gap: 9px; }
+    .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #475569; object-fit: cover; }
+    .user-name { font-size: 12px; font-weight: 600; color: #e2e8f0; line-height: 1.2; }
+    .user-email { font-size: 10px; color: #94a3b8; line-height: 1.2; }
+    .btn-signout { background: none; border: 1px solid #475569; color: #94a3b8; border-radius: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer; }
     .btn-signout:hover { border-color: #94a3b8; color: #cbd5e1; }
 
     .tabs { background: white; border-bottom: 2px solid #e2e8f0; padding: 0 24px; display: flex; gap: 2px; }
@@ -145,7 +149,13 @@
       <div class="header-meta" id="hdr-meta"></div>
     </div>
     <div class="header-user">
-      <div id="hdr-email"></div>
+      <div class="user-info">
+        <img id="hdr-avatar" class="user-avatar" src="" alt="" style="display:none">
+        <div>
+          <div class="user-name" id="hdr-name"></div>
+          <div class="user-email" id="hdr-email"></div>
+        </div>
+      </div>
       <button class="btn-signout" onclick="signOut()">Déconnexion</button>
     </div>
   </div>
@@ -184,7 +194,10 @@ function handleCredentialResponse(response) {
   try {
     const b64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
     const payload = JSON.parse(atob(b64));
-    const email = payload.email || '';
+    const email      = payload.email       || '';
+    const name       = payload.name        || '';
+    const givenName  = payload.given_name  || name;
+    const picture    = payload.picture     || '';
 
     if (!email.endsWith('@figarocms.fr')) {
       document.getElementById('login-error').textContent =
@@ -192,11 +205,25 @@ function handleCredentialResponse(response) {
       return;
     }
 
-    // OK → stocker le token et lancer le dashboard
+    // OK → afficher avatar + nom dans le header
     _idToken = token;
+    document.getElementById('hdr-name').textContent  = givenName;
+    document.getElementById('hdr-email').textContent = email;
+    if (picture) {
+      const av = document.getElementById('hdr-avatar');
+      av.src = picture;
+      av.style.display = 'block';
+    }
+
+    // Log de connexion (fire & forget)
+    fetch(APPS_SCRIPT_URL
+      + '?action=log'
+      + '&email=' + encodeURIComponent(email)
+      + '&name='  + encodeURIComponent(name)
+    ).catch(() => {});
+
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('loading').style.display = 'flex';
-    document.getElementById('hdr-email').textContent = email;
     main();
 
   } catch(e) {
