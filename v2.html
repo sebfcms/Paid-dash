@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Paid Performance</title>
+  <title>Dashboard Paid Performance - V2 (12/06/2026)</title>
   <script src="https://accounts.google.com/gsi/client" async></script>
   <style>
     :root { color-scheme: light; }
@@ -50,7 +50,7 @@
     .app-main { flex: 1; min-width: 0; overflow: hidden; }
     .sidebar-outer {
       flex-shrink: 0;
-      padding: 10px 10px 10px 0;
+      padding: 10px 48px 10px 0;
       position: sticky; top: 0; align-self: flex-start;
       max-height: calc(100vh - 120px); overflow-y: auto;
     }
@@ -117,7 +117,7 @@
     tbody tr:last-child td { border-bottom: none; }
     tbody tr:hover td { background: #f8fafc; }
     /* Liserés pointillés entre groupes — tbody uniquement */
-    tbody td.sep { border-left: 1.5px dashed #94a3b8; }
+    tbody td.sep { border-left: 1.5px dashed #94a3b8; padding-left: 16px; }
     /* Valeurs Actuel */
     tbody td.act { font-size: 13px; font-weight: 700; color: #0f172a; }
     /* Lignes catégorie — plus hautes et bien distinctes */
@@ -169,7 +169,7 @@
   <div class="login-card">
     <div class="login-logo">📊</div>
     <div class="login-title">Dashboard Paid Performance</div>
-    <div class="login-sub">Accès réservé aux comptes @figarocms.fr</div>
+    <div class="login-sub">Accès réservé aux comptes @figarocms.fr autorisés</div>
     <div id="g_id_onload"
       data-client_id="616034106773-pefm7p7kc60kng9orj7vtlqvp8lu5m2d.apps.googleusercontent.com"
       data-callback="handleCredentialResponse"
@@ -729,7 +729,7 @@ function renderDetailTabs(rows, allMois, selMois) {
 
   document.getElementById('hdr-title').textContent = `Dashboard Paid — ${MONTH_FULL[parseInt(smm)]} ${syyy}`;
   document.getElementById('hdr-meta').textContent  = isCurrent
-    ? `J${daysElapsed}/${totalDays} (${(pctElapsed*100).toFixed(0)}% du mois) · Données au ${today.toLocaleDateString('fr-FR')} · Comparatifs proratés sur ${daysElapsed} jours`
+    ? `J${daysElapsed}/${totalDays} (${(pctElapsed*100).toFixed(0)}% du mois) · Données au ${today.toLocaleDateString('fr-FR')} · Comparatifs au prorata de ${daysElapsed} jours`
     : `Mois complet · ${totalDays} jours · Bilan définitif`;
   document.getElementById('mnav-label').textContent = `${MONTH_FULL[parseInt(smm)]} ${syyy}`;
   document.getElementById('mnav-tag').textContent   = isCurrent ? '(mois en cours)' : '(mois complet)';
