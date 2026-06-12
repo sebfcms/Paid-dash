@@ -152,6 +152,18 @@
     .delta-neu { color: #9ca3af; font-weight: 600; font-size: 10px; }
     .cat-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; vertical-align: middle; flex-shrink: 0; }
     .cat-chip { display: inline-flex; align-items: center; font-size: 10px; color: #94a3b8; margin-right: 3px; }
+    /* Liseré centré : espace symétrique avant/après le pointillé */
+    tbody td.pre-sep { padding-right: 14px; }
+    thead th.pre-sep { padding-right: 14px; }
+    /* Statut canal */
+    .statut-chip { font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px; display: inline-block; white-space: nowrap; }
+    .statut-chip.ok   { background: #dcfce7; color: #15803d; }
+    .statut-chip.warn { background: #fef9c3; color: #a16207; }
+    .statut-chip.bad  { background: #fee2e2; color: #b91c1c; }
+    /* Plan de com layout 2 colonnes */
+    .plancom-inner { display: flex; gap: 14px; }
+    .plancom-left  { flex: 1; min-width: 0; }
+    .plancom-right { width: 158px; flex-shrink: 0; border-left: 1px solid #fde68a; padding-left: 14px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; }
 
     /* ── Branding block ── */
     .branding-wrap { background: white; border: 1px solid #fde68a; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
@@ -326,6 +338,7 @@ const COLGROUP = `<colgroup>
   <col style="width:48px"><col style="width:52px"><col style="width:28px"><col style="width:38px"><col style="width:38px">
   <col style="width:48px"><col style="width:38px"><col style="width:38px">
   <col style="width:52px"><col style="width:38px"><col style="width:38px">
+  <col style="width:42px">
 </colgroup>`;
 
 const CAT_COLORS = {
@@ -420,16 +433,43 @@ function sortMois(arr) {
 // ═══════════════════════════════════════════════
 // PLAN DE COM HELPERS
 // ═══════════════════════════════════════════════
+
+// Accepte DD/MM/YYYY ou MM/YYYY — retourne un objet Date (minuit)
+function parseExactDate(s) {
+  const parts = s.split('/');
+  if (parts.length === 3) {
+    // DD/MM/YYYY
+    return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+  } else if (parts.length === 2) {
+    // MM/YYYY → 1er du mois
+    return new Date(parseInt(parts[1]), parseInt(parts[0]) - 1, 1);
+  }
+  return null;
+}
+
 function monthInRange(mois, debut, fin) {
   const [mm, yy] = mois.split('/').map(Number);
-  const [dm, dy] = debut.split('/').map(Number);
-  const [fm, fy] = fin.split('/').map(Number);
-  return (yy * 12 + mm) >= (dy * 12 + dm) && (yy * 12 + mm) <= (fy * 12 + fm);
+  // Construit un intervalle couvrant tout le mois sélectionné
+  const monthStart = new Date(yy, mm - 1, 1);
+  const monthEnd   = new Date(yy, mm, 0); // dernier jour du mois
+  const dStart = parseExactDate(debut);
+  const dEnd   = parseExactDate(fin);
+  if (!dStart || !dEnd) return false;
+  // Le plan est actif si la période chevauche le mois
+  return dStart <= monthEnd && dEnd >= monthStart;
 }
 
 function getActivePlanCom(selMois) {
   if (!_plancom || !_plancom.length) return [];
   return _plancom.filter(r => r.periodeDebut && r.periodeFin && monthInRange(selMois, r.periodeDebut, r.periodeFin));
+}
+
+// Formate une date pour affichage (DD/MM/YYYY → "18 mai")
+function fmtDateCourt(s) {
+  const d = parseExactDate(s);
+  if (!d) return s;
+  const MOIS = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
+  return d.getDate() + ' ' + MOIS[d.getMonth()];
 }
 
 // ── Plan de com strip (entre les blocs budget et le tableau) ──
@@ -439,15 +479,32 @@ function renderPlanComStrip(selMois) {
 
   const debut = active[0].periodeDebut;
   const fin   = active[0].periodeFin;
-  const [dm, dy] = debut.split('/');
-  const [fm, fy] = fin.split('/');
-  const debutLbl = MONTH_NAMES[parseInt(dm)] + ' ' + dy.slice(2);
-  const finLbl   = MONTH_NAMES[parseInt(fm)] + ' ' + fy.slice(2);
+  const dStart = parseExactDate(debut);
+  const dEnd   = parseExactDate(fin);
+  const debutLbl = fmtDateCourt(debut);
+  const finLbl   = fmtDateCourt(fin);
 
   const totBud  = active.reduce((s, r) => s + (r.budgetTotal   || 0), 0);
   const totDep  = active.reduce((s, r) => s + (r.budgetDepense || 0), 0);
-  const pctCons = totBud > 0 ? Math.min(totDep / totBud * 100, 100) : 0;
   const restant = Math.max(totBud - totDep, 0);
+
+  // Progression basée sur les dates exactes
+  const today = new Date(); today.setHours(0,0,0,0);
+  let pctTemps = 0, pctCons = 0;
+  if (dStart && dEnd) {
+    const totalMs = dEnd - dStart;
+    const elapsedMs = Math.min(Math.max(today - dStart, 0), totalMs);
+    pctTemps = totalMs > 0 ? elapsedMs / totalMs * 100 : 0;
+  }
+  pctCons = totBud > 0 ? Math.min(totDep / totBud * 100, 100) : 0;
+
+  // Rythme branding = % budget / % temps
+  const rythme = pctTemps > 0 ? pctCons / pctTemps : null;
+  let rythmeLabel = 'On track', rythmeColor = '#16a34a', rythmeIcon = '✓';
+  if (rythme !== null) {
+    if      (rythme < 0.85) { rythmeLabel = 'Sous-rythme'; rythmeColor = '#f59e0b'; rythmeIcon = '~'; }
+    else if (rythme > 1.10) { rythmeLabel = 'Sur-rythme';  rythmeColor = '#dc2626'; rythmeIcon = '!'; }
+  }
 
   const plateformes = [...new Set(active.map(r => r.plateforme))];
   const chips = plateformes.map(p => `<span class="plancom-chip">${p}</span>`).join('');
@@ -457,15 +514,34 @@ function renderPlanComStrip(selMois) {
       <div class="plancom-title">📡 Plan de communication</div>
       <span class="plancom-period">${debutLbl} → ${finLbl}</span>
     </div>
-    <div class="plancom-tl"><div class="plancom-tl-fill" style="width:${pctCons.toFixed(0)}%"></div></div>
-    <div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;margin-bottom:10px">
-      <span>${debutLbl}</span><span>${finLbl}</span>
-    </div>
-    <div class="plancom-stats">
-      <div class="plancom-stat"><div class="lb">Budget total période</div><div class="vl">${fmtEuroRaw(totBud)}</div></div>
-      <div class="plancom-stat"><div class="lb">Dépensé à date</div><div class="vl">${fmtEuroRaw(totDep)}</div></div>
-      <div class="plancom-stat"><div class="lb">Restant</div><div class="vl">${fmtEuroRaw(restant)}</div></div>
-      <div class="plancom-chips" style="margin-left:auto">${chips}</div>
+    <div class="plancom-inner">
+      <div class="plancom-left">
+        <div class="plancom-tl" title="Progression budget : ${pctCons.toFixed(0)}%">
+          <div class="plancom-tl-fill" style="width:${pctCons.toFixed(0)}%"></div>
+        </div>
+        <div style="position:relative;height:4px;background:#e2e8f0;border-radius:2px;margin-bottom:6px;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;height:100%;width:${pctTemps.toFixed(0)}%;background:#94a3b8;border-radius:2px"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;margin-bottom:10px">
+          <span>${debutLbl}</span><span style="font-size:9px;color:#cbd5e1">🟡 temps  🟠 budget</span><span>${finLbl}</span>
+        </div>
+        <div class="plancom-stats">
+          <div class="plancom-stat"><div class="lb">Budget total</div><div class="vl">${fmtEuroRaw(totBud)}</div></div>
+          <div class="plancom-stat"><div class="lb">Dépensé</div><div class="vl">${fmtEuroRaw(totDep)}</div></div>
+          <div class="plancom-stat"><div class="lb">Restant</div><div class="vl">${fmtEuroRaw(restant)}</div></div>
+        </div>
+      </div>
+      <div class="plancom-right">
+        <div>
+          <div style="font-size:10px;color:#94a3b8;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.04em">Leviers</div>
+          <div>${chips}</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:#94a3b8;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.04em">Rythme branding</div>
+          <div style="font-size:13px;font-weight:700;color:${rythmeColor}">${rythmeIcon} ${rythmeLabel}</div>
+          <div style="font-size:10px;color:#94a3b8;margin-top:2px">${pctCons.toFixed(0)}% budget · ${pctTemps.toFixed(0)}% période</div>
+        </div>
+      </div>
     </div>
   </div>`;
 }
@@ -477,10 +553,8 @@ function renderBrandingBlock(selMois) {
 
   const debut = active[0].periodeDebut;
   const fin   = active[0].periodeFin;
-  const [dm, dy] = debut.split('/');
-  const [fm, fy] = fin.split('/');
-  const debutLbl = MONTH_NAMES[parseInt(dm)] + ' ' + dy.slice(2);
-  const finLbl   = MONTH_NAMES[parseInt(fm)] + ' ' + fy.slice(2);
+  const debutLbl = fmtDateCourt(debut);
+  const finLbl   = fmtDateCourt(fin);
 
   // Grouper par plateforme
   const byPlat = {};
@@ -674,6 +748,17 @@ function kpiCard(label, valHtml, deltaM1, deltaA1, m1Label, a1Label, invertDelta
 }
 
 // ═══════════════════════════════════════════════
+// STATUS CHIP (Statut vs prorata M-1)
+// ═══════════════════════════════════════════════
+function statusChip(actual, expected) {
+  if (actual == null || !actual || expected == null || !expected) return '<span class="na">—</span>';
+  const ratio = actual / expected * 100;
+  if (ratio >= 90) return `<span class="statut-chip ok">✓</span>`;
+  if (ratio >= 70) return `<span class="statut-chip warn">~</span>`;
+  return `<span class="statut-chip bad">✗</span>`;
+}
+
+// ═══════════════════════════════════════════════
 // TABLE FUSIONNÉE (cat-rows + levier-rows + total)
 // ═══════════════════════════════════════════════
 function buildTable(cur, m1, a1, pro, metricKey, metricLabel, m1Label, a1Label) {
@@ -683,10 +768,11 @@ function buildTable(cur, m1, a1, pro, metricKey, metricLabel, m1Label, a1Label) 
       <th class="group" colspan="5">Dépenses</th>
       <th class="group" colspan="3">${metricLabel}</th>
       <th class="group" colspan="3">CPA ${metricLabel}</th>
+      <th rowspan="2" style="text-align:center">Statut</th>
     </tr>
     <tr>
-      <th>Budget</th><th>Actuel</th><th>%</th><th>vs ${a1Label}</th><th>vs ${m1Label}</th>
-      <th>Actuel</th><th>vs ${a1Label}</th><th>vs ${m1Label}</th>
+      <th>Budget</th><th>Actuel</th><th>%</th><th>vs ${a1Label}</th><th class="pre-sep">vs ${m1Label}</th>
+      <th>Actuel</th><th>vs ${a1Label}</th><th class="pre-sep">vs ${m1Label}</th>
       <th>Actuel</th><th>vs ${a1Label}</th><th>vs ${m1Label}</th>
     </tr>
   </thead>`;
@@ -710,13 +796,14 @@ function buildTable(cur, m1, a1, pro, metricKey, metricLabel, m1Label, a1Label) 
       <td class="act">${isOrg ? '<span class="na">—</span>' : fmtEuro(cd.depenses)}</td>
       <td>${isOrg ? '<span class="na">—</span>' : fmtPct(cd.depenses, cd.budget)}</td>
       <td>${isOrg ? '' : fmtDelta(pctDelta(cd.depenses, pro(ad.depenses)))}</td>
-      <td>${isOrg ? '' : fmtDelta(pctDelta(cd.depenses, pro(md.depenses)))}</td>
+      <td class="pre-sep">${isOrg ? '' : fmtDelta(pctDelta(cd.depenses, pro(md.depenses)))}</td>
       <td class="sep act">${fmtK(val)}</td>
       <td>${fmtDelta(pctDelta(val, pro(aVal)))}</td>
-      <td>${fmtDelta(pctDelta(val, pro(mVal)))}</td>
+      <td class="pre-sep">${fmtDelta(pctDelta(val, pro(mVal)))}</td>
       <td class="sep act">${isOrg ? '<span class="na">—</span>' : fmtEuroCpa(curCpa)}</td>
       <td>${isOrg ? '' : fmtDelta(pctDelta(curCpa, aCpa), true)}</td>
       <td>${isOrg ? '' : fmtDelta(pctDelta(curCpa, mCpa), true)}</td>
+      <td style="text-align:center">${statusChip(val, pro(mVal))}</td>
     </tr>`;
 
     const canals = Object.entries(cur.byCan).filter(([, d]) => d.categorie === cat);
@@ -735,13 +822,14 @@ function buildTable(cur, m1, a1, pro, metricKey, metricLabel, m1Label, a1Label) 
         <td class="act">${isOrg ? '<span class="na">—</span>' : fmtEuro(lcd.depenses)}</td>
         <td>${isOrg ? '<span class="na">—</span>' : fmtPct(lcd.depenses, lcd.budget)}</td>
         <td>${isOrg ? '' : fmtDelta(pctDelta(lcd.depenses, pro(lad.depenses)))}</td>
-        <td>${isOrg ? '' : fmtDelta(pctDelta(lcd.depenses, pro(lmd.depenses)))}</td>
+        <td class="pre-sep">${isOrg ? '' : fmtDelta(pctDelta(lcd.depenses, pro(lmd.depenses)))}</td>
         <td class="sep act">${fmtK(lVal)}</td>
         <td>${fmtDelta(pctDelta(lVal, pro(laVal)))}</td>
-        <td>${fmtDelta(pctDelta(lVal, pro(lmVal)))}</td>
+        <td class="pre-sep">${fmtDelta(pctDelta(lVal, pro(lmVal)))}</td>
         <td class="sep act">${isOrg ? '<span class="na">—</span>' : fmtEuroCpa(lCurCpa)}</td>
         <td>${isOrg ? '' : fmtDelta(pctDelta(lCurCpa, laCpa), true)}</td>
         <td>${isOrg ? '' : fmtDelta(pctDelta(lCurCpa, lmCpa), true)}</td>
+        <td style="text-align:center">${statusChip(lVal, pro(lmVal))}</td>
       </tr>`;
     }
   }
@@ -761,13 +849,14 @@ function buildTable(cur, m1, a1, pro, metricKey, metricLabel, m1Label, a1Label) 
     <td class="act">${fmtEuro(tc.depenses)}</td>
     <td>${fmtPct(tc.depenses, tc.budget)}</td>
     <td>${fmtDelta(pctDelta(tc.depenses, pro(ta1.depenses)))}</td>
-    <td>${fmtDelta(pctDelta(tc.depenses, pro(tm1.depenses)))}</td>
+    <td class="pre-sep">${fmtDelta(pctDelta(tc.depenses, pro(tm1.depenses)))}</td>
     <td class="sep act">${fmtK(totMetric)}</td>
     <td>${fmtDelta(pctDelta(totMetric, pro(a1TotMetric)))}</td>
-    <td>${fmtDelta(pctDelta(totMetric, pro(m1TotMetric)))}</td>
+    <td class="pre-sep">${fmtDelta(pctDelta(totMetric, pro(m1TotMetric)))}</td>
     <td class="sep act">${fmtEuroCpa(totCpa2)}</td>
     <td>${fmtDelta(pctDelta(totCpa2, a1TotCpa2), true)}</td>
     <td>${fmtDelta(pctDelta(totCpa2, m1TotCpa2), true)}</td>
+    <td style="text-align:center">${statusChip(totMetric, pro(m1TotMetric))}</td>
   </tr>`;
 
   return `${toggleBar()}<div class="table-wrap"><table>${COLGROUP}${theadHtml}<tbody>${rows}</tbody></table></div>`;
