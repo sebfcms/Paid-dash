@@ -58,19 +58,23 @@
     .section-title::after { content: ''; flex: 1; height: 1px; background: #e2e8f0; }
 
     .table-wrap { background: white; border-radius: 10px; border: 1px solid #e2e8f0; overflow: auto; margin-bottom: 20px; }
-    table { width: 100%; border-collapse: collapse; min-width: 760px; }
-    thead th { background: #f8fafc; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #64748b; padding: 8px 10px; text-align: right; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+    table { width: 100%; border-collapse: collapse; min-width: 840px; table-layout: fixed; }
+    thead th { background: #f8fafc; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #64748b; padding: 7px 8px; text-align: right; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
     thead th.left { text-align: left; }
     thead th.group { background: #f1f5f9; text-align: center; color: #475569; border-left: 1px solid #e2e8f0; }
-    tbody td { padding: 8px 10px; text-align: right; border-bottom: 1px solid #f8fafc; font-size: 12px; }
+    tbody td { padding: 6px 8px; text-align: right; border-bottom: 1px solid #f8fafc; font-size: 11px; }
     tbody td.left { text-align: left; }
     tbody tr:last-child td { border-bottom: none; }
     tbody tr:hover { background: #f8fafc; }
     .cat-row td { background: #f1f5f9; font-weight: 700; font-size: 11px; color: #374151; border-top: 1px solid #e2e8f0; }
+    /* Colonnes Actuel (3, 7, 10) mises en avant */
+    .table-wrap table tbody td:nth-child(3),
+    .table-wrap table tbody td:nth-child(7),
+    .table-wrap table tbody td:nth-child(10) { font-size: 13px; font-weight: 700; color: #0f172a; }
     .na { color: #d1d5db; }
-    .delta-up { color: #16a34a; font-weight: 600; font-size: 11px; }
-    .delta-down { color: #dc2626; font-weight: 600; font-size: 11px; }
-    .delta-neu { color: #9ca3af; font-weight: 600; font-size: 11px; }
+    .delta-up { color: #16a34a; font-weight: 600; font-size: 10px; }
+    .delta-down { color: #dc2626; font-weight: 600; font-size: 10px; }
+    .delta-neu { color: #9ca3af; font-weight: 600; font-size: 10px; }
 
     .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .chart-card { background: white; border-radius: 10px; padding: 18px; border: 1px solid #e2e8f0; }
@@ -95,10 +99,52 @@
     .mnav-btn:disabled { opacity: 0.25; cursor: default; }
     .mnav-label { font-size: 13px; font-weight: 700; color: #1e293b; min-width: 130px; text-align: center; }
     .mnav-tag { font-size: 10px; color: #94a3b8; font-weight: 500; }
+
+    /* ── Sidebar contextuelle ── */
+    .app-layout { display: flex; align-items: flex-start; }
+    .app-main { flex: 1; min-width: 0; overflow: hidden; }
+    .sidebar {
+      width: 220px; flex-shrink: 0; background: white;
+      border-left: 1px solid #e2e8f0;
+      position: sticky; top: 0; align-self: flex-start;
+      max-height: calc(100vh - 116px); overflow-y: auto;
+    }
+    .sidebar-hdr {
+      padding: 10px 14px; border-bottom: 1px solid #e2e8f0;
+      display: flex; flex-direction: column; gap: 1px;
+      position: sticky; top: 0; background: white; z-index: 1;
+    }
+    .sidebar-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #94a3b8; }
+    .sidebar-mois { font-size: 12px; font-weight: 700; color: #0f172a; }
+    .sidebar-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
+    .sidebar-empty { font-size: 11px; color: #94a3b8; text-align: center; padding: 16px 0; line-height: 1.6; }
+    .ctx-item { border-left: 3px solid #bfdbfe; padding: 4px 0 4px 10px; }
+    .ctx-item.alerte   { border-color: #fca5a5; }
+    .ctx-item.produit  { border-color: #6ee7b7; }
+    .ctx-item.marche   { border-color: #c4b5fd; }
+    .ctx-item.resultat { border-color: #fcd34d; }
+    .ctx-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #3b82f6; }
+    .ctx-item.alerte .ctx-lbl   { color: #dc2626; }
+    .ctx-item.produit .ctx-lbl  { color: #059669; }
+    .ctx-item.marche .ctx-lbl   { color: #7c3aed; }
+    .ctx-item.resultat .ctx-lbl { color: #d97706; }
+    .ctx-titre  { font-size: 11px; font-weight: 600; color: #0f172a; line-height: 1.35; margin-top: 2px; }
+    .ctx-detail { font-size: 10px; color: #64748b; margin-top: 3px; line-height: 1.45; }
+    .sidebar-hint { font-size: 9px; color: #94a3b8; padding: 10px 14px; border-top: 1px solid #f1f5f9; line-height: 1.5; }
+
     @media (max-width: 900px) {
       .kpi-grid { grid-template-columns: repeat(3, 1fr); }
       .charts-grid { grid-template-columns: 1fr; }
       .chart-card.full { grid-column: 1; }
+    }
+    @media (max-width: 768px) {
+      .app-layout { flex-direction: column; }
+      .sidebar {
+        width: 100%; border-left: none; border-top: 1px solid #e2e8f0;
+        position: static; max-height: none; overflow-y: visible;
+      }
+      .sidebar-body { flex-direction: row; flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+      .ctx-item { min-width: 140px; flex: 1; }
     }
     @media (max-width: 600px) {
       .kpi-grid { grid-template-columns: repeat(2, 1fr); }
@@ -171,11 +217,26 @@
     <button class="mnav-btn" id="mnav-next" onclick="navMonth(1)">&#8250;</button>
     <span class="mnav-tag" id="mnav-tag"></span>
   </div>
-  <div class="content">
-    <div id="tab-mois" class="tab-panel active"></div>
-    <div id="tab-evol" class="tab-panel"></div>
-    <div id="tab-alertistes" class="tab-panel"></div>
-    <div id="tab-cv" class="tab-panel"></div>
+  <!-- Layout avec sidebar droite -->
+  <div class="app-layout">
+    <div class="app-main">
+      <div class="content">
+        <div id="tab-mois" class="tab-panel active"></div>
+        <div id="tab-evol" class="tab-panel"></div>
+        <div id="tab-alertistes" class="tab-panel"></div>
+        <div id="tab-cv" class="tab-panel"></div>
+      </div>
+    </div>
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-hdr">
+        <div class="sidebar-lbl">Contexte du mois</div>
+        <div class="sidebar-mois" id="sidebar-mois"></div>
+      </div>
+      <div class="sidebar-body" id="sidebar-body">
+        <div class="sidebar-empty">Chargement…</div>
+      </div>
+      <div class="sidebar-hint">Alimenté par l'onglet <em>Contexte</em> de votre Sheet.<br>Colonnes : Mois · Type · Titre · Détail</div>
+    </div>
   </div>
 </div>
 
@@ -190,10 +251,11 @@ let _idToken = null;
 function handleCredentialResponse(response) {
   const token = response.credential;
 
-  // Décodage du JWT (partie payload, base64url)
+  // Décodage du JWT — UTF-8 correct (accents préservés)
   try {
     const b64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-    const payload = JSON.parse(atob(b64));
+    const payload = JSON.parse(decodeURIComponent(atob(b64).split('').map(c =>
+      '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
     const email      = payload.email       || '';
     const name       = payload.name        || '';
     const givenName  = payload.given_name  || name;
@@ -233,7 +295,6 @@ function handleCredentialResponse(response) {
 
 function signOut() {
   _idToken = null;
-  // Réinitialiser l'état GIS et réafficher l'écran de login
   if (window.google && google.accounts) {
     google.accounts.id.disableAutoSelect();
   }
@@ -248,6 +309,14 @@ function signOut() {
 const MONTH_NAMES = ['','Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
 const MONTH_FULL  = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 
+// Colgroup partagé → colonnes identiques dans les deux tableaux
+const COLGROUP = `<colgroup>
+  <col style="width:160px">
+  <col style="width:65px"><col style="width:70px"><col style="width:46px"><col style="width:60px"><col style="width:60px">
+  <col style="width:65px"><col style="width:60px"><col style="width:60px">
+  <col style="width:70px"><col style="width:62px"><col style="width:62px">
+</colgroup>`;
+
 const CAT_COLORS = {
   'SEA':          '#2563eb',
   'Agrégateurs':  '#f97316',
@@ -259,7 +328,7 @@ const CAT_COLORS = {
 
 function parseVal(str) {
   if (!str) return null;
-  const s = str.replace(/[€]/g,'').replace(/[ \s]/g,'').replace(',','.');
+  const s = str.replace(/[€]/g,'').replace(/[ \s]/g,'').replace(',','.');
   if (!s || s === '\\-' || s === '-') return null;
   const v = parseFloat(s);
   return isNaN(v) ? null : v;
@@ -424,7 +493,7 @@ function renderMois(rows, curMois, pctElapsed, m1Mois, a1Mois, daysElapsed) {
     </thead>`;
 
   const CAT_ORDER = ['SEA','Agrégateurs','Retargeting','Social','Affiliation','Organic'];
-  html += `<div class="section-title">Par catégorie</div><div class="table-wrap"><table>${theadHtml}<tbody>`;
+  html += `<div class="section-title">Par catégorie</div><div class="table-wrap"><table>${COLGROUP}${theadHtml}<tbody>`;
   for (const cat of CAT_ORDER) {
     const cd = cur.byCat[cat]; if (!cd) continue;
     const md = m1.byCat[cat]  || {};
@@ -451,7 +520,7 @@ function renderMois(rows, curMois, pctElapsed, m1Mois, a1Mois, daysElapsed) {
   }
   html += '</tbody></table></div>';
 
-  html += `<div class="section-title">Par levier</div><div class="table-wrap"><table>${theadHtml}<tbody>`;
+  html += `<div class="section-title">Par levier</div><div class="table-wrap"><table>${COLGROUP}${theadHtml}<tbody>`;
   for (const cat of CAT_ORDER) {
     const canals = Object.entries(cur.byCan).filter(([, d]) => d.categorie === cat);
     if (!canals.length) continue;
@@ -489,8 +558,8 @@ function kpiCard(label, valHtml, deltaM1, deltaA1, m1Label, a1Label, invertDelta
     <div class="kpi-value">${valHtml}</div>
     ${extraHtml}
     <div class="kpi-compare">
-      <div class="kpi-compare-line"><span>vs ${a1Label} proraté</span>${fmtDelta(deltaA1, invertDelta)}</div>
-      <div class="kpi-compare-line"><span>vs ${m1Label} proraté</span>${fmtDelta(deltaM1, invertDelta)}</div>
+      <div class="kpi-compare-line"><span>vs ${a1Label}</span>${fmtDelta(deltaA1, invertDelta)}</div>
+      <div class="kpi-compare-line"><span>vs ${m1Label}</span>${fmtDelta(deltaM1, invertDelta)}</div>
     </div>
   </div>`;
 }
@@ -550,7 +619,7 @@ function renderConvTab(rows, tabId, metricKey, metricLabel, curMois, pctElapsed,
 
   const CAT_ORDER = ['SEA','Agrégateurs','Retargeting','Social','Affiliation','Organic'];
 
-  html += `<div class="section-title">Par catégorie</div><div class="table-wrap"><table>${theadHtml}<tbody>`;
+  html += `<div class="section-title">Par catégorie</div><div class="table-wrap"><table>${COLGROUP}${theadHtml}<tbody>`;
   for (const cat of CAT_ORDER) {
     const cd = cur.byCat[cat]; if (!cd) continue;
     const md = m1.byCat[cat]  || {};
@@ -580,7 +649,7 @@ function renderConvTab(rows, tabId, metricKey, metricLabel, curMois, pctElapsed,
   }
   html += '</tbody></table></div>';
 
-  html += `<div class="section-title">Par levier</div><div class="table-wrap"><table>${theadHtml}<tbody>`;
+  html += `<div class="section-title">Par levier</div><div class="table-wrap"><table>${COLGROUP}${theadHtml}<tbody>`;
   for (const cat of CAT_ORDER) {
     const canals = Object.entries(cur.byCan).filter(([, d]) => d.categorie === cat);
     if (!canals.length) continue;
@@ -795,9 +864,38 @@ function renderEvol(rows, allMois) {
 }
 
 // ═══════════════════════════════════════════════
+// RENDER — SIDEBAR CONTEXTUELLE
+// ═══════════════════════════════════════════════
+function renderSidebar(mois) {
+  const [mm, yyyy] = mois.split('/');
+  document.getElementById('sidebar-mois').textContent =
+    `${MONTH_FULL[parseInt(mm)]} ${yyyy}`;
+
+  const TYPE_CLASS = {
+    'Alerte':'alerte', 'Levier':'', 'Produit':'produit',
+    'Marché':'marche', 'Résultat':'resultat'
+  };
+  const items = (_contexte || [])
+    .filter(c => c.mois === mois)
+    .sort((a, b) => (a.poids || 5) - (b.poids || 5));
+
+  const body = document.getElementById('sidebar-body');
+  if (!items.length) {
+    body.innerHTML = `<div class="sidebar-empty">Aucun événement.<br>Ajoutez des lignes dans l'onglet <em>Contexte</em>.</div>`;
+    return;
+  }
+  body.innerHTML = items.map(item => `
+    <div class="ctx-item ${TYPE_CLASS[item.type] ?? ''}">
+      <div class="ctx-lbl">${item.type}</div>
+      <div class="ctx-titre">${item.titre}</div>
+      ${item.detail ? `<div class="ctx-detail">${item.detail}</div>` : ''}
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════
 // MONTH NAVIGATION STATE
 // ═══════════════════════════════════════════════
-let _rows = null, _allMois = null, _selMoisIdx = 0;
+let _rows = null, _allMois = null, _selMoisIdx = 0, _contexte = [];
 
 function navMonth(dir) {
   const next = _selMoisIdx + dir;
@@ -837,6 +935,7 @@ function renderDetailTabs(rows, allMois, selMois) {
   renderMois(rows, selMois, pctElapsed, m1Mois, a1Mois, daysElapsed);
   renderConvTab(rows, 'tab-alertistes', 'alertiste', 'Alertistes', selMois, pctElapsed, m1Mois, a1Mois, daysElapsed);
   renderConvTab(rows, 'tab-cv', 'cv', 'CV déposés', selMois, pctElapsed, m1Mois, a1Mois, daysElapsed);
+  renderSidebar(selMois);
 }
 
 // ═══════════════════════════════════════════════
@@ -848,10 +947,11 @@ async function main() {
   try {
     const res = await fetch(APPS_SCRIPT_URL);
     if (!res.ok) throw new Error('Erreur HTTP ' + res.status);
-    const { rows, error } = await res.json();
+    const { rows, error, contexte } = await res.json();
     if (error) throw new Error(error);
     if (!rows || !rows.length) throw new Error('Aucune donnée — vérifier la structure du fichier.');
 
+    _contexte = contexte || [];
     const allMois = sortMois([...new Set(rows.map(r => r.mois))]);
     _rows = rows; _allMois = allMois; _selMoisIdx = allMois.length - 1;
 
