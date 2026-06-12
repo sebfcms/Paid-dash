@@ -1,30 +1,38 @@
 <!DOCTYPE html>
-<script type="application/json" id="cowork-artifact-meta">
-{
-  "name": "Dashboard Paid Perf",
-  "schemaVersion": 1,
-  "description": "Dashboard paid performance mensuel — mois en cours vs M-1 et A-1 proratés (par catégorie et par levier), + graphes 13+ mois glissants (Rdm, Spend, CPA). Données lues en direct depuis Google Sheets.",
-  "mcpTools": [
-    "mcp__3e12f7bb-d3ca-458e-ba92-633473393c64__read_file_content"
-  ],
-  "mcpServerNames": [
-    "Google Drive"
-  ]
-}
-</script>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Paid Performance</title>
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async></script>
   <style>
     :root { color-scheme: light; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f1f5f9; color: #1e293b; font-size: 13px; }
 
+    /* ── Login screen ── */
+    #login-screen {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; gap: 24px;
+    }
+    .login-card {
+      background: white; border-radius: 16px; border: 1px solid #e2e8f0;
+      padding: 40px 48px; text-align: center; max-width: 380px; width: 90%;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+    .login-logo { font-size: 32px; margin-bottom: 4px; }
+    .login-title { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
+    .login-sub { font-size: 12px; color: #94a3b8; margin-bottom: 28px; }
+    .login-error { font-size: 12px; color: #dc2626; margin-top: 14px; min-height: 18px; }
+
+    /* ── Dashboard ── */
     .header { background: #1e293b; color: white; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
     .header-title { font-size: 16px; font-weight: 700; }
     .header-meta { font-size: 11px; color: #94a3b8; margin-top: 3px; }
+    .header-user { font-size: 11px; color: #94a3b8; text-align: right; }
+    .btn-signout { background: none; border: 1px solid #475569; color: #94a3b8; border-radius: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer; margin-top: 4px; }
+    .btn-signout:hover { border-color: #94a3b8; color: #cbd5e1; }
 
     .tabs { background: white; border-bottom: 2px solid #e2e8f0; padding: 0 24px; display: flex; gap: 2px; }
     .tab { padding: 11px 18px; cursor: pointer; font-size: 13px; font-weight: 500; color: #64748b; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; user-select: none; }
@@ -76,7 +84,6 @@
 
     .prorate-note { font-size: 10px; color: #94a3b8; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 12px; margin-bottom: 16px; display: inline-block; }
 
-
     .month-nav { background: white; border-bottom: 1px solid #e2e8f0; padding: 7px 24px; display: flex; align-items: center; gap: 10px; }
     .month-nav.hidden { display: none; }
     .mnav-btn { background: none; border: 1px solid #e2e8f0; border-radius: 6px; width: 28px; height: 28px; cursor: pointer; font-size: 16px; color: #475569; display: flex; align-items: center; justify-content: center; transition: background 0.15s; line-height: 1; }
@@ -96,7 +103,38 @@
 </head>
 <body>
 
-<div id="loading" class="loading">
+<!-- ══════════════════════════════════════════
+     ÉCRAN DE CONNEXION
+════════════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">📊</div>
+    <div class="login-title">Dashboard Paid Performance</div>
+    <div class="login-sub">Accès réservé aux comptes @figarocms.fr</div>
+
+    <!-- Bouton Google Sign-In -->
+    <div id="g_id_onload"
+      data-client_id="616034106773-pefm7p7kc60kng9orj7vtlqvp8lu5m2d.apps.googleusercontent.com"
+      data-callback="handleCredentialResponse"
+      data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin"
+      data-type="standard"
+      data-size="large"
+      data-theme="outline"
+      data-text="signin_with"
+      data-shape="rectangular"
+      data-locale="fr">
+    </div>
+
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     DASHBOARD (masqué jusqu'à connexion)
+════════════════════════════════════════════ -->
+<div id="loading" class="loading" style="display:none">
   <div class="spinner"></div>
   <div>Chargement des données…</div>
 </div>
@@ -105,6 +143,10 @@
     <div>
       <div class="header-title" id="hdr-title">Dashboard Paid Performance</div>
       <div class="header-meta" id="hdr-meta"></div>
+    </div>
+    <div class="header-user">
+      <div id="hdr-email"></div>
+      <button class="btn-signout" onclick="signOut()">Déconnexion</button>
     </div>
   </div>
   <div class="tabs">
@@ -130,6 +172,50 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
 <script>
 // ═══════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════
+const CLIENT_ID = '616034106773-pefm7p7kc60kng9orj7vtlqvp8lu5m2d.apps.googleusercontent.com';
+let _idToken = null;
+
+function handleCredentialResponse(response) {
+  const token = response.credential;
+
+  // Décodage du JWT (partie payload, base64url)
+  try {
+    const b64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(atob(b64));
+    const email = payload.email || '';
+
+    if (!email.endsWith('@figarocms.fr')) {
+      document.getElementById('login-error').textContent =
+        `Accès refusé : ${email} n'est pas un compte @figarocms.fr`;
+      return;
+    }
+
+    // OK → stocker le token et lancer le dashboard
+    _idToken = token;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('loading').style.display = 'flex';
+    document.getElementById('hdr-email').textContent = email;
+    main();
+
+  } catch(e) {
+    document.getElementById('login-error').textContent = 'Erreur de connexion : ' + e.message;
+  }
+}
+
+function signOut() {
+  _idToken = null;
+  // Réinitialiser l'état GIS et réafficher l'écran de login
+  if (window.google && google.accounts) {
+    google.accounts.id.disableAutoSelect();
+  }
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-error').textContent = '';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+// ═══════════════════════════════════════════════
 // UTILS
 // ═══════════════════════════════════════════════
 const MONTH_NAMES = ['','Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
@@ -146,7 +232,7 @@ const CAT_COLORS = {
 
 function parseVal(str) {
   if (!str) return null;
-  const s = str.replace(/[€]/g,'').replace(/[    ]/g,'').replace(',','.');
+  const s = str.replace(/[€]/g,'').replace(/[ \s]/g,'').replace(',','.');
   if (!s || s === '\\-' || s === '-') return null;
   const v = parseFloat(s);
   return isNaN(v) ? null : v;
@@ -167,8 +253,6 @@ function fmtEuroCpa(v) {
   return new Intl.NumberFormat('fr-FR', { style:'currency', currency:'EUR', maximumFractionDigits:2, minimumFractionDigits:2 }).format(v);
 }
 
-// For metrics where higher = better (Rdm, Dépenses in context = not necessarily, but for comparisons we keep neutral)
-// For CPA: lower is better → invert sign
 function fmtDelta(pct, invert=false) {
   if (pct == null) return '<span class="delta-neu">—</span>';
   const effective = invert ? -pct : pct;
@@ -200,36 +284,6 @@ function sortMois(arr) {
     const [mb, yb] = b.split('/');
     return (parseInt(ya)*12+parseInt(ma)) - (parseInt(yb)*12+parseInt(mb));
   });
-}
-
-// ═══════════════════════════════════════════════
-// PARSE TABLE 1 (lines 0-169 of the sheet content)
-// ═══════════════════════════════════════════════
-function parseTable1(content) {
-  const lines = content.split('\n');
-  const rows = [];
-  for (let i = 0; i < Math.min(lines.length, 171); i++) {
-    const line = lines[i];
-    if (!line || !line.startsWith('|')) continue;
-    const cells = line.split('|').slice(1, -1).map(c => c.trim());
-    if (cells.length < 9) continue;
-    if (!cells[0].match(/^\d{2}\/\d{4}$/)) continue;
-    const [mm, yyyy] = cells[0].split('/');
-    rows.push({
-      mois:      cells[0],
-      month:     parseInt(mm),
-      year:      parseInt(yyyy),
-      categorie: cells[1],
-      canal:     cells[2],
-      budget:    parseVal(cells[4]),
-      depenses:  parseVal(cells[5]),
-      rdm:       parseVal(cells[6]),
-      alertiste: parseVal(cells[7]),
-      cv:        parseVal(cells[8]),
-      cpaRdm:    parseVal(cells[9]),
-    });
-  }
-  return rows;
 }
 
 // ═══════════════════════════════════════════════
@@ -297,7 +351,7 @@ function renderMois(rows, curMois, pctElapsed, m1Mois, a1Mois, daysElapsed) {
   const m1  = aggregate(rows, m1Mois);
   const a1  = aggregate(rows, a1Mois);
 
-  const pro = v => v != null ? v * pctElapsed : null; // prorate ref to elapsed days
+  const pro = v => v != null ? v * pctElapsed : null;
 
   const [cmm]  = curMois.split('/');
   const [m1mm, m1yy] = m1Mois.split('/');
@@ -305,7 +359,6 @@ function renderMois(rows, curMois, pctElapsed, m1Mois, a1Mois, daysElapsed) {
   const m1Label = MONTH_NAMES[parseInt(m1mm)] + ' ' + m1yy.slice(2);
   const a1Label = MONTH_NAMES[parseInt(a1mm)] + ' ' + a1yy.slice(2);
 
-  // ─── KPI cards
   const t = cur.total;
   const kpiDep  = t.depenses;
   const kpiRdm  = t.rdm;
@@ -328,7 +381,6 @@ function renderMois(rows, curMois, pctElapsed, m1Mois, a1Mois, daysElapsed) {
     ${kpiCard('CPA Rdm global', fmtEuroCpa(kpiCpa), pctDelta(kpiCpa, m1.total.cpa), pctDelta(kpiCpa, a1.total.cpa), m1Label, a1Label, true)}
   </div>`;
 
-  // ─── Tables (catégorie + levier)
   const theadHtml = `
     <thead>
       <tr>
@@ -344,7 +396,6 @@ function renderMois(rows, curMois, pctElapsed, m1Mois, a1Mois, daysElapsed) {
       </tr>
     </thead>`;
 
-  // ─── By catégorie
   const CAT_ORDER = ['SEA','Agrégateurs','Retargeting','Social','Affiliation','Organic'];
   html += `<div class="section-title">Par catégorie</div><div class="table-wrap"><table>${theadHtml}<tbody>`;
   for (const cat of CAT_ORDER) {
@@ -373,7 +424,6 @@ function renderMois(rows, curMois, pctElapsed, m1Mois, a1Mois, daysElapsed) {
   }
   html += '</tbody></table></div>';
 
-  // ─── By levier (grouped by cat)
   html += `<div class="section-title">Par levier</div><div class="table-wrap"><table>${theadHtml}<tbody>`;
   for (const cat of CAT_ORDER) {
     const canals = Object.entries(cur.byCan).filter(([, d]) => d.categorie === cat);
@@ -473,7 +523,6 @@ function renderConvTab(rows, tabId, metricKey, metricLabel, curMois, pctElapsed,
 
   const CAT_ORDER = ['SEA','Agrégateurs','Retargeting','Social','Affiliation','Organic'];
 
-  // By catégorie
   html += `<div class="section-title">Par catégorie</div><div class="table-wrap"><table>${theadHtml}<tbody>`;
   for (const cat of CAT_ORDER) {
     const cd = cur.byCat[cat]; if (!cd) continue;
@@ -504,7 +553,6 @@ function renderConvTab(rows, tabId, metricKey, metricLabel, curMois, pctElapsed,
   }
   html += '</tbody></table></div>';
 
-  // By levier
   html += `<div class="section-title">Par levier</div><div class="table-wrap"><table>${theadHtml}<tbody>`;
   for (const cat of CAT_ORDER) {
     const canals = Object.entries(cur.byCan).filter(([, d]) => d.categorie === cat);
@@ -545,7 +593,6 @@ function renderConvTab(rows, tabId, metricKey, metricLabel, curMois, pctElapsed,
 // RENDER — ÉVOLUTION
 // ═══════════════════════════════════════════════
 function renderEvol(rows, allMois) {
-  // 13 mois glissants (mois en cours inclus)
   const months = allMois.slice(-13);
 
   const labels = months.map(m => {
@@ -558,7 +605,6 @@ function renderEvol(rows, allMois) {
   const rdmData   = totals.map(t => t.rdm       || 0);
   const cpaData   = totals.map(t => t.cpa);
 
-  // Per-category spend
   const CAT_ORDER = ['SEA','Agrégateurs','Retargeting','Social','Affiliation'];
   const catDatasets = CAT_ORDER.map(cat => ({
     label: cat,
@@ -600,7 +646,6 @@ function renderEvol(rows, allMois) {
   const base   = { responsive: true, maintainAspectRatio: false, animation: false,
                    plugins: { legend: { display: false }, tooltip: { bodyFont: { size: 11 }, titleFont: { size: 11 } } } };
 
-  // CPA by category (multi-line)
   const cpaCatDatasets = CAT_ORDER.filter(c => c !== 'Social').map(cat => {
     const color = CAT_COLORS[cat] || '#94a3b8';
     return {
@@ -631,7 +676,6 @@ function renderEvol(rows, allMois) {
     }
   });
 
-  // Stacked by cat
   new Chart(document.getElementById('chart-cat'), {
     type: 'bar',
     data: { labels, datasets: catDatasets },
@@ -647,7 +691,6 @@ function renderEvol(rows, allMois) {
     }
   });
 
-  // Plugin : % SEA / Agrégateurs / Organic sur les barres empilées
   const pctLabelPlugin = {
     id: 'pctLabel',
     afterDatasetsDraw(chart) {
@@ -681,7 +724,6 @@ function renderEvol(rows, allMois) {
   };
   Chart.register(pctLabelPlugin);
 
-  // Helper: stacked conv chart by category
   function makeConvStackedDatasets(metricKey) {
     const convOrder = ['SEA','Agrégateurs','Retargeting','Social','Affiliation','Organic'];
     return convOrder.map(cat => ({
@@ -725,7 +767,6 @@ function renderEvol(rows, allMois) {
   });
 }
 
-
 // ═══════════════════════════════════════════════
 // MONTH NAVIGATION STATE
 // ═══════════════════════════════════════════════
@@ -753,14 +794,12 @@ function renderDetailTabs(rows, allMois, selMois) {
   const m1Mois = `${String(m1m).padStart(2,'0')}/${m1y}`;
   const a1Mois = `${String(smm).padStart(2,'0')}/${parseInt(syyy)-1}`;
 
-  // Header
   document.getElementById('hdr-title').textContent =
     `Dashboard Paid — ${MONTH_FULL[parseInt(smm)]} ${syyy}`;
   document.getElementById('hdr-meta').textContent = isCurrent
     ? `J${daysElapsed}/${totalDays} (${(pctElapsed*100).toFixed(0)}% du mois) · Données au ${today.toLocaleDateString('fr-FR')} · Comparatifs proratés sur ${daysElapsed} jours`
     : `Mois complet · ${totalDays} jours · Bilan définitif`;
 
-  // Nav bar
   document.getElementById('mnav-label').textContent =
     `${MONTH_FULL[parseInt(smm)]} ${syyy}`;
   document.getElementById('mnav-tag').textContent =
@@ -774,28 +813,22 @@ function renderDetailTabs(rows, allMois, selMois) {
 }
 
 // ═══════════════════════════════════════════════
-// MAIN
+// MAIN — appelé après connexion réussie
 // ═══════════════════════════════════════════════
-
-// ⚠️ Remplace cette URL par celle générée lors du déploiement Apps Script
-const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/figarocms.fr/s/AKfycbxc64I1H3_zc30tLuaTMizABbPJ8fNFCVw3nfdJGYZES01IBCAN4KGK5gPkq0JDN0_PJg/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygHAciNYReephVxDHJr_QwkO92BA9MmLXY6h-zlJ5UUe7Ypfom4O6aahKCWmOQEqz64g/exec';
 
 async function main() {
   try {
-    const res = await fetch(APPS_SCRIPT_URL);
+    // Passe le token Google en paramètre → Apps Script valide côté serveur
+    const url = APPS_SCRIPT_URL + '?token=' + encodeURIComponent(_idToken);
+    const res = await fetch(url);
     if (!res.ok) throw new Error('Erreur HTTP ' + res.status);
     const { rows, error } = await res.json();
     if (error) throw new Error(error);
-
     if (!rows || !rows.length) throw new Error('Aucune donnée — vérifier la structure du fichier.');
 
-    // Determine months in data
     const allMois = sortMois([...new Set(rows.map(r => r.mois))]);
-
-    // Init global state — default to latest month
-    _rows = rows;
-    _allMois = allMois;
-    _selMoisIdx = allMois.length - 1;
+    _rows = rows; _allMois = allMois; _selMoisIdx = allMois.length - 1;
 
     renderDetailTabs(rows, allMois, allMois[_selMoisIdx]);
     renderEvol(rows, allMois);
@@ -808,8 +841,7 @@ async function main() {
       `<div class="error">⚠️ Erreur : ${e.message}<br><small>${e.stack||''}</small></div>`;
   }
 }
-
-main();
+// NOTE: main() n'est plus appelé au chargement — il est déclenché par handleCredentialResponse()
 </script>
 </body>
 </html>
