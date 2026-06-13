@@ -775,7 +775,7 @@ function renderBudgetBlocks(t, pctElapsed) {
       <div class="bb-label">Budget acquisition restant</div>
       <div class="bb-bar-wrap"><div class="bb-bar-fill" style="width:${Math.min(pctDep,100).toFixed(1)}%;background:${barColor}"></div></div>
       <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#64748b">
-        <span>${pctDep.toFixed(0)}% consommé</span>${restantHtml}
+        <span><strong>Budget ${fmtEuroRaw(bud)} ·</strong> ${pctDep.toFixed(0)}% consommé</span>${restantHtml}
       </div>
       ${projDep ? `<div style="font-size:10px;color:#94a3b8;margin-top:5px">Projeté fin de mois : ${fmtEuroRaw(projDep)} sur ${fmtEuroRaw(bud)}</div>` : ''}
     </div>
@@ -1025,7 +1025,7 @@ function renderMois(rows, curMois, pctElapsed, m1Mois, a1Mois, daysElapsed, work
     ${kpiCard('Dépenses', fmtEuro(t.depenses),
         pctDelta(t.depenses, pro(m1.total.depenses)), pctDelta(t.depenses, pro(a1.total.depenses)),
         m1Label, a1Label, false,
-        t.budget > 0 ? `<div style="font-size:11px;color:#64748b;margin:5px 0 2px">Budget <strong>${fmtEuro(t.budget)}</strong> · ${fmtPct(t.depenses, t.budget)} dépensé</div>` : '',
+        '',
         pj(projDep, fmtEuro))}
     ${kpiCard('Rdm (candidatures)', fmtK(t.rdm),
         pctDelta(t.rdm, pro(m1.total.rdm)), pctDelta(t.rdm, pro(a1.total.rdm)),
