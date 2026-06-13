@@ -161,14 +161,13 @@
     .statut-chip.warn { background: #fef9c3; color: #a16207; }
     .statut-chip.bad  { background: #fee2e2; color: #b91c1c; }
     /* ── Freshness chip ── */
-    .fr-chip { display:flex; align-items:center; gap:5px; font-size:11px; font-weight:500; padding:4px 10px; border-radius:6px; border:0.5px solid #fde68a; background:#fffbeb; color:#92400e; cursor:default; position:relative; white-space:nowrap; }
-    .fr-chip.fr-ok   { border-color:#bbf7d0; background:#f0fdf4; color:#15803d; }
-    .fr-chip.fr-alert { border-color:#fca5a5; background:#fff1f2; color:#991b1b; }
-    .fr-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; display:inline-block; }
+    .fr-chip { display:flex; align-items:center; gap:5px; font-size:11px; font-weight:400; padding:3px 10px; border-radius:6px; border:0.5px solid #e2e8f0; background:white; color:#374151; cursor:default; position:relative; white-space:nowrap; line-height:1.4; }
+    .fr-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; display:inline-block; vertical-align:middle; }
     .fr-dot-ok   { background:#16a34a; }
     .fr-dot-warn { background:#f59e0b; }
     .fr-dot-err  { background:#dc2626; }
-    .fr-tooltip { display:none; position:absolute; top:calc(100% + 6px); right:0; width:260px; background:white; border:0.5px solid #e2e8f0; border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,.12); z-index:100; overflow:hidden; font-weight:400; }
+    .fr-sep-pipe { color:#d1d5db; margin:0 5px; font-weight:300; }
+    .fr-tooltip { display:none; position:absolute; top:calc(100% + 6px); right:0; width:270px; background:white; border:0.5px solid #e2e8f0; border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,.12); z-index:100; overflow:hidden; font-weight:400; }
     .fr-chip:hover .fr-tooltip { display:block; }
     .fr-tooltip-row { display:flex; align-items:center; justify-content:space-between; padding:7px 12px; border-bottom:1px solid #f1f5f9; font-size:11px; color:#374151; }
     .fr-tooltip-row:last-child { border-bottom:none; }
@@ -264,8 +263,7 @@
     <div class="tab" data-tab="evol" onclick="switchTab('evol')">📈 Évolution mensuelle</div>
     <div style="flex:1"></div>
     <div id="freshness-chip" class="fr-chip" style="display:none;margin:auto 12px auto 0">
-      <span id="freshness-dot" class="fr-dot"></span>
-      <span id="freshness-label"></span>
+      <span id="freshness-inner"></span>
       <div id="freshness-tooltip" class="fr-tooltip"></div>
     </div>
   </div>
@@ -1371,10 +1369,11 @@ function renderFreshnessChip(selMois) {
   if (!chip) return;
 
   const MOIS_SHORT = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
-  const fmtDay = s => { const d = parseExactDate(s); return d ? `${d.getDate()} ${MOIS_SHORT[d.getMonth()]}` : (s || '—'); };
+  const fmtDay    = s => { const d = parseExactDate(s); return d ? `${d.getDate()} ${MOIS_SHORT[d.getMonth()]}` : (s || '—'); };
   const fmtDaysLbl = days => days === null ? '—' : days === 0 ? "aujourd'hui" : days === 1 ? 'hier' : `il y a ${days}j`;
+  const dot = cls => `<span class="fr-dot ${cls}"></span>`;
 
-  // ── Acquisition : derniereMAJ par canal pour le mois sélectionné ──
+  // ── Acquisition ──
   const acqByCanal = {};
   for (const r of (_rows || [])) {
     if (r.mois !== selMois || !r.derniereMAJ) continue;
@@ -1385,12 +1384,11 @@ function renderFreshnessChip(selMois) {
   }
   const acqStatuses = Object.entries(acqByCanal).map(([label, info]) => {
     const days = daysSince(info.str);
-    // Acquisition : données attendues J-1 ou J → seuils serrés
     const status = days === null ? 'na' : days <= 1 ? 'ok' : days <= 2 ? 'warn' : 'err';
     return { label, days, str: info.str, status };
   });
 
-  // ── Branding : derniereMAJ par plateforme (PlanCom) ──
+  // ── Branding ──
   const byPlat = {};
   for (const r of (_plancom || [])) {
     if (!r.derniereMAJ) continue;
@@ -1401,37 +1399,47 @@ function renderFreshnessChip(selMois) {
   }
   const brandStatuses = Object.entries(byPlat).map(([label, info]) => {
     const days = daysSince(info.str);
-    // Branding : données mise à jour moins fréquemment → seuils plus larges
     const status = days === null ? 'na' : days <= 3 ? 'ok' : days <= 7 ? 'warn' : 'err';
     return { label, days, str: info.str, status };
   });
 
-  const hasAcq   = acqStatuses.length > 0;
-  const hasBrand = brandStatuses.length > 0;
+  // ── Helper : construit le bloc de dots pour une section ──
+  function sectionInner(statuses, label) {
+    const ok   = statuses.filter(s => s.status === 'ok').length;
+    const warn = statuses.filter(s => s.status === 'warn').length;
+    const err  = statuses.filter(s => s.status === 'err').length;
+    let html = `${dot('fr-dot-ok')} <span style="color:#374151;font-weight:500">${label}</span> <span style="color:#94a3b8">(${ok})</span>`;
+    if (warn > 0) html += ` <span style="color:#d1d5db">·</span> ${dot('fr-dot-warn')} <span style="color:#94a3b8">(${warn})</span>`;
+    if (err  > 0) html += ` <span style="color:#d1d5db">·</span> ${dot('fr-dot-err')} <span style="color:#94a3b8">(${err})</span>`;
+    return html;
+  }
 
-  const rank = { ok: 0, na: 0, warn: 1, err: 2 };
-  const allStatuses = [...acqStatuses, ...brandStatuses];
-  const worst = allStatuses.length
-    ? allStatuses.reduce((w, s) => rank[s.status] >= rank[w.status] ? s : w, allStatuses[0])
-    : { status: 'na' };
-
-  const dotCls  = worst.status === 'ok' ? 'fr-dot-ok' : worst.status === 'err' ? 'fr-dot-err' : 'fr-dot-warn';
-  const chipCls = worst.status === 'err' ? 'fr-alert' : worst.status === 'ok' ? 'fr-ok' : '';
-  const chipLabel = worst.status === 'ok' ? 'Données à jour' : worst.status === 'err' ? 'Données en retard' : worst.status === 'warn' ? 'Données récentes' : 'Dates non renseignées';
-
+  // ── Helper : tooltip rows ──
   const makeRows = statuses => statuses
     .sort((a, b) => (b.days ?? -1) - (a.days ?? -1))
     .map(s => {
       const dotC = s.status === 'ok' ? 'fr-dot-ok' : s.status === 'err' ? 'fr-dot-err' : 'fr-dot-warn';
       return `<div class="fr-tooltip-row">
-        <span style="display:flex;align-items:center;gap:5px"><span class="fr-dot ${dotC}" style="width:6px;height:6px;flex-shrink:0"></span>${s.label}</span>
+        <span style="display:flex;align-items:center;gap:5px">${dot(dotC)} ${s.label}</span>
         <span style="color:#94a3b8;white-space:nowrap">${fmtDay(s.str)} <em style="color:#cbd5e1">(${fmtDaysLbl(s.days)})</em></span>
       </div>`;
     }).join('');
 
+  const hasAcq   = acqStatuses.length > 0;
+  const hasBrand = brandStatuses.length > 0;
   const [smm] = (selMois || '').split('/');
   const moisLbl = smm ? MONTH_NAMES[parseInt(smm)] : '';
 
+  // ── Inner chip HTML ──
+  let innerHtml = '';
+  if (hasAcq)   innerHtml += sectionInner(acqStatuses, 'Acq.');
+  if (hasAcq && hasBrand) innerHtml += ` <span class="fr-sep-pipe">|</span> `;
+  if (hasBrand) innerHtml += sectionInner(brandStatuses, 'Bran.');
+  if (!hasAcq && !hasBrand) {
+    innerHtml = `${dot('fr-dot-warn')} <span style="color:#94a3b8;font-style:italic">MàJ non renseignées</span>`;
+  }
+
+  // ── Tooltip HTML ──
   let tooltipHtml = '';
   if (hasAcq) {
     tooltipHtml += `<div class="fr-tooltip-hdr">📈 Acquisition — ${moisLbl}</div>${makeRows(acqStatuses)}`;
@@ -1446,10 +1454,9 @@ function renderFreshnessChip(selMois) {
       <div class="fr-tooltip-row"><span style="color:#94a3b8;font-style:italic">Colonne MàJ non renseignée dans PlanCom</span></div>`;
   }
 
-  document.getElementById('freshness-dot').className    = `fr-dot ${dotCls}`;
-  document.getElementById('freshness-label').textContent = chipLabel;
+  document.getElementById('freshness-inner').innerHTML  = innerHtml;
   document.getElementById('freshness-tooltip').innerHTML = tooltipHtml;
-  chip.className   = `fr-chip ${chipCls}`;
+  chip.className     = 'fr-chip';
   chip.style.display = 'flex';
 }
 
