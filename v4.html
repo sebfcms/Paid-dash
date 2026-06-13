@@ -492,11 +492,18 @@ function fmtDateCourt(s) {
 
 // ── Plan de com strip (entre les blocs budget et le tableau) ──
 function renderPlanComStrip(selMois) {
-  const active = getActivePlanCom(selMois);
+  const active = _plancom && _plancom.length ? _plancom : [];
   if (!active.length) return '';
 
-  const debut = active[0].periodeDebut;
-  const fin   = active[0].periodeFin;
+  // Période globale : plus tôt debut → plus tard fin
+  const debut = active.reduce((min, r) => {
+    const d = parseExactDate(r.periodeDebut), m = parseExactDate(min);
+    return (d && (!m || d < m)) ? r.periodeDebut : min;
+  }, active[0].periodeDebut);
+  const fin = active.reduce((max, r) => {
+    const d = parseExactDate(r.periodeFin), m = parseExactDate(max);
+    return (d && (!m || d > m)) ? r.periodeFin : max;
+  }, active[0].periodeFin);
   const dStart = parseExactDate(debut);
   const dEnd   = parseExactDate(fin);
   const debutLbl = fmtDateCourt(debut);
@@ -571,11 +578,18 @@ function renderPlanComStrip(selMois) {
 
 // ── Bloc branding cumulatif (après le tableau) ──
 function renderBrandingBlock(selMois) {
-  const active = getActivePlanCom(selMois);
+  const active = _plancom && _plancom.length ? _plancom : [];
   if (!active.length) return '';
 
-  const debut = active[0].periodeDebut;
-  const fin   = active[0].periodeFin;
+  // Période globale
+  const debut = active.reduce((min, r) => {
+    const d = parseExactDate(r.periodeDebut), m = parseExactDate(min);
+    return (d && (!m || d < m)) ? r.periodeDebut : min;
+  }, active[0].periodeDebut);
+  const fin = active.reduce((max, r) => {
+    const d = parseExactDate(r.periodeFin), m = parseExactDate(max);
+    return (d && (!m || d > m)) ? r.periodeFin : max;
+  }, active[0].periodeFin);
   const debutLbl = fmtDateCourt(debut);
   const finLbl   = fmtDateCourt(fin);
 
@@ -682,10 +696,22 @@ function renderBrandingBlock(selMois) {
     <col style="width:68px"><col style="width:68px"><col style="width:68px"><col style="width:58px">
   </colgroup>`;
 
+  // Stocker les données pour les charts (initialisés après injection HTML)
+  const platColors = ['#2563eb','#16a34a','#f59e0b','#ef4444','#a855f7','#14b8a6','#f97316','#06b6d4'];
+  const platLabels  = Object.keys(byPlat);
+  _brandingChartData = {
+    labels:   platLabels,
+    depenses: platLabels.map(p => byPlat[p].depense),
+    reaches:  platLabels.map(p => byPlat[p].reach),
+    restant:  Math.max(totBud - totDep, 0),
+    totBud, totDep,
+    colors:   platLabels.map((_, i) => platColors[i % platColors.length]),
+  };
+
   return `<div class="branding-wrap">
     <div class="branding-hdr">
       <div class="branding-title">📊 Branding — Cumul ${debutLbl} → ${finLbl}</div>
-      <span class="plancom-period">Plan de com actif</span>
+      <span class="plancom-period">Campagne globale</span>
     </div>
     <div class="table-wrap">
       <table style="width:auto">${colgroup}
@@ -705,7 +731,17 @@ function renderBrandingBlock(selMois) {
         <tbody>${rows}</tbody>
       </table>
     </div>
-    <div class="branding-note">Reach total inter-plateformes non cumulable · CPM = Dépensé ÷ Impressions × 1 000 · Coût/k reach = Dépensé ÷ Reach × 1 000 · CPC = Dépensé ÷ Clics · TrueView = vues YouTube ≥ 30s</div>
+    <div style="display:flex;gap:20px;padding:14px 18px 16px;border-top:1px solid #fde68a;background:#fffbeb;flex-wrap:wrap">
+      <div style="flex-shrink:0">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#92400e;margin-bottom:8px">Budget campagne</div>
+        <div style="position:relative;width:140px;height:140px"><canvas id="chart-brand-donut"></canvas></div>
+      </div>
+      <div style="flex:1;min-width:180px">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#92400e;margin-bottom:8px">Reach par plateforme</div>
+        <div style="position:relative;height:140px"><canvas id="chart-brand-bar"></canvas></div>
+      </div>
+    </div>
+    <div class="branding-note">Reach inter-plateformes non cumulable · CPM = Dépensé ÷ Impressions × 1 000 · Coût/k reach = Dépensé ÷ Reach × 1 000 · CPC = Dépensé ÷ Clics · TrueView = vues YouTube ≥ 30s</div>
   </div>`;
 }
 
@@ -1021,6 +1057,7 @@ function renderMois(rows, curMois, pctElapsed, m1Mois, a1Mois, daysElapsed, work
   html += renderBrandingBlock(curMois);
 
   document.getElementById('tab-mois').innerHTML = html;
+  initBrandingCharts();
 }
 
 // ═══════════════════════════════════════════════
@@ -1201,6 +1238,7 @@ function renderSidebar(mois) {
 // NAVIGATION MOIS
 // ═══════════════════════════════════════════════
 let _rows=null, _allMois=null, _selMoisIdx=0, _contexte=[], _plancom=[];
+let _chartBrandingDonut=null, _chartBrandingBar=null, _brandingChartData=null;
 
 function navMonth(dir) {
   const next = _selMoisIdx + dir;
@@ -1244,6 +1282,77 @@ function renderDetailTabs(rows, allMois, selMois) {
   renderConvTab(rows, 'tab-alertistes', 'alertiste', 'Alertistes', selMois, pctElapsed, m1Mois, a1Mois, daysElapsed, workingDaysElapsed);
   renderConvTab(rows, 'tab-cv', 'cv', 'CV déposés', selMois, pctElapsed, m1Mois, a1Mois, daysElapsed, workingDaysElapsed);
   renderSidebar(selMois);
+  renderFreshnessChip(selMois);
+}
+
+// ═══════════════════════════════════════════════
+// BRANDING CHARTS (donut + barres horizontales)
+// ═══════════════════════════════════════════════
+function initBrandingCharts() {
+  if (_chartBrandingDonut) { _chartBrandingDonut.destroy(); _chartBrandingDonut = null; }
+  if (_chartBrandingBar)   { _chartBrandingBar.destroy();   _chartBrandingBar   = null; }
+  if (!_brandingChartData) return;
+  const donutEl = document.getElementById('chart-brand-donut');
+  const barEl   = document.getElementById('chart-brand-bar');
+  if (!donutEl || !barEl) return;
+
+  const { labels, depenses, reaches, restant, totBud, totDep, colors } = _brandingChartData;
+
+  const fmtEurCompact = v =>
+    new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(v);
+
+  // Donut : dépensé par plateforme + restant
+  _chartBrandingDonut = new Chart(donutEl, {
+    type: 'doughnut',
+    data: {
+      labels: [...labels, 'Restant'],
+      datasets: [{ data: [...depenses, restant],
+        backgroundColor: [...colors, '#e2e8f0'], borderWidth: 0, hoverOffset: 4 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false, cutout: '62%',
+      plugins: {
+        legend: { display: true, position: 'bottom',
+          labels: { font: { size: 9 }, boxWidth: 8, padding: 8,
+            generateLabels: chart => chart.data.labels.map((l, i) => ({
+              text: l, fillStyle: chart.data.datasets[0].backgroundColor[i],
+              fontColor: '#64748b', borderRadius: 3,
+            }))
+          }
+        },
+        tooltip: { bodyFont: { size: 11 },
+          callbacks: { label: ctx => ` ${fmtEurCompact(ctx.parsed)}` }
+        }
+      }
+    }
+  });
+
+  // Barres horizontales : reach par plateforme
+  _chartBrandingBar = new Chart(barEl, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{ data: reaches,
+        backgroundColor: colors.map(c => c + 'bb'), borderColor: colors,
+        borderWidth: 1, borderRadius: 3 }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { bodyFont: { size: 11 },
+          callbacks: { label: ctx => ` ${new Intl.NumberFormat('fr-FR').format(ctx.parsed.x)}` }
+        }
+      },
+      scales: {
+        x: { grid: { color: '#f1f5f9' }, border: { display: false },
+          ticks: { font: { size: 9 }, color: '#94a3b8',
+            callback: v => new Intl.NumberFormat('fr-FR',{notation:'compact'}).format(v) } },
+        y: { grid: { display: false }, border: { display: false },
+          ticks: { font: { size: 10 }, color: '#374151' } }
+      }
+    }
+  });
 }
 
 // ═══════════════════════════════════════════════
@@ -1257,55 +1366,90 @@ function daysSince(dateStr) {
   return Math.floor((today - d) / 86400000);
 }
 
-function renderFreshnessChip() {
+function renderFreshnessChip(selMois) {
   const chip = document.getElementById('freshness-chip');
-  if (!_plancom || !_plancom.length) { chip.style.display = 'none'; return; }
+  if (!chip) return;
 
-  // Une entrée par plateforme (la plus récente si plusieurs)
+  const MOIS_SHORT = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
+  const fmtDay = s => { const d = parseExactDate(s); return d ? `${d.getDate()} ${MOIS_SHORT[d.getMonth()]}` : (s || '—'); };
+  const fmtDaysLbl = days => days === null ? '—' : days === 0 ? "aujourd'hui" : days === 1 ? 'hier' : `il y a ${days}j`;
+
+  // ── Acquisition : derniereMAJ par canal pour le mois sélectionné ──
+  const acqByCanal = {};
+  for (const r of (_rows || [])) {
+    if (r.mois !== selMois || !r.derniereMAJ) continue;
+    const d = parseExactDate(r.derniereMAJ);
+    if (!d) continue;
+    if (!acqByCanal[r.canal] || d > acqByCanal[r.canal].date)
+      acqByCanal[r.canal] = { date: d, str: r.derniereMAJ };
+  }
+  const acqStatuses = Object.entries(acqByCanal).map(([label, info]) => {
+    const days = daysSince(info.str);
+    // Acquisition : données attendues J-1 ou J → seuils serrés
+    const status = days === null ? 'na' : days <= 1 ? 'ok' : days <= 2 ? 'warn' : 'err';
+    return { label, days, str: info.str, status };
+  });
+
+  // ── Branding : derniereMAJ par plateforme (PlanCom) ──
   const byPlat = {};
-  for (const r of _plancom) {
+  for (const r of (_plancom || [])) {
     if (!r.derniereMAJ) continue;
     const d = parseExactDate(r.derniereMAJ);
     if (!d) continue;
-    if (!byPlat[r.plateforme] || d > byPlat[r.plateforme].date) {
+    if (!byPlat[r.plateforme] || d > byPlat[r.plateforme].date)
       byPlat[r.plateforme] = { date: d, str: r.derniereMAJ };
-    }
   }
-  const statuses = Object.entries(byPlat).map(([plat, info]) => {
+  const brandStatuses = Object.entries(byPlat).map(([label, info]) => {
     const days = daysSince(info.str);
+    // Branding : données mise à jour moins fréquemment → seuils plus larges
     const status = days === null ? 'na' : days <= 3 ? 'ok' : days <= 7 ? 'warn' : 'err';
-    return { plat, days, str: info.str, status };
+    return { label, days, str: info.str, status };
   });
 
-  if (!statuses.length) { chip.style.display = 'none'; return; }
+  const hasAcq   = acqStatuses.length > 0;
+  const hasBrand = brandStatuses.length > 0;
 
-  const worst = statuses.reduce((w, s) => {
-    const rank = { ok:0, warn:1, err:2, na:0 };
-    return rank[s.status] > rank[w.status] ? s : w;
-  }, statuses[0]);
+  const rank = { ok: 0, na: 0, warn: 1, err: 2 };
+  const allStatuses = [...acqStatuses, ...brandStatuses];
+  const worst = allStatuses.length
+    ? allStatuses.reduce((w, s) => rank[s.status] >= rank[w.status] ? s : w, allStatuses[0])
+    : { status: 'na' };
 
-  const dotCls  = worst.status === 'ok' ? 'fr-dot-ok' : worst.status === 'warn' ? 'fr-dot-warn' : 'fr-dot-err';
+  const dotCls  = worst.status === 'ok' ? 'fr-dot-ok' : worst.status === 'err' ? 'fr-dot-err' : 'fr-dot-warn';
   const chipCls = worst.status === 'err' ? 'fr-alert' : worst.status === 'ok' ? 'fr-ok' : '';
-  const label   = worst.status === 'ok' ? 'Branding à jour' : worst.status === 'warn' ? 'Branding récent' : 'Branding en retard';
+  const chipLabel = worst.status === 'ok' ? 'Données à jour' : worst.status === 'err' ? 'Données en retard' : worst.status === 'warn' ? 'Données récentes' : 'Dates non renseignées';
 
-  const MOIS = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
-  const fmtDay = s => { const d = parseExactDate(s); return d ? `${d.getDate()} ${MOIS[d.getMonth()]}` : s; };
-  const tooltipRows = statuses
-    .sort((a, b) => (b.days || 0) - (a.days || 0))
+  const makeRows = statuses => statuses
+    .sort((a, b) => (b.days ?? -1) - (a.days ?? -1))
     .map(s => {
-      const dotC = s.status === 'ok' ? 'fr-dot-ok' : s.status === 'warn' ? 'fr-dot-warn' : 'fr-dot-err';
-      const daysLbl = s.days === null ? '—' : s.days === 0 ? 'aujourd\'hui' : `il y a ${s.days}j`;
+      const dotC = s.status === 'ok' ? 'fr-dot-ok' : s.status === 'err' ? 'fr-dot-err' : 'fr-dot-warn';
       return `<div class="fr-tooltip-row">
-        <span style="display:flex;align-items:center;gap:5px"><span class="fr-dot ${dotC}" style="width:6px;height:6px"></span>${s.plat}</span>
-        <span style="color:#94a3b8">${fmtDay(s.str)} <em style="color:#cbd5e1">(${daysLbl})</em></span>
+        <span style="display:flex;align-items:center;gap:5px"><span class="fr-dot ${dotC}" style="width:6px;height:6px;flex-shrink:0"></span>${s.label}</span>
+        <span style="color:#94a3b8;white-space:nowrap">${fmtDay(s.str)} <em style="color:#cbd5e1">(${fmtDaysLbl(s.days)})</em></span>
       </div>`;
     }).join('');
 
-  document.getElementById('freshness-dot').className   = `fr-dot ${dotCls}`;
-  document.getElementById('freshness-label').textContent = label;
-  document.getElementById('freshness-tooltip').innerHTML =
-    `<div class="fr-tooltip-hdr">Dernière MàJ branding</div>${tooltipRows}`;
-  chip.className = `fr-chip ${chipCls}`;
+  const [smm] = (selMois || '').split('/');
+  const moisLbl = smm ? MONTH_NAMES[parseInt(smm)] : '';
+
+  let tooltipHtml = '';
+  if (hasAcq) {
+    tooltipHtml += `<div class="fr-tooltip-hdr">📈 Acquisition — ${moisLbl}</div>${makeRows(acqStatuses)}`;
+  } else {
+    tooltipHtml += `<div class="fr-tooltip-hdr">📈 Acquisition — ${moisLbl}</div>
+      <div class="fr-tooltip-row"><span style="color:#94a3b8;font-style:italic">Colonne MàJ non renseignée dans le Sheet</span></div>`;
+  }
+  if (hasBrand) {
+    tooltipHtml += `<div class="fr-tooltip-hdr">📡 Branding</div>${makeRows(brandStatuses)}`;
+  } else if (_plancom && _plancom.length) {
+    tooltipHtml += `<div class="fr-tooltip-hdr">📡 Branding</div>
+      <div class="fr-tooltip-row"><span style="color:#94a3b8;font-style:italic">Colonne MàJ non renseignée dans PlanCom</span></div>`;
+  }
+
+  document.getElementById('freshness-dot').className    = `fr-dot ${dotCls}`;
+  document.getElementById('freshness-label').textContent = chipLabel;
+  document.getElementById('freshness-tooltip').innerHTML = tooltipHtml;
+  chip.className   = `fr-chip ${chipCls}`;
   chip.style.display = 'flex';
 }
 
@@ -1328,7 +1472,6 @@ async function main() {
     const allMois = sortMois([...new Set(rows.map(r => r.mois))]);
     _rows = rows; _allMois = allMois; _selMoisIdx = allMois.length-1;
 
-    renderFreshnessChip();
     renderDetailTabs(rows, allMois, allMois[_selMoisIdx]);
     renderEvol(rows, allMois);
 
