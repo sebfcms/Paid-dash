@@ -507,6 +507,14 @@ function renderPlanComStrip(selMois) {
   const debutLbl = fmtDateCourt(debut);
   const finLbl   = fmtDateCourt(fin);
 
+  // Ne pas afficher si le mois sélectionné est hors campagne
+  const gStart = parseExactDate(debut);
+  const gEnd   = parseExactDate(fin);
+  const [smm, syy] = selMois.split('/').map(Number);
+  const monthStart = new Date(syy, smm - 1, 1);
+  const monthEnd   = new Date(syy, smm, 0);
+  if (!gStart || !gEnd || gEnd < monthStart || gStart > monthEnd) return '';
+  
   const totBud  = active.reduce((s, r) => s + (r.budgetTotal   || 0), 0);
   const totDep  = active.reduce((s, r) => s + (r.budgetDepense || 0), 0);
   const restant = Math.max(totBud - totDep, 0);
@@ -591,6 +599,15 @@ function renderBrandingBlock(selMois) {
   const debutLbl = fmtDateCourt(debut);
   const finLbl   = fmtDateCourt(fin);
 
+// Ne pas afficher si le mois sélectionné est hors campagne
+const gStart = parseExactDate(debut);
+const gEnd   = parseExactDate(fin);
+const [smm, syy] = selMois.split('/').map(Number);
+const monthStart = new Date(syy, smm - 1, 1);
+const monthEnd   = new Date(syy, smm, 0);
+if (!gStart || !gEnd || gEnd < monthStart || gStart > monthEnd) return '';
+
+  
   // Grouper par plateforme
   const byPlat = {};
   for (const r of active) {
