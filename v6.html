@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Paid Performance - V5 - 16/06/2026</title>
+  <title>Dashboard Paid Performance · v1.7 · juin 2026</title>
   <script src="https://accounts.google.com/gsi/client" async></script>
   <style>
     :root { color-scheme: light; }
@@ -895,8 +895,16 @@ function aggregate(rows, mois) {
   const totAlrt = Object.values(byCat).reduce((s,c) => s + c.alertiste, 0);
   const totCv   = Object.values(byCat).reduce((s,c) => s + c.cv,        0);
   const totBud  = Object.values(byCat).reduce((s,c) => s + c.budget,    0);
+  // Leviers payants uniquement (budget > 0) → pour les CPA globaux
+  const paidCats  = Object.values(byCat).filter(c => c.budget > 0);
+  const paidDep   = paidCats.reduce((s,c) => s + c.depenses,  0);
+  const paidRdm   = paidCats.reduce((s,c) => s + c.rdm,       0);
+  const paidAlrt  = paidCats.reduce((s,c) => s + c.alertiste, 0);
+  const paidCv    = paidCats.reduce((s,c) => s + c.cv,        0);
   return {
-    total: { depenses:totDep, rdm:totRdm, alertiste:totAlrt, cv:totCv, budget:totBud, cpa:cpa(totDep,totRdm) },
+    total: { depenses:totDep, rdm:totRdm, alertiste:totAlrt, cv:totCv, budget:totBud,
+             cpa:cpa(paidDep,paidRdm), cpaAlrt:cpa(paidDep,paidAlrt), cpaCv:cpa(paidDep,paidCv) },
+    paid:  { depenses:paidDep, rdm:paidRdm, alertiste:paidAlrt, cv:paidCv },
     byCat, byCan
   };
 }
@@ -1022,9 +1030,10 @@ function buildTable(cur, m1, a1, pro, metricKey, metricLabel, m1Label, a1Label, 
   const totMetric    = tc[metricKey]  || 0;
   const m1TotMetric  = tm1[metricKey] || 0;
   const a1TotMetric  = ta1[metricKey] || 0;
-  const totCpa2   = cpa(tc.depenses,  totMetric);
-  const m1TotCpa2 = cpa(tm1.depenses, m1TotMetric);
-  const a1TotCpa2 = cpa(ta1.depenses, a1TotMetric);
+  // CPA total : leviers payants uniquement
+  const totCpa2   = cpa(cur.paid.depenses, cur.paid[metricKey]  || 0);
+  const m1TotCpa2 = cpa(m1.paid.depenses,  m1.paid[metricKey]  || 0);
+  const a1TotCpa2 = cpa(a1.paid.depenses,  a1.paid[metricKey]  || 0);
 
   rows += `<tr class="total-row">
     <td class="left">◉ Total acquisition</td>
@@ -1132,7 +1141,8 @@ function renderConvTab(rows, tabId, metricKey, metricLabel, curMois, pctElapsed,
 
   const kpiM   = cur.total[metricKey] || 0;
   const kpiDep = cur.total.depenses;
-  const kpiCpa = cpa(kpiDep, kpiM);
+  // CPA : dépenses et conversions payantes uniquement (budget > 0)
+  const kpiCpa = cpa(cur.paid.depenses, cur.paid[metricKey] || 0);
   const m1M    = m1.total[metricKey] || 0;
   const a1M    = a1.total[metricKey] || 0;
 
@@ -1158,7 +1168,8 @@ function renderConvTab(rows, tabId, metricKey, metricLabel, curMois, pctElapsed,
         pctDelta(kpiM, pro(m1M)), pctDelta(kpiM, pro(a1M)),
         m1Label, a1Label, false, '', pj(projM, fmtK))}
     ${kpiCard('CPA ' + metricLabel, fmtEuroCpa(kpiCpa),
-        pctDelta(kpiCpa, cpa(m1.total.depenses, m1M)), pctDelta(kpiCpa, cpa(a1.total.depenses, a1M)),
+        pctDelta(kpiCpa, cpa(m1.paid.depenses, m1.paid[metricKey] || 0)),
+        pctDelta(kpiCpa, cpa(a1.paid.depenses, a1.paid[metricKey] || 0)),
         m1Label, a1Label, true, '',
         projCpa != null ? `<div class="kpi-proj neutral">⟳ Projeté ${fmtEuroCpaRaw(projCpa)}</div>` : '')}
   </div>`;
