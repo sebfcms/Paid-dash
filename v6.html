@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Paid Performance · v1.7 · juin 2026</title>
+  <title>Dashboard Paid Performance · v1.8 · juin 2026</title>
   <script src="https://accounts.google.com/gsi/client" async></script>
   <style>
     :root { color-scheme: light; }
@@ -704,7 +704,6 @@ if (!gStart || !gEnd || gEnd < monthStart || gStart > monthEnd) return '';
     <td><span class="na">—</span></td>
   </tr>`;
 
-  // Proportions : plateforme 12% · 4 cols Budget 7% · 4 cols Reach 7% · 4 cols Engagement (dernière 6%)
   const colgroup = `<colgroup>
     <col style="width:12%">
     <col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:7%">
@@ -712,19 +711,7 @@ if (!gStart || !gEnd || gEnd < monthStart || gStart > monthEnd) return '';
     <col style="width:7%"><col style="width:7%"><col style="width:7%"><col style="width:6%">
   </colgroup>`;
 
-  // Stocker les données pour les charts (initialisés après injection HTML)
-  const platColors = ['#2563eb','#16a34a','#f59e0b','#ef4444','#a855f7','#14b8a6','#f97316','#06b6d4'];
-  const platLabels  = Object.keys(byPlat);
-  _brandingChartData = {
-    labels:   platLabels,
-    depenses: platLabels.map(p => byPlat[p].depense),
-    reaches:  platLabels.map(p => byPlat[p].reach),
-    restant:  Math.max(totBud - totDep, 0),
-    totBud, totDep,
-    colors:   platLabels.map((_, i) => platColors[i % platColors.length]),
-  };
-
-  // ── Mini KPIs branding ──
+  // Mini KPIs au-dessus du tableau
   const totRestant  = Math.max(totBud - totDep, 0);
   const totPctConso = totBud > 0 ? (totDep / totBud * 100).toFixed(0) : '—';
   const fmtImpK = v => v >= 1e6 ? (v/1e6).toFixed(2).replace('.',',') + ' M'
@@ -733,7 +720,6 @@ if (!gStart || !gEnd || gEnd < monthStart || gStart > monthEnd) return '';
   const kpiLbl   = `font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#92400e;opacity:.7;margin-bottom:3px`;
   const kpiVal   = `font-size:15px;font-weight:700;color:#78350f;line-height:1.1`;
   const kpiSub   = `font-size:10px;color:#92400e;opacity:.75;margin-top:1px`;
-
   const miniKpis = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 14px 10px;border-bottom:0.5px solid #fde68a;background:#fffbeb">
     <div style="${kpiStyle}">
       <div style="${kpiLbl}">Dépensé</div>
@@ -756,6 +742,18 @@ if (!gStart || !gEnd || gEnd < monthStart || gStart > monthEnd) return '';
       <div style="${kpiSub}">${totClics ? fmtK(totClics) + ' clics' : 'aucun clic'}</div>
     </div>
   </div>`;
+
+  // Stocker les données pour les charts (initialisés après injection HTML)
+  const platColors = ['#2563eb','#16a34a','#f59e0b','#ef4444','#a855f7','#14b8a6','#f97316','#06b6d4'];
+  const platLabels  = Object.keys(byPlat);
+  _brandingChartData = {
+    labels:   platLabels,
+    depenses: platLabels.map(p => byPlat[p].depense),
+    reaches:  platLabels.map(p => byPlat[p].reach),
+    restant:  Math.max(totBud - totDep, 0),
+    totBud, totDep,
+    colors:   platLabels.map((_, i) => platColors[i % platColors.length]),
+  };
 
   return `<div class="branding-wrap">
     <div class="branding-hdr">
@@ -824,8 +822,8 @@ function renderBudgetBlocks(t, pctElapsed) {
 
   return `<div style="margin-bottom:16px">
     <div style="display:flex;align-items:center;gap:7px;padding:0 2px 8px">
-      <i class="ti ti-chart-pie-2" style="font-size:14px;color:#64748b" aria-hidden="true"></i>
-      <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b">Intégration budgétaire</span>
+      <span style="font-size:14px" aria-hidden="true">🌤</span>
+      <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b">Météo budgétaire</span>
     </div>
     <div class="budget-blocks" style="margin-bottom:0">
     <div class="budget-block">
@@ -895,12 +893,12 @@ function aggregate(rows, mois) {
   const totAlrt = Object.values(byCat).reduce((s,c) => s + c.alertiste, 0);
   const totCv   = Object.values(byCat).reduce((s,c) => s + c.cv,        0);
   const totBud  = Object.values(byCat).reduce((s,c) => s + c.budget,    0);
-  // Leviers payants uniquement (budget > 0) → pour les CPA globaux
-  const paidCats  = Object.values(byCat).filter(c => c.budget > 0);
-  const paidDep   = paidCats.reduce((s,c) => s + c.depenses,  0);
-  const paidRdm   = paidCats.reduce((s,c) => s + c.rdm,       0);
-  const paidAlrt  = paidCats.reduce((s,c) => s + c.alertiste, 0);
-  const paidCv    = paidCats.reduce((s,c) => s + c.cv,        0);
+  // CPA : leviers payants uniquement (filtre au niveau ligne)
+  const paidRows = subset.filter(r => (r.budget ?? 0) > 0);
+  const paidDep  = paidRows.reduce((s,r) => s + (r.depenses  ?? 0), 0);
+  const paidRdm  = paidRows.reduce((s,r) => s + (r.rdm       ?? 0), 0);
+  const paidAlrt = paidRows.reduce((s,r) => s + (r.alertiste ?? 0), 0);
+  const paidCv   = paidRows.reduce((s,r) => s + (r.cv        ?? 0), 0);
   return {
     total: { depenses:totDep, rdm:totRdm, alertiste:totAlrt, cv:totCv, budget:totBud,
              cpa:cpa(paidDep,paidRdm), cpaAlrt:cpa(paidDep,paidAlrt), cpaCv:cpa(paidDep,paidCv) },
@@ -1031,9 +1029,9 @@ function buildTable(cur, m1, a1, pro, metricKey, metricLabel, m1Label, a1Label, 
   const m1TotMetric  = tm1[metricKey] || 0;
   const a1TotMetric  = ta1[metricKey] || 0;
   // CPA total : leviers payants uniquement
-  const totCpa2   = cpa(cur.paid.depenses, cur.paid[metricKey]  || 0);
-  const m1TotCpa2 = cpa(m1.paid.depenses,  m1.paid[metricKey]  || 0);
-  const a1TotCpa2 = cpa(a1.paid.depenses,  a1.paid[metricKey]  || 0);
+  const totCpa2   = cpa(cur.paid.depenses, cur.paid[metricKey] || 0);
+  const m1TotCpa2 = cpa(m1.paid.depenses,  m1.paid[metricKey] || 0);
+  const a1TotCpa2 = cpa(a1.paid.depenses,  a1.paid[metricKey] || 0);
 
   rows += `<tr class="total-row">
     <td class="left">◉ Total acquisition</td>
@@ -1141,7 +1139,6 @@ function renderConvTab(rows, tabId, metricKey, metricLabel, curMois, pctElapsed,
 
   const kpiM   = cur.total[metricKey] || 0;
   const kpiDep = cur.total.depenses;
-  // CPA : dépenses et conversions payantes uniquement (budget > 0)
   const kpiCpa = cpa(cur.paid.depenses, cur.paid[metricKey] || 0);
   const m1M    = m1.total[metricKey] || 0;
   const a1M    = a1.total[metricKey] || 0;
@@ -1168,8 +1165,7 @@ function renderConvTab(rows, tabId, metricKey, metricLabel, curMois, pctElapsed,
         pctDelta(kpiM, pro(m1M)), pctDelta(kpiM, pro(a1M)),
         m1Label, a1Label, false, '', pj(projM, fmtK))}
     ${kpiCard('CPA ' + metricLabel, fmtEuroCpa(kpiCpa),
-        pctDelta(kpiCpa, cpa(m1.paid.depenses, m1.paid[metricKey] || 0)),
-        pctDelta(kpiCpa, cpa(a1.paid.depenses, a1.paid[metricKey] || 0)),
+        pctDelta(kpiCpa, cpa(m1.paid.depenses, m1.paid[metricKey] || 0)), pctDelta(kpiCpa, cpa(a1.paid.depenses, a1.paid[metricKey] || 0)),
         m1Label, a1Label, true, '',
         projCpa != null ? `<div class="kpi-proj neutral">⟳ Projeté ${fmtEuroCpaRaw(projCpa)}</div>` : '')}
   </div>`;
