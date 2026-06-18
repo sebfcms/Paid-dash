@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Paid Performance · v1.8 · juin 2026</title>
+  <title>Dashboard Paid Performance · v1.9 · juin 2026</title>
   <script src="https://accounts.google.com/gsi/client" async></script>
   <style>
     :root { color-scheme: light; }
@@ -894,7 +894,7 @@ function aggregate(rows, mois) {
   const totCv   = Object.values(byCat).reduce((s,c) => s + c.cv,        0);
   const totBud  = Object.values(byCat).reduce((s,c) => s + c.budget,    0);
   // CPA : leviers payants uniquement (filtre au niveau ligne)
-  const paidRows = subset.filter(r => (r.budget ?? 0) > 0);
+  const paidRows = subset.filter(r => (r.depenses ?? 0) > 0);
   const paidDep  = paidRows.reduce((s,r) => s + (r.depenses  ?? 0), 0);
   const paidRdm  = paidRows.reduce((s,r) => s + (r.rdm       ?? 0), 0);
   const paidAlrt = paidRows.reduce((s,r) => s + (r.alertiste ?? 0), 0);
@@ -976,9 +976,20 @@ function buildTable(cur, m1, a1, pro, metricKey, metricLabel, m1Label, a1Label, 
     const val  = cd[metricKey] || 0;
     const mVal = md[metricKey] || 0;
     const aVal = ad[metricKey] || 0;
-    const curCpa = cpa(cd.depenses, val);
-    const mCpa   = cpa(md.depenses, mVal);
-    const aCpa   = cpa(ad.depenses, aVal);
+    // CPA catégorie : leviers avec dépenses réelles uniquement
+    const canals = Object.entries(cur.byCan).filter(([, d]) => d.categorie === cat);
+    const _catPd  = canals.filter(([,d])=>(d.depenses??0)>0);
+    const _catPdM1 = Object.entries(m1.byCan).filter(([,d])=>d.categorie===cat&&(d.depenses??0)>0);
+    const _catPdA1 = Object.entries(a1.byCan).filter(([,d])=>d.categorie===cat&&(d.depenses??0)>0);
+    const _cDep  = _catPd.reduce((s,[,d])=>s+d.depenses,0);
+    const _cVal  = _catPd.reduce((s,[,d])=>s+(d[metricKey]||0),0);
+    const _mDep  = _catPdM1.reduce((s,[,d])=>s+d.depenses,0);
+    const _mVal  = _catPdM1.reduce((s,[,d])=>s+(d[metricKey]||0),0);
+    const _aDep  = _catPdA1.reduce((s,[,d])=>s+d.depenses,0);
+    const _aVal  = _catPdA1.reduce((s,[,d])=>s+(d[metricKey]||0),0);
+    const curCpa = cpa(_cDep, _cVal);
+    const mCpa   = cpa(_mDep, _mVal);
+    const aCpa   = cpa(_aDep, _aVal);
     const dot = `<span class="cat-dot" style="background:${CAT_COLORS[cat]||'#94a3b8'}"></span>`;
 
     rows += `<tr class="cat-row">
@@ -996,7 +1007,6 @@ function buildTable(cur, m1, a1, pro, metricKey, metricLabel, m1Label, a1Label, 
       <td>${isOrg ? '' : fmtDelta(pctDelta(curCpa, mCpa), true)}</td>
     </tr>`;
 
-    const canals = Object.entries(cur.byCan).filter(([, d]) => d.categorie === cat);
     const color  = CAT_COLORS[cat] || '#94a3b8';
     for (const [canal, lcd] of canals) {
       const lmd = m1.byCan[canal] || {}, lad = a1.byCan[canal] || {};
