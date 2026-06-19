@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Paid Performance · v1.9 · juin 2026</title>
+  <title>Dashboard Paid Performance · v1.8 · juin 2026</title>
   <script src="https://accounts.google.com/gsi/client" async></script>
   <style>
     :root { color-scheme: light; }
@@ -894,7 +894,7 @@ function aggregate(rows, mois) {
   const totCv   = Object.values(byCat).reduce((s,c) => s + c.cv,        0);
   const totBud  = Object.values(byCat).reduce((s,c) => s + c.budget,    0);
   // CPA : leviers payants uniquement (filtre au niveau ligne)
-  const paidRows = subset.filter(r => (r.depenses ?? 0) > 0);
+  const paidRows = subset.filter(r => (r.budget ?? 0) > 0);
   const paidDep  = paidRows.reduce((s,r) => s + (r.depenses  ?? 0), 0);
   const paidRdm  = paidRows.reduce((s,r) => s + (r.rdm       ?? 0), 0);
   const paidAlrt = paidRows.reduce((s,r) => s + (r.alertiste ?? 0), 0);
@@ -976,20 +976,9 @@ function buildTable(cur, m1, a1, pro, metricKey, metricLabel, m1Label, a1Label, 
     const val  = cd[metricKey] || 0;
     const mVal = md[metricKey] || 0;
     const aVal = ad[metricKey] || 0;
-    // CPA catégorie : leviers avec dépenses réelles uniquement
-    const canals = Object.entries(cur.byCan).filter(([, d]) => d.categorie === cat);
-    const _catPd  = canals.filter(([,d])=>(d.depenses??0)>0);
-    const _catPdM1 = Object.entries(m1.byCan).filter(([,d])=>d.categorie===cat&&(d.depenses??0)>0);
-    const _catPdA1 = Object.entries(a1.byCan).filter(([,d])=>d.categorie===cat&&(d.depenses??0)>0);
-    const _cDep  = _catPd.reduce((s,[,d])=>s+d.depenses,0);
-    const _cVal  = _catPd.reduce((s,[,d])=>s+(d[metricKey]||0),0);
-    const _mDep  = _catPdM1.reduce((s,[,d])=>s+d.depenses,0);
-    const _mVal  = _catPdM1.reduce((s,[,d])=>s+(d[metricKey]||0),0);
-    const _aDep  = _catPdA1.reduce((s,[,d])=>s+d.depenses,0);
-    const _aVal  = _catPdA1.reduce((s,[,d])=>s+(d[metricKey]||0),0);
-    const curCpa = cpa(_cDep, _cVal);
-    const mCpa   = cpa(_mDep, _mVal);
-    const aCpa   = cpa(_aDep, _aVal);
+    const curCpa = cpa(cd.depenses, val);
+    const mCpa   = cpa(md.depenses, mVal);
+    const aCpa   = cpa(ad.depenses, aVal);
     const dot = `<span class="cat-dot" style="background:${CAT_COLORS[cat]||'#94a3b8'}"></span>`;
 
     rows += `<tr class="cat-row">
@@ -1007,6 +996,7 @@ function buildTable(cur, m1, a1, pro, metricKey, metricLabel, m1Label, a1Label, 
       <td>${isOrg ? '' : fmtDelta(pctDelta(curCpa, mCpa), true)}</td>
     </tr>`;
 
+    const canals = Object.entries(cur.byCan).filter(([, d]) => d.categorie === cat);
     const color  = CAT_COLORS[cat] || '#94a3b8';
     for (const [canal, lcd] of canals) {
       const lmd = m1.byCan[canal] || {}, lad = a1.byCan[canal] || {};
@@ -1310,7 +1300,7 @@ function renderSidebar(mois) {
 // ═══════════════════════════════════════════════
 // NAVIGATION MOIS
 // ═══════════════════════════════════════════════
-let _rows=null, _allMois=null, _selMoisIdx=0, _contexte=[], _plancom=[];
+let _rows=null, _allMois=null, _selMoisIdx=0, _contexte=[], _plancom=[], _config=[];
 let _chartBrandingDonut=null, _chartBrandingBar=null, _brandingChartData=null;
 
 function navMonth(dir) {
@@ -1449,10 +1439,23 @@ function renderFreshnessChip(selMois) {
   const fmtDaysLbl = days => days === null ? '—' : days === 0 ? "aujourd'hui" : days === 1 ? 'hier' : `il y a ${days}j`;
   const dot = cls => `<span class="fr-dot ${cls}"></span>`;
 
+  // ── Helper config : une plateforme est-elle active pour perf/branding ?
+  const isPerfActif = label => {
+    if (!_config.length) return true; // si pas de config, tout actif par défaut
+    const found = _config.find(c => c.plateforme.toLowerCase() === label.toLowerCase());
+    return found ? found.perfActif : true;
+  };
+  const isBrandingActif = label => {
+    if (!_config.length) return true;
+    const found = _config.find(c => c.plateforme.toLowerCase() === label.toLowerCase());
+    return found ? found.brandingActif : true;
+  };
+
   // ── Acquisition ──
   const acqByCanal = {};
   for (const r of (_rows || [])) {
     if (r.mois !== selMois || !r.derniereMAJ) continue;
+    if (!isPerfActif(r.canal)) continue; // plateforme pausée → ignorée
     const d = parseExactDate(r.derniereMAJ);
     if (!d) continue;
     if (!acqByCanal[r.canal] || d > acqByCanal[r.canal].date)
@@ -1468,6 +1471,7 @@ function renderFreshnessChip(selMois) {
   const byPlat = {};
   for (const r of (_plancom || [])) {
     if (!r.derniereMAJ) continue;
+    if (!isBrandingActif(r.plateforme)) continue; // plateforme pausée → ignorée
     const d = parseExactDate(r.derniereMAJ);
     if (!d) continue;
     if (!byPlat[r.plateforme] || d > byPlat[r.plateforme].date)
@@ -1545,12 +1549,13 @@ async function main() {
   try {
     const res = await fetch(APPS_SCRIPT_URL);
     if (!res.ok) throw new Error('Erreur HTTP ' + res.status);
-    const { rows, error, contexte, plancom } = await res.json();
+    const { rows, error, contexte, plancom, config } = await res.json();
     if (error) throw new Error(error);
     if (!rows || !rows.length) throw new Error('Aucune donnée — vérifier la structure du fichier.');
 
     _contexte = contexte || [];
     _plancom  = plancom  || [];
+    _config   = config   || [];
 
     const allMois = sortMois([...new Set(rows.map(r => r.mois))]);
     _rows = rows; _allMois = allMois; _selMoisIdx = allMois.length-1;
