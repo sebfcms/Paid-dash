@@ -893,8 +893,8 @@ function aggregate(rows, mois) {
   const totAlrt = Object.values(byCat).reduce((s,c) => s + c.alertiste, 0);
   const totCv   = Object.values(byCat).reduce((s,c) => s + c.cv,        0);
   const totBud  = Object.values(byCat).reduce((s,c) => s + c.budget,    0);
-  // CPA : leviers payants uniquement (filtre au niveau ligne)
-  const paidRows = subset.filter(r => (r.budget ?? 0) > 0);
+  // CPA : leviers payants = ceux avec des dépenses (budget peut être vide pour l'historique)
+  const paidRows = subset.filter(r => (r.depenses ?? 0) > 0);
   const paidDep  = paidRows.reduce((s,r) => s + (r.depenses  ?? 0), 0);
   const paidRdm  = paidRows.reduce((s,r) => s + (r.rdm       ?? 0), 0);
   const paidAlrt = paidRows.reduce((s,r) => s + (r.alertiste ?? 0), 0);
