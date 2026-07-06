@@ -1557,8 +1557,15 @@ async function main() {
     _plancom  = plancom  || [];
     _config   = config   || [];
 
-    const allMois = sortMois([...new Set(rows.map(r => r.mois))]);
-    _rows = rows; _allMois = allMois; _selMoisIdx = allMois.length-1;
+    const _today = new Date();
+    const todayMoisStr = `${String(_today.getMonth()+1).padStart(2,'0')}/${_today.getFullYear()}`;
+    const toKey = m => { const [mm,yy] = m.split('/'); return `${yy}-${mm}`; };
+    const todayKey = toKey(todayMoisStr);
+    // Filtrer les mois futurs (budget rempli à l'avance mais pas encore arrivés)
+    const allMois = sortMois([...new Set(rows.map(r => r.mois))]).filter(m => toKey(m) <= todayKey);
+    // Défaut = mois en cours, sinon dernier mois disponible
+    const curIdx = allMois.indexOf(todayMoisStr);
+    _rows = rows; _allMois = allMois; _selMoisIdx = curIdx >= 0 ? curIdx : allMois.length - 1;
 
     renderDetailTabs(rows, allMois, allMois[_selMoisIdx]);
     renderEvol(rows, allMois);
