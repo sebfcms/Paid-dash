@@ -1,570 +1,1564 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Paid Performance · v1.8 · juin 2026</title>
-  <script src="https://accounts.google.com/gsi/client" async></script>
-  <style>
-    :root { color-scheme: light; }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f1f5f9; color: #1e293b; font-size: 13px; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Paid Performance · v1.8 · juin 2026</title>
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #f1f5f9;
+        color: #1e293b;
+        font-size: 13px;
+      }
 
-    /* ── Login ── */
-    #login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 24px; }
-    .login-card { background: white; border-radius: 16px; border: 1px solid #e2e8f0; padding: 40px 48px; text-align: center; max-width: 380px; width: 90%; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
-    .login-logo { font-size: 32px; margin-bottom: 4px; }
-    .login-title { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
-    .login-sub { font-size: 12px; color: #94a3b8; margin-bottom: 28px; }
-    .login-error { font-size: 12px; color: #dc2626; margin-top: 14px; min-height: 18px; }
+      /* ── Login ── */
+      #login-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        gap: 24px;
+      }
+      .login-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        padding: 40px 48px;
+        text-align: center;
+        max-width: 380px;
+        width: 90%;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+      }
+      .login-logo {
+        font-size: 32px;
+        margin-bottom: 4px;
+      }
+      .login-title {
+        font-size: 18px;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 6px;
+      }
+      .login-sub {
+        font-size: 12px;
+        color: #94a3b8;
+        margin-bottom: 28px;
+      }
+      .login-error {
+        font-size: 12px;
+        color: #dc2626;
+        margin-top: 14px;
+        min-height: 18px;
+      }
 
-    /* ── Header ── */
-    .header { background: #1e293b; color: white; padding: 14px 48px; display: flex; align-items: center; justify-content: space-between; }
-    .header-title { font-size: 20px; font-weight: 800; }
-    .header-meta { font-size: 11px; color: #94a3b8; margin-top: 3px; }
-    .header-user { display: flex; align-items: center; gap: 12px; }
-    .user-info { display: flex; align-items: center; gap: 9px; }
-    .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #475569; object-fit: cover; }
-    .user-name { font-size: 12px; font-weight: 600; color: #e2e8f0; line-height: 1.2; }
-    .user-email { font-size: 10px; color: #94a3b8; line-height: 1.2; }
-    .btn-signout { background: none; border: 1px solid #475569; color: #94a3b8; border-radius: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer; }
-    .btn-signout:hover { border-color: #94a3b8; color: #cbd5e1; }
+      /* ── Header ── */
+      .header {
+        background: #1e293b;
+        color: white;
+        padding: 14px 48px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .header-title {
+        font-size: 20px;
+        font-weight: 800;
+      }
+      .header-user {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .user-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 2px solid #475569;
+        object-fit: cover;
+      }
+      .user-name {
+        font-size: 12px;
+        font-weight: 600;
+        color: #e2e8f0;
+        line-height: 1.2;
+      }
+      .user-email {
+        font-size: 10px;
+        color: #94a3b8;
+        line-height: 1.2;
+      }
+      .btn-signout {
+        background: none;
+        border: 1px solid #475569;
+        color: #94a3b8;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        cursor: pointer;
+      }
+      .btn-signout:hover {
+        border-color: #94a3b8;
+        color: #cbd5e1;
+      }
 
-    /* ── Tabs ── */
-    .tabs { background: white; border-bottom: 2px solid #e2e8f0; padding: 0 48px; display: flex; gap: 2px; }
-    .tab { padding: 11px 18px; cursor: pointer; font-size: 13px; font-weight: 500; color: #64748b; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; user-select: none; }
-    .tab.active { color: #2563eb; border-bottom-color: #2563eb; }
-    .tab:hover:not(.active) { color: #374151; background: #f8fafc; }
+      /* ── Tabs ── */
+      .tabs {
+        background: white;
+        border-bottom: 2px solid #e2e8f0;
+        padding: 0 48px;
+        display: flex;
+        gap: 2px;
+      }
+      .tab {
+        padding: 11px 18px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        color: #64748b;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+        transition: all 0.15s;
+        user-select: none;
+      }
+      .tab.active {
+        color: #2563eb;
+        border-bottom-color: #2563eb;
+      }
+      .tab:hover:not(.active) {
+        color: #374151;
+        background: #f8fafc;
+      }
 
-    /* ── Month nav ── */
-    .month-nav { background: white; border-bottom: 1px solid #e2e8f0; padding: 7px 48px; display: flex; align-items: center; gap: 10px; }
-    .month-nav.hidden { display: none; }
-    .mnav-btn { background: none; border: 1px solid #e2e8f0; border-radius: 6px; width: 28px; height: 28px; cursor: pointer; font-size: 16px; color: #475569; display: flex; align-items: center; justify-content: center; transition: background 0.15s; line-height: 1; }
-    .mnav-btn:hover:not(:disabled) { background: #f1f5f9; border-color: #cbd5e1; }
-    .mnav-btn:disabled { opacity: 0.25; cursor: default; }
-    .mnav-label { font-size: 13px; font-weight: 700; color: #1e293b; min-width: 130px; text-align: center; }
-    .mnav-tag { font-size: 10px; color: #94a3b8; font-weight: 500; }
+      /* ── Month nav ── */
+      .month-nav {
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 7px 48px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .month-nav.hidden {
+        display: none;
+      }
+      .mnav-btn {
+        background: none;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        width: 28px;
+        height: 28px;
+        cursor: pointer;
+        font-size: 16px;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s;
+        line-height: 1;
+      }
+      .mnav-btn:hover:not(:disabled) {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+      }
+      .mnav-btn:disabled {
+        opacity: 0.25;
+        cursor: default;
+      }
+      .mnav-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #1e293b;
+        min-width: 130px;
+        text-align: center;
+      }
+      .mnav-tag {
+        font-size: 10px;
+        color: #94a3b8;
+        font-weight: 500;
+      }
 
-    /* ── Layout avec sidebar ── */
-    .app-layout { display: flex; align-items: flex-start; background: #f1f5f9; }
-    .app-main { flex: 1; min-width: 0; overflow: hidden; }
-    .sidebar-outer {
-      flex-shrink: 0;
-      padding: 10px 16px 10px 0;
-      position: sticky; top: 0; align-self: flex-start;
-      max-height: calc(100vh - 120px); overflow-y: auto;
-    }
-    .sidebar {
-      width: 320px; background: white;
-      border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden;
-    }
-    .sidebar-hdr { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 1px; background: #f8fafc; }
-    .sidebar-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #94a3b8; }
-    .sidebar-mois { font-size: 14px; font-weight: 700; color: #0f172a; }
-    .sidebar-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; }
-    .sidebar-empty { font-size: 12px; color: #94a3b8; text-align: center; padding: 16px 0; line-height: 1.6; }
-    .ctx-item { border-left: 3px solid #bfdbfe; padding: 6px 0 6px 12px; }
-    .ctx-item.alerte   { border-color: #fca5a5; }
-    .ctx-item.produit  { border-color: #6ee7b7; }
-    .ctx-item.marche   { border-color: #c4b5fd; }
-    .ctx-item.resultat { border-color: #fcd34d; }
-    .ctx-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #3b82f6; }
-    .ctx-item.alerte .ctx-lbl   { color: #dc2626; }
-    .ctx-item.produit .ctx-lbl  { color: #059669; }
-    .ctx-item.marche .ctx-lbl   { color: #7c3aed; }
-    .ctx-item.resultat .ctx-lbl { color: #d97706; }
-    .ctx-titre  { font-size: 13px; font-weight: 600; color: #0f172a; line-height: 1.35; margin-top: 3px; }
-    .ctx-detail { font-size: 11px; color: #64748b; margin-top: 4px; line-height: 1.5; }
-    .sidebar-hint { font-size: 10px; color: #94a3b8; padding: 10px 16px; border-top: 1px solid #f1f5f9; line-height: 1.5; }
+      /* ── Period status bar (remplace hdr-meta + prorate-note) ── */
+      .period-status-bar {
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 6px 48px;
+      }
+      .period-status-bar.hidden {
+        display: none;
+      }
+      .period-status {
+        font-size: 11px;
+        font-weight: 500;
+      }
+      .period-status.current {
+        color: #1e40af;
+      }
+      .period-status.complete {
+        color: #166534;
+      }
 
-    /* ── Content ── */
-    .content { padding: 24px 16px 24px 48px; }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+      /* ── Layout avec sidebar ── */
+      .app-layout {
+        display: flex;
+        align-items: flex-start;
+        background: #f1f5f9;
+      }
+      .app-main {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+      }
+      .sidebar-outer {
+        flex-shrink: 0;
+        padding: 10px 16px 10px 0;
+        position: sticky;
+        top: 0;
+        align-self: flex-start;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+      }
+      .sidebar {
+        width: 320px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .sidebar-hdr {
+        padding: 10px 14px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        background: #f8fafc;
+      }
+      .sidebar-lbl {
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: #94a3b8;
+      }
+      .sidebar-mois {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0f172a;
+      }
+      .sidebar-body {
+        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .sidebar-empty {
+        font-size: 12px;
+        color: #94a3b8;
+        text-align: center;
+        padding: 16px 0;
+        line-height: 1.6;
+      }
+      .ctx-item {
+        border-left: 3px solid #bfdbfe;
+        padding: 6px 0 6px 12px;
+      }
+      .ctx-item.alerte {
+        border-color: #fca5a5;
+      }
+      .ctx-item.produit {
+        border-color: #6ee7b7;
+      }
+      .ctx-item.marche {
+        border-color: #c4b5fd;
+      }
+      .ctx-item.resultat {
+        border-color: #fcd34d;
+      }
+      .ctx-lbl {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #3b82f6;
+      }
+      .ctx-item.alerte .ctx-lbl {
+        color: #dc2626;
+      }
+      .ctx-item.produit .ctx-lbl {
+        color: #059669;
+      }
+      .ctx-item.marche .ctx-lbl {
+        color: #7c3aed;
+      }
+      .ctx-item.resultat .ctx-lbl {
+        color: #d97706;
+      }
+      .ctx-titre {
+        font-size: 13px;
+        font-weight: 600;
+        color: #0f172a;
+        line-height: 1.35;
+        margin-top: 3px;
+      }
+      .ctx-detail {
+        font-size: 11px;
+        color: #64748b;
+        margin-top: 4px;
+        line-height: 1.5;
+      }
+      .sidebar-hint {
+        font-size: 10px;
+        color: #94a3b8;
+        padding: 10px 16px;
+        border-top: 1px solid #f1f5f9;
+        line-height: 1.5;
+      }
 
-    /* ── KPI cards ── */
-    .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 16px; }
-    .kpi-card { background: white; border-radius: 10px; padding: 14px 16px; border: 1px solid #e2e8f0; }
-    .kpi-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #94a3b8; margin-bottom: 6px; }
-    .kpi-value { font-size: 20px; font-weight: 800; color: #0f172a; line-height: 1.1; }
-    .kpi-proj { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 8px; background: #f0fdf4; color: #166534; margin: 5px 0 3px; display: inline-block; }
-    .kpi-proj.neutral { background: #f1f5f9; color: #475569; }
-    .kpi-compare { margin-top: 8px; display: flex; flex-direction: column; gap: 3px; }
-    .kpi-compare-line { display: flex; align-items: center; justify-content: space-between; font-size: 10px; color: #64748b; }
+      /* ── Content ── */
+      .content {
+        padding: 24px 16px 24px 48px;
+      }
+      .tab-panel {
+        display: none;
+      }
+      .tab-panel.active {
+        display: block;
+      }
 
-    /* ── Budget blocks ── */
-    .budget-blocks { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-    .budget-block { background: white; border-radius: 10px; border: 1px solid #e2e8f0; padding: 13px 16px; }
-    .bb-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #94a3b8; margin-bottom: 7px; }
-    .bb-bar-wrap { background: #f1f5f9; border-radius: 4px; height: 6px; margin: 0 0 5px; overflow: hidden; }
-    .bb-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+      /* ── KPI cards ── */
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .kpi-card {
+        background: white;
+        border-radius: 10px;
+        padding: 14px 16px;
+        border: 1px solid #e2e8f0;
+      }
+      .kpi-label {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #94a3b8;
+        margin-bottom: 6px;
+      }
+      .kpi-value {
+        font-size: 20px;
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1.1;
+      }
+      .kpi-proj {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 8px;
+        background: #f0fdf4;
+        color: #166534;
+        margin: 5px 0 3px;
+        display: inline-block;
+      }
+      .kpi-proj.neutral {
+        background: #f1f5f9;
+        color: #475569;
+      }
+      .kpi-compare {
+        margin-top: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .kpi-compare-line {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 10px;
+        color: #64748b;
+      }
 
-    /* ── Plan de com ── */
-    .plancom-block { background: white; border: 1px solid #fde68a; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; }
-    .plancom-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
-    .plancom-title { font-size: 12px; font-weight: 700; color: #92400e; }
-    .plancom-period { font-size: 10px; background: #fef9c3; border: 1px solid #fde68a; border-radius: 4px; padding: 2px 8px; color: #78350f; white-space: nowrap; }
-    .plancom-tl { background: #f1f5f9; border-radius: 4px; height: 5px; overflow: hidden; margin: 0 0 4px; }
-    .plancom-tl-fill { background: #f59e0b; height: 100%; }
-    .plancom-chips { display: flex; gap: 5px; flex-wrap: wrap; }
-    .plancom-chip { font-size: 10px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 4px; padding: 1px 7px; color: #78350f; }
-    .plancom-stats { display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-top: 8px; }
-    .plancom-stat .lb { font-size: 10px; color: #92400e; margin-bottom: 2px; }
-    .plancom-stat .vl { font-size: 14px; font-weight: 700; color: #78350f; }
+      /* ── Budget blocks ── */
+      .budget-blocks {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .budget-block {
+        background: white;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        padding: 13px 16px;
+      }
+      .bb-label {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #94a3b8;
+        margin-bottom: 7px;
+      }
+      .bb-bar-wrap {
+        background: #f1f5f9;
+        border-radius: 4px;
+        height: 6px;
+        margin: 0 0 5px;
+        overflow: hidden;
+      }
+      .bb-bar-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.4s ease;
+      }
 
-    /* ── Section title ── */
-    .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin: 20px 0 10px; display: flex; align-items: center; gap: 8px; }
-    .section-title::after { content: ''; flex: 1; height: 1px; background: #e2e8f0; }
+      /* ── Plan de com ── */
+      .plancom-block {
+        background: white;
+        border: 1px solid #fde68a;
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-bottom: 16px;
+      }
+      .plancom-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .plancom-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #92400e;
+      }
+      .plancom-period {
+        font-size: 10px;
+        background: #fef9c3;
+        border: 1px solid #fde68a;
+        border-radius: 4px;
+        padding: 2px 8px;
+        color: #78350f;
+        white-space: nowrap;
+      }
+      .plancom-tl {
+        background: #f1f5f9;
+        border-radius: 4px;
+        height: 5px;
+        overflow: hidden;
+        margin: 0 0 4px;
+      }
+      .plancom-tl-fill {
+        background: #f59e0b;
+        height: 100%;
+      }
+      .plancom-chips {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+      }
+      .plancom-chip {
+        font-size: 10px;
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: 4px;
+        padding: 1px 7px;
+        color: #78350f;
+      }
+      .plancom-stats {
+        display: flex;
+        align-items: flex-end;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .plancom-stat .lb {
+        font-size: 10px;
+        color: #92400e;
+        margin-bottom: 2px;
+      }
+      .plancom-stat .vl {
+        font-size: 14px;
+        font-weight: 700;
+        color: #78350f;
+      }
 
-    /* ── Toggle leviers ── */
-    .toggle-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-    .toggle-label { font-size: 11px; color: #64748b; }
-    .toggle-switch { position: relative; display: inline-block; width: 36px; height: 20px; cursor: pointer; flex-shrink: 0; }
-    .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
-    .toggle-slider { position: absolute; inset: 0; background: #cbd5e1; border-radius: 20px; transition: .2s; }
-    .toggle-slider:before { content: ''; position: absolute; height: 14px; width: 14px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: .2s; }
-    .toggle-switch input:checked + .toggle-slider { background: #2563eb; }
-    .toggle-switch input:checked + .toggle-slider:before { transform: translateX(16px); }
-    .toggle-tag { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: #f1f5f9; color: #64748b; }
-    .toggle-tag.on { background: #dbeafe; color: #1d4ed8; }
+      /* ── Section title ── */
+      .section-title {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        margin: 20px 0 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .section-title::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #e2e8f0;
+      }
 
-    /* ── Tables ── */
-    .table-wrap { background: white; border-radius: 10px; border: 1px solid #e2e8f0; overflow: auto; margin-bottom: 20px; }
-    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    thead th { background: #f8fafc; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #64748b; padding: 8px 9px; text-align: right; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
-    thead th.left { text-align: left; }
-    thead th.group { background: #f1f5f9; text-align: center; color: #475569; }
-    tbody td { padding: 7px 9px; text-align: right; border-bottom: 1px solid #f8fafc; font-size: 11px; color: #1e293b; }
-    tbody td.left { text-align: left; }
-    tbody tr:last-child td { border-bottom: none; }
-    tbody tr:hover td { background: #f8fafc; }
-    tbody td.sep { border-left: 1.5px dashed #94a3b8; padding-left: 16px; }
-    tbody td.act { font-size: 13px; font-weight: 700; color: #0f172a; }
-    tbody tr.cat-row td { background: #f1f5f9; font-weight: 700; font-size: 11px; color: #374151; border-top: 1px solid #e2e8f0; padding-top: 10px; padding-bottom: 10px; }
-    tbody tr.cat-row:hover td { background: #e8eef5; }
-    tbody tr.levier-row td { font-size: 11px; color: #475569; }
-    tbody tr.levier-row td.left { padding-left: 22px; }
-    tbody tr.total-row td { background: #e8eef5; font-weight: 700; color: #0f172a; border-top: 2px solid #c6d0e0; }
-    tbody tr.total-row:hover td { background: #dce6f0; }
-    .na { color: #d1d5db; }
-    .delta-up { color: #16a34a; font-weight: 600; font-size: 10px; }
-    .delta-down { color: #dc2626; font-weight: 600; font-size: 10px; }
-    .delta-neu { color: #9ca3af; font-weight: 600; font-size: 10px; }
-    .cat-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; vertical-align: middle; flex-shrink: 0; }
-    .cat-chip { display: inline-flex; align-items: center; font-size: 10px; color: #94a3b8; margin-right: 3px; }
-    /* Liseré centré : espace symétrique avant/après le pointillé */
-    tbody td.pre-sep { padding-right: 14px; }
-    thead th.pre-sep { padding-right: 14px; }
-    /* Statut canal */
-    .statut-chip { font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px; display: inline-block; white-space: nowrap; }
-    .statut-chip.ok   { background: #dcfce7; color: #15803d; }
-    .statut-chip.warn { background: #fef9c3; color: #a16207; }
-    .statut-chip.bad  { background: #fee2e2; color: #b91c1c; }
-    /* ── Freshness chip ── */
-    .fr-chip { display:flex; align-items:center; gap:5px; font-size:11px; font-weight:400; padding:3px 10px; border-radius:6px; border:0.5px solid #e2e8f0; background:white; color:#374151; cursor:default; position:relative; white-space:nowrap; line-height:1.4; }
-    .fr-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; display:inline-block; vertical-align:middle; }
-    .fr-dot-ok   { background:#16a34a; }
-    .fr-dot-warn { background:#f59e0b; }
-    .fr-dot-err  { background:#dc2626; }
-    .fr-sep-pipe { color:#d1d5db; margin:0 5px; font-weight:300; }
-    .fr-tooltip { display:none; position:absolute; top:calc(100% + 6px); right:0; width:270px; background:white; border:0.5px solid #e2e8f0; border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,.12); z-index:100; overflow:hidden; font-weight:400; }
-    .fr-chip:hover .fr-tooltip { display:block; }
-    .fr-tooltip-row { display:flex; align-items:center; justify-content:space-between; padding:7px 12px; border-bottom:1px solid #f1f5f9; font-size:11px; color:#374151; }
-    .fr-tooltip-row:last-child { border-bottom:none; }
-    .fr-tooltip-hdr { padding:6px 12px; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#94a3b8; background:#f8fafc; border-bottom:1px solid #e2e8f0; }
-    /* Plan de com layout 2 colonnes */
-    .plancom-inner { display: flex; gap: 14px; }
-    .plancom-left  { flex: 1; min-width: 0; }
-    .plancom-right { width: 158px; flex-shrink: 0; border-left: 1px solid #fde68a; padding-left: 14px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; }
+      /* ── Toggle leviers ── */
+      .toggle-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .toggle-label {
+        font-size: 11px;
+        color: #64748b;
+      }
+      .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 36px;
+        height: 20px;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        position: absolute;
+      }
+      .toggle-slider {
+        position: absolute;
+        inset: 0;
+        background: #cbd5e1;
+        border-radius: 20px;
+        transition: 0.2s;
+      }
+      .toggle-slider:before {
+        content: "";
+        position: absolute;
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 3px;
+        background: white;
+        border-radius: 50%;
+        transition: 0.2s;
+      }
+      .toggle-switch input:checked + .toggle-slider {
+        background: #2563eb;
+      }
+      .toggle-switch input:checked + .toggle-slider:before {
+        transform: translateX(16px);
+      }
+      .toggle-tag {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 10px;
+        background: #f1f5f9;
+        color: #64748b;
+      }
+      .toggle-tag.on {
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
 
-    /* ── Branding block ── */
-    .branding-wrap { background: white; border: 1px solid #fde68a; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
-    .branding-hdr { background: #fffbeb; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #fde68a; flex-wrap: wrap; gap: 6px; }
-    .branding-title { font-size: 12px; font-weight: 700; color: #92400e; }
-    .branding-note { font-size: 10px; color: #92400e; padding: 6px 16px 8px; opacity: 0.75; border-top: 1px solid #fef9c3; }
-    .branding-wrap .table-wrap { margin: 0; border: none; border-radius: 0; }
-    .branding-wrap thead th { background: #fffbeb; color: #92400e; }
-    .branding-wrap thead th.group { background: #fef9c3; }
-    .branding-wrap tbody tr.total-row td { background: #fef3c7; color: #78350f; border-top-color: #fde68a; }
-    .branding-wrap tbody tr:hover td { background: #fef9c3; }
+      /* ── Tables ── */
+      .table-wrap {
+        background: white;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        overflow: auto;
+        margin-bottom: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+      thead th {
+        background: #f8fafc;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #64748b;
+        padding: 8px 9px;
+        text-align: right;
+        border-bottom: 1px solid #e2e8f0;
+        white-space: nowrap;
+      }
+      thead th.left {
+        text-align: left;
+      }
+      thead th.group {
+        background: #f1f5f9;
+        text-align: center;
+        color: #475569;
+      }
+      tbody td {
+        padding: 7px 9px;
+        text-align: right;
+        border-bottom: 1px solid #f8fafc;
+        font-size: 11px;
+        color: #1e293b;
+      }
+      tbody td.left {
+        text-align: left;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover td {
+        background: #f8fafc;
+      }
+      tbody td.sep {
+        border-left: 1.5px dashed #94a3b8;
+        padding-left: 16px;
+      }
+      tbody td.act {
+        font-size: 13px;
+        font-weight: 700;
+        color: #0f172a;
+      }
+      tbody tr.cat-row td {
+        background: #f1f5f9;
+        font-weight: 700;
+        font-size: 11px;
+        color: #374151;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+      tbody tr.cat-row:hover td {
+        background: #e8eef5;
+      }
+      tbody tr.levier-row td {
+        font-size: 11px;
+        color: #475569;
+      }
+      tbody tr.levier-row td.left {
+        padding-left: 22px;
+      }
+      tbody tr.total-row td {
+        background: #e8eef5;
+        font-weight: 700;
+        color: #0f172a;
+        border-top: 2px solid #c6d0e0;
+      }
+      tbody tr.total-row:hover td {
+        background: #dce6f0;
+      }
+      .na {
+        color: #d1d5db;
+      }
+      .delta-up {
+        color: #16a34a;
+        font-weight: 600;
+        font-size: 10px;
+      }
+      .delta-down {
+        color: #dc2626;
+        font-weight: 600;
+        font-size: 10px;
+      }
+      .delta-neu {
+        color: #9ca3af;
+        font-weight: 600;
+        font-size: 10px;
+      }
+      .cat-dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        margin-right: 5px;
+        vertical-align: middle;
+        flex-shrink: 0;
+      }
+      .cat-chip {
+        display: inline-flex;
+        align-items: center;
+        font-size: 10px;
+        color: #94a3b8;
+        margin-right: 3px;
+      }
+      /* Liseré centré : espace symétrique avant/après le pointillé */
+      tbody td.pre-sep {
+        padding-right: 14px;
+      }
+      thead th.pre-sep {
+        padding-right: 14px;
+      }
+      /* Statut canal */
+      .statut-chip {
+        font-size: 9px;
+        font-weight: 700;
+        padding: 2px 5px;
+        border-radius: 4px;
+        display: inline-block;
+        white-space: nowrap;
+      }
+      .statut-chip.ok {
+        background: #dcfce7;
+        color: #15803d;
+      }
+      .statut-chip.warn {
+        background: #fef9c3;
+        color: #a16207;
+      }
+      .statut-chip.bad {
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+      /* ── Freshness chip ── */
+      .fr-chip {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        font-weight: 400;
+        padding: 3px 10px;
+        border-radius: 6px;
+        border: 0.5px solid #e2e8f0;
+        background: white;
+        color: #374151;
+        cursor: default;
+        position: relative;
+        white-space: nowrap;
+        line-height: 1.4;
+      }
+      .fr-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: inline-block;
+        vertical-align: middle;
+      }
+      .fr-dot-ok {
+        background: #16a34a;
+      }
+      .fr-dot-warn {
+        background: #f59e0b;
+      }
+      .fr-dot-err {
+        background: #dc2626;
+      }
+      .fr-sep-pipe {
+        color: #d1d5db;
+        margin: 0 5px;
+        font-weight: 300;
+      }
+      .fr-tooltip {
+        display: none;
+        position: absolute;
+        top: calc(100% + 6px);
+        right: 0;
+        width: 270px;
+        background: white;
+        border: 0.5px solid #e2e8f0;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        z-index: 100;
+        overflow: hidden;
+        font-weight: 400;
+      }
+      .fr-chip:hover .fr-tooltip {
+        display: block;
+      }
+      .fr-tooltip-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 7px 12px;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 11px;
+        color: #374151;
+      }
+      .fr-tooltip-row:last-child {
+        border-bottom: none;
+      }
+      .fr-tooltip-hdr {
+        padding: 6px 12px;
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #94a3b8;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      /* Plan de com layout 2 colonnes */
+      .plancom-inner {
+        display: flex;
+        gap: 14px;
+      }
+      .plancom-left {
+        flex: 1;
+        min-width: 0;
+      }
+      .plancom-right {
+        width: 158px;
+        flex-shrink: 0;
+        border-left: 1px solid #fde68a;
+        padding-left: 14px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 10px;
+      }
 
-    /* ── Charts ── */
-    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .chart-card { background: white; border-radius: 10px; padding: 18px; border: 1px solid #e2e8f0; }
-    .chart-title { font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 14px; }
-    .chart-wrap { height: 210px; position: relative; }
+      /* ── Branding block ── */
+      .branding-wrap {
+        background: white;
+        border: 1px solid #fde68a;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+      .branding-hdr {
+        background: #fffbeb;
+        padding: 10px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #fde68a;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .branding-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #92400e;
+      }
+      .branding-note {
+        font-size: 10px;
+        color: #92400e;
+        padding: 6px 16px 8px;
+        opacity: 0.75;
+        border-top: 1px solid #fef9c3;
+      }
+      .branding-wrap .table-wrap {
+        margin: 0;
+        border: none;
+        border-radius: 0;
+      }
+      .branding-wrap thead th {
+        background: #fffbeb;
+        color: #92400e;
+      }
+      .branding-wrap thead th.group {
+        background: #fef9c3;
+      }
+      .branding-wrap tbody tr.total-row td {
+        background: #fef3c7;
+        color: #78350f;
+        border-top-color: #fde68a;
+      }
+      .branding-wrap tbody tr:hover td {
+        background: #fef9c3;
+      }
 
-    /* ── Misc ── */
-    .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; gap: 14px; color: #64748b; }
-    .spinner { width: 28px; height: 28px; border: 3px solid #e2e8f0; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.7s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .error { color: #dc2626; text-align: center; padding: 40px; }
-    .prorate-note { font-size: 10px; color: #94a3b8; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 12px; margin-bottom: 16px; display: inline-block; }
+      /* ── Charts ── */
+      .charts-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .chart-card {
+        background: white;
+        border-radius: 10px;
+        padding: 18px;
+        border: 1px solid #e2e8f0;
+      }
+      .chart-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #374151;
+        margin-bottom: 14px;
+      }
+      .chart-wrap {
+        height: 210px;
+        position: relative;
+      }
 
-    @media (max-width: 1200px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } .charts-grid { grid-template-columns: 1fr; } .budget-blocks { grid-template-columns: 1fr; } }
-    @media (max-width: 768px) {
-      .app-layout { flex-direction: column; }
-      .sidebar-outer { width: 100%; padding: 0 0 10px; position: static; max-height: none; }
-      .sidebar { width: 100%; border-radius: 0; border-left: none; border-right: none; }
-      .sidebar-body { flex-direction: row; flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
-      .ctx-item { min-width: 140px; flex: 1; }
-    }
-    @media (max-width: 600px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+      /* ── Misc ── */
+      .loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 300px;
+        gap: 14px;
+        color: #64748b;
+      }
+      .spinner {
+        width: 28px;
+        height: 28px;
+        border: 3px solid #e2e8f0;
+        border-top-color: #2563eb;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .error {
+        color: #dc2626;
+        text-align: center;
+        padding: 40px;
+      }
 
-    /* ── Period mode buttons ── */
-    .period-btns { display: flex; gap: 3px; margin-right: 10px; }
-    .pmb { background: none; border: 1px solid #e2e8f0; border-radius: 5px; padding: 3px 10px; font-size: 11px; font-weight: 500; cursor: pointer; color: #64748b; transition: all 0.15s; white-space: nowrap; }
-    .pmb:hover:not(.active) { background: #f1f5f9; border-color: #cbd5e1; }
-    .pmb.active { background: #2563eb; color: white; border-color: #2563eb; font-weight: 600; }
-  </style>
-</head>
-<body>
+      @media (max-width: 1200px) {
+        .kpi-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      @media (max-width: 900px) {
+        .kpi-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .charts-grid {
+          grid-template-columns: 1fr;
+        }
+        .budget-blocks {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 768px) {
+        .app-layout {
+          flex-direction: column;
+        }
+        .sidebar-outer {
+          width: 100%;
+          padding: 0 0 10px;
+          position: static;
+          max-height: none;
+        }
+        .sidebar {
+          width: 100%;
+          border-radius: 0;
+          border-left: none;
+          border-right: none;
+        }
+        .sidebar-body {
+          flex-direction: row;
+          flex-wrap: wrap;
+          gap: 8px;
+          padding: 10px 12px;
+        }
+        .ctx-item {
+          min-width: 140px;
+          flex: 1;
+        }
+      }
+      @media (max-width: 600px) {
+        .kpi-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
 
-<!-- ══ LOGIN ══ -->
-<div id="login-screen">
-  <div class="login-card">
-    <div class="login-logo">📊</div>
-    <div class="login-title">Dashboard Paid Performance</div>
-    <div class="login-sub">Accès réservé aux comptes @figarocms.fr autorisés</div>
-    <div id="g_id_onload"
-      data-client_id="616034106773-pefm7p7kc60kng9orj7vtlqvp8lu5m2d.apps.googleusercontent.com"
-      data-callback="handleCredentialResponse"
-      data-auto_prompt="false">
+      /* ── Period mode buttons ── */
+      .period-btns {
+        display: flex;
+        gap: 3px;
+        margin-right: 10px;
+      }
+      .pmb {
+        background: none;
+        border: 1px solid #e2e8f0;
+        border-radius: 5px;
+        padding: 3px 10px;
+        font-size: 11px;
+        font-weight: 500;
+        cursor: pointer;
+        color: #64748b;
+        transition: all 0.15s;
+        white-space: nowrap;
+      }
+      .pmb:hover:not(.active) {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+      }
+      .pmb.active {
+        background: #2563eb;
+        color: white;
+        border-color: #2563eb;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ══ LOGIN ══ -->
+    <div id="login-screen">
+      <div class="login-card">
+        <div class="login-logo">📊</div>
+        <div class="login-title">Dashboard Paid Performance</div>
+        <div class="login-sub">
+          Accès réservé aux comptes @figarocms.fr autorisés
+        </div>
+        <div
+          id="g_id_onload"
+          data-client_id="616034106773-pefm7p7kc60kng9orj7vtlqvp8lu5m2d.apps.googleusercontent.com"
+          data-callback="handleCredentialResponse"
+          data-auto_prompt="false"
+        ></div>
+        <div
+          class="g_id_signin"
+          data-type="standard"
+          data-size="large"
+          data-theme="outline"
+          data-text="signin_with"
+          data-shape="rectangular"
+          data-locale="fr"
+        ></div>
+        <div class="login-error" id="login-error"></div>
+      </div>
     </div>
-    <div class="g_id_signin"
-      data-type="standard" data-size="large" data-theme="outline"
-      data-text="signin_with" data-shape="rectangular" data-locale="fr">
-    </div>
-    <div class="login-error" id="login-error"></div>
-  </div>
-</div>
 
-<!-- ══ DASHBOARD ══ -->
-<div id="loading" class="loading" style="display:none">
-  <div class="spinner"></div>
-  <div>Chargement des données…</div>
-</div>
-<div id="app" style="display:none">
-  <div class="header">
-    <div>
-      <div class="header-title" id="hdr-title">Dashboard Paid Performance</div>
-      <div class="header-meta" id="hdr-meta"></div>
+    <!-- ══ DASHBOARD ══ -->
+    <div id="loading" class="loading" style="display: none">
+      <div class="spinner"></div>
+      <div>Chargement des données…</div>
     </div>
-    <div class="header-user">
-      <div class="user-info">
-        <img id="hdr-avatar" class="user-avatar" src="" alt="" style="display:none">
+    <div id="app" style="display: none">
+      <div class="header">
         <div>
-          <div class="user-name" id="hdr-name"></div>
-          <div class="user-email" id="hdr-email"></div>
+          <div class="header-title" id="hdr-title">
+            Dashboard Paid Performance
+          </div>
+        </div>
+        <div class="header-user">
+          <div class="user-info">
+            <img
+              id="hdr-avatar"
+              class="user-avatar"
+              src=""
+              alt=""
+              style="display: none"
+            />
+            <div>
+              <div class="user-name" id="hdr-name"></div>
+              <div class="user-email" id="hdr-email"></div>
+            </div>
+          </div>
+          <button class="btn-signout" onclick="signOut()">Déconnexion</button>
         </div>
       </div>
-      <button class="btn-signout" onclick="signOut()">Déconnexion</button>
-    </div>
-  </div>
-  <div class="tabs">
-    <div class="tab active" data-tab="mois" onclick="switchTab('mois')">📅 Mois en cours</div>
-    <div class="tab" data-tab="alertistes" onclick="switchTab('alertistes')">🔔 Alertistes</div>
-    <div class="tab" data-tab="cv" onclick="switchTab('cv')">📄 CV déposés</div>
-    <div class="tab" data-tab="evol" onclick="switchTab('evol')">📈 Évolution mensuelle</div>
-    <div style="flex:1"></div>
-    <div id="freshness-chip" class="fr-chip" style="display:none;margin:auto 12px auto 0">
-      <span id="freshness-inner"></span>
-      <div id="freshness-tooltip" class="fr-tooltip"></div>
-    </div>
-  </div>
-  <div class="month-nav" id="month-nav">
-    <div class="period-btns">
-      <button class="pmb active" id="pmb-mois" onclick="setPeriodMode('mois')">Mois</button>
-      <button class="pmb" id="pmb-trim" onclick="setPeriodMode('trim')">Trimestre</button>
-      <button class="pmb" id="pmb-sem" onclick="setPeriodMode('sem')">Semestre</button>
-      <button class="pmb" id="pmb-an" onclick="setPeriodMode('an')">Année</button>
-    </div>
-    <button class="mnav-btn" id="mnav-prev" onclick="navPeriod(-1)">&#8249;</button>
-    <div class="mnav-label" id="mnav-label"></div>
-    <button class="mnav-btn" id="mnav-next" onclick="navPeriod(1)">&#8250;</button>
-    <span class="mnav-tag" id="mnav-tag"></span>
-  </div>
-  <div class="app-layout">
-    <div class="app-main">
-      <div class="content">
-        <div id="tab-mois" class="tab-panel active"></div>
-        <div id="tab-evol" class="tab-panel"></div>
-        <div id="tab-alertistes" class="tab-panel"></div>
-        <div id="tab-cv" class="tab-panel"></div>
+      <div class="tabs">
+        <div class="tab active" data-tab="mois" onclick="switchTab('mois')">
+          🎯 Rendements
+        </div>
+        <div
+          class="tab"
+          data-tab="alertistes"
+          onclick="switchTab('alertistes')"
+        >
+          🔔 Alertistes
+        </div>
+        <div class="tab" data-tab="cv" onclick="switchTab('cv')">
+          📄 CV déposés
+        </div>
+        <div class="tab" data-tab="evol" onclick="switchTab('evol')">
+          📈 Évolution mensuelle
+        </div>
+        <div style="flex: 1"></div>
+        <div
+          id="freshness-chip"
+          class="fr-chip"
+          style="display: none; margin: auto 12px auto 0"
+        >
+          <span id="freshness-inner"></span>
+          <div id="freshness-tooltip" class="fr-tooltip"></div>
+        </div>
+      </div>
+      <div class="month-nav" id="month-nav">
+        <div class="period-btns">
+          <button
+            class="pmb active"
+            id="pmb-mois"
+            onclick="setPeriodMode('mois')"
+          >
+            Mois
+          </button>
+          <button class="pmb" id="pmb-trim" onclick="setPeriodMode('trim')">
+            Trimestre
+          </button>
+          <button class="pmb" id="pmb-sem" onclick="setPeriodMode('sem')">
+            Semestre
+          </button>
+          <button class="pmb" id="pmb-an" onclick="setPeriodMode('an')">
+            Année
+          </button>
+        </div>
+        <button class="mnav-btn" id="mnav-prev" onclick="navPeriod(-1)">
+          &#8249;
+        </button>
+        <div class="mnav-label" id="mnav-label"></div>
+        <button class="mnav-btn" id="mnav-next" onclick="navPeriod(1)">
+          &#8250;
+        </button>
+        <span class="mnav-tag" id="mnav-tag"></span>
+      </div>
+      <div class="period-status-bar" id="period-status-bar"></div>
+      <div class="app-layout">
+        <div class="app-main">
+          <div class="content">
+            <div id="tab-mois" class="tab-panel active"></div>
+            <div id="tab-evol" class="tab-panel"></div>
+            <div id="tab-alertistes" class="tab-panel"></div>
+            <div id="tab-cv" class="tab-panel"></div>
+          </div>
+        </div>
+        <div class="sidebar-outer">
+          <div class="sidebar" id="sidebar">
+            <div class="sidebar-hdr">
+              <div class="sidebar-lbl" id="sidebar-lbl">Contexte du mois</div>
+              <div class="sidebar-mois" id="sidebar-mois"></div>
+            </div>
+            <div class="sidebar-body" id="sidebar-body">
+              <div class="sidebar-empty">Chargement…</div>
+            </div>
+            <div class="sidebar-hint">
+              Alimenté par l'onglet <em>Contexte</em> de votre Sheet.<br />Colonnes
+              : Mois · Type · Titre · Détail
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="sidebar-outer">
-      <div class="sidebar" id="sidebar">
-        <div class="sidebar-hdr">
-          <div class="sidebar-lbl">Contexte du mois</div>
-          <div class="sidebar-mois" id="sidebar-mois"></div>
-        </div>
-        <div class="sidebar-body" id="sidebar-body">
-          <div class="sidebar-empty">Chargement…</div>
-        </div>
-        <div class="sidebar-hint">Alimenté par l'onglet <em>Contexte</em> de votre Sheet.<br>Colonnes : Mois · Type · Titre · Détail</div>
-      </div>
-    </div>
-  </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
-<script>
-// ═══════════════════════════════════════════════
-// AUTH
-// ═══════════════════════════════════════════════
-let _idToken = null;
+    <script
+      src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"
+      integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      // ═══════════════════════════════════════════════
+      // AUTH
+      // ═══════════════════════════════════════════════
+      let _idToken = null;
 
-function handleCredentialResponse(response) {
-  const token = response.credential;
-  try {
-    const b64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-    const payload = JSON.parse(decodeURIComponent(atob(b64).split('').map(c =>
-      '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
-    const email     = payload.email      || '';
-    const name      = payload.name       || '';
-    const givenName = payload.given_name || name;
-    const picture   = payload.picture    || '';
+      function handleCredentialResponse(response) {
+        const token = response.credential;
+        try {
+          const b64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+          const payload = JSON.parse(
+            decodeURIComponent(
+              atob(b64)
+                .split("")
+                .map(
+                  (c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2),
+                )
+                .join(""),
+            ),
+          );
+          const email = payload.email || "";
+          const name = payload.name || "";
+          const givenName = payload.given_name || name;
+          const picture = payload.picture || "";
 
-    if (!email.endsWith('@figarocms.fr')) {
-      document.getElementById('login-error').textContent =
-        `Accès refusé : ${email} n'est pas un compte @figarocms.fr`;
-      return;
-    }
-    _idToken = token;
-    document.getElementById('hdr-name').textContent  = givenName;
-    document.getElementById('hdr-email').textContent = email;
-    if (picture) {
-      const av = document.getElementById('hdr-avatar');
-      av.src = picture; av.style.display = 'block';
-    }
-    fetch(APPS_SCRIPT_URL + '?action=log&email=' + encodeURIComponent(email) + '&name=' + encodeURIComponent(name)).catch(() => {});
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('loading').style.display = 'flex';
-    main();
-  } catch(e) {
-    document.getElementById('login-error').textContent = 'Erreur de connexion : ' + e.message;
-  }
-}
+          if (!email.endsWith("@figarocms.fr")) {
+            document.getElementById("login-error").textContent =
+              `Accès refusé : ${email} n'est pas un compte @figarocms.fr`;
+            return;
+          }
+          _idToken = token;
+          document.getElementById("hdr-name").textContent = givenName;
+          document.getElementById("hdr-email").textContent = email;
+          if (picture) {
+            const av = document.getElementById("hdr-avatar");
+            av.src = picture;
+            av.style.display = "block";
+          }
+          fetch(
+            APPS_SCRIPT_URL +
+              "?action=log&email=" +
+              encodeURIComponent(email) +
+              "&name=" +
+              encodeURIComponent(name),
+          ).catch(() => {});
+          document.getElementById("login-screen").style.display = "none";
+          document.getElementById("loading").style.display = "flex";
+          main();
+        } catch (e) {
+          document.getElementById("login-error").textContent =
+            "Erreur de connexion : " + e.message;
+        }
+      }
 
-function signOut() {
-  _idToken = null;
-  if (window.google && google.accounts) google.accounts.id.disableAutoSelect();
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-error').textContent = '';
-  document.getElementById('login-screen').style.display = 'flex';
-}
+      function signOut() {
+        _idToken = null;
+        if (window.google && google.accounts)
+          google.accounts.id.disableAutoSelect();
+        document.getElementById("app").style.display = "none";
+        document.getElementById("login-error").textContent = "";
+        document.getElementById("login-screen").style.display = "flex";
+      }
 
-// ═══════════════════════════════════════════════
-// CONSTANTS & UTILS
-// ═══════════════════════════════════════════════
-const MONTH_NAMES = ['','Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
-const MONTH_FULL  = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+      // ═══════════════════════════════════════════════
+      // CONSTANTS & UTILS
+      // ═══════════════════════════════════════════════
+      const MONTH_NAMES = [
+        "",
+        "Jan",
+        "Fév",
+        "Mar",
+        "Avr",
+        "Mai",
+        "Jun",
+        "Jul",
+        "Aoû",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Déc",
+      ];
+      const MONTH_FULL = [
+        "",
+        "Janvier",
+        "Février",
+        "Mars",
+        "Avril",
+        "Mai",
+        "Juin",
+        "Juillet",
+        "Août",
+        "Septembre",
+        "Octobre",
+        "Novembre",
+        "Décembre",
+      ];
 
-const COLGROUP = `<colgroup>
+      const COLGROUP = `<colgroup>
   <col style="width:88px">
   <col style="width:48px"><col style="width:52px"><col style="width:72px"><col style="width:38px"><col style="width:38px">
   <col style="width:48px"><col style="width:38px"><col style="width:38px">
   <col style="width:52px"><col style="width:38px"><col style="width:38px">
 </colgroup>`;
 
-const CAT_COLORS = {
-  'SEA':          '#2563eb',
-  'Agrégateurs':  '#f97316',
-  'Retargeting':  '#ef4444',
-  'Social':       '#a855f7',
-  'Affiliation':  '#14b8a6',
-  'Organic':      '#22c55e',
-};
-const CAT_ORDER = ['SEA','Agrégateurs','Retargeting','Social','Affiliation','Organic'];
+      const CAT_COLORS = {
+        SEA: "#2563eb",
+        Agrégateurs: "#f97316",
+        Retargeting: "#ef4444",
+        Social: "#a855f7",
+        Affiliation: "#14b8a6",
+        Organic: "#22c55e",
+      };
+      const CAT_ORDER = [
+        "SEA",
+        "Agrégateurs",
+        "Retargeting",
+        "Social",
+        "Affiliation",
+        "Organic",
+      ];
 
-function daysInMonth(m, y) { return new Date(y, m, 0).getDate(); }
+      function daysInMonth(m, y) {
+        return new Date(y, m, 0).getDate();
+      }
 
-// ── Jours fériés français (Pâques mobile inclus) ──
-function easterDate(year) {
-  const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4;
-  const f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3);
-  const h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4;
-  const l=(32+2*e+2*i-h-k)%7,mn=Math.floor((a+11*h+22*l)/451);
-  const month=Math.floor((h+l-7*mn+114)/31),day=((h+l-7*mn+114)%31)+1;
-  return new Date(year,month-1,day);
-}
-function frenchHolidays(year) {
-  const e=easterDate(year),add=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
-  const key=d=>`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-  return new Set([
-    new Date(year,0,1),new Date(year,4,1),new Date(year,4,8),
-    new Date(year,6,14),new Date(year,7,15),new Date(year,10,1),
-    new Date(year,10,11),new Date(year,11,25),
-    add(e,1),add(e,39),add(e,50)
-  ].map(key));
-}
-function countWorkingDays(year, month, fromDay, toDay) {
-  const holidays=frenchHolidays(year);
-  const key=d=>`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-  let count=0;
-  for(let d=fromDay;d<=toDay;d++){
-    const dt=new Date(year,month-1,d),dow=dt.getDay();
-    if(dow!==0&&dow!==6&&!holidays.has(key(dt)))count++;
-  }
-  return count;
-}
+      // ── Jours fériés français (Pâques mobile inclus) ──
+      function easterDate(year) {
+        const a = year % 19,
+          b = Math.floor(year / 100),
+          c = year % 100,
+          d = Math.floor(b / 4),
+          e = b % 4;
+        const f = Math.floor((b + 8) / 25),
+          g = Math.floor((b - f + 1) / 3);
+        const h = (19 * a + b - d - g + 15) % 30,
+          i = Math.floor(c / 4),
+          k = c % 4;
+        const l = (32 + 2 * e + 2 * i - h - k) % 7,
+          mn = Math.floor((a + 11 * h + 22 * l) / 451);
+        const month = Math.floor((h + l - 7 * mn + 114) / 31),
+          day = ((h + l - 7 * mn + 114) % 31) + 1;
+        return new Date(year, month - 1, day);
+      }
+      function frenchHolidays(year) {
+        const e = easterDate(year),
+          add = (d, n) =>
+            new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+        const key = (d) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+        return new Set(
+          [
+            new Date(year, 0, 1),
+            new Date(year, 4, 1),
+            new Date(year, 4, 8),
+            new Date(year, 6, 14),
+            new Date(year, 7, 15),
+            new Date(year, 10, 1),
+            new Date(year, 10, 11),
+            new Date(year, 11, 25),
+            add(e, 1),
+            add(e, 39),
+            add(e, 50),
+          ].map(key),
+        );
+      }
+      function countWorkingDays(year, month, fromDay, toDay) {
+        const holidays = frenchHolidays(year);
+        const key = (d) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+        let count = 0;
+        for (let d = fromDay; d <= toDay; d++) {
+          const dt = new Date(year, month - 1, d),
+            dow = dt.getDay();
+          if (dow !== 0 && dow !== 6 && !holidays.has(key(dt))) count++;
+        }
+        return count;
+      }
 
-function fmtK(v) {
-  if (v == null || v === 0) return '<span class="na">—</span>';
-  return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(v);
-}
-function fmtEuro(v) {
-  if (v == null || v === 0) return '<span class="na">—</span>';
-  return new Intl.NumberFormat('fr-FR', { style:'currency', currency:'EUR', maximumFractionDigits:0 }).format(v);
-}
-function fmtEuroRaw(v) {
-  return new Intl.NumberFormat('fr-FR', { style:'currency', currency:'EUR', maximumFractionDigits:0 }).format(v || 0);
-}
-function fmtEuroCpa(v) {
-  if (v == null) return '<span class="na">—</span>';
-  return new Intl.NumberFormat('fr-FR', { style:'currency', currency:'EUR', maximumFractionDigits:2, minimumFractionDigits:2 }).format(v);
-}
-function fmtEuroCpaRaw(v) {
-  return new Intl.NumberFormat('fr-FR', { style:'currency', currency:'EUR', maximumFractionDigits:2, minimumFractionDigits:2 }).format(v || 0);
-}
-function fmtDelta(pct, invert=false) {
-  if (pct == null) return '<span class="delta-neu">—</span>';
-  const effective = invert ? -pct : pct;
-  const sign = pct >= 0 ? '+' : '';
-  const cls = effective > 1 ? 'delta-up' : effective < -1 ? 'delta-down' : 'delta-neu';
-  return `<span class="${cls}">${sign}${pct.toFixed(1)}%</span>`;
-}
-function fmtPct(dep, bud) {
-  if (!dep || !bud || bud <= 0) return '<span class="na">—</span>';
-  const p = dep / bud * 100;
-  const cls = p > 105 ? 'delta-down' : p >= 90 ? 'delta-up' : '';
-  return `<span class="${cls || 'delta-neu'}">${p.toFixed(0)}%</span>`;
-}
-function pctDelta(cur, ref) {
-  if (cur == null || ref == null || ref === 0) return null;
-  return (cur - ref) / ref * 100;
-}
-function cpa(dep, rdm) {
-  if (!dep || !rdm || dep <= 0 || rdm <= 0) return null;
-  return dep / rdm;
-}
-function sortMois(arr) {
-  return [...arr].sort((a, b) => {
-    const [ma, ya] = a.split('/');
-    const [mb, yb] = b.split('/');
-    return (parseInt(ya)*12+parseInt(ma)) - (parseInt(yb)*12+parseInt(mb));
-  });
-}
+      function fmtK(v) {
+        if (v == null || v === 0) return '<span class="na">—</span>';
+        return new Intl.NumberFormat("fr-FR", {
+          maximumFractionDigits: 0,
+        }).format(v);
+      }
+      function fmtEuro(v) {
+        if (v == null || v === 0) return '<span class="na">—</span>';
+        return new Intl.NumberFormat("fr-FR", {
+          style: "currency",
+          currency: "EUR",
+          maximumFractionDigits: 0,
+        }).format(v);
+      }
+      function fmtEuroRaw(v) {
+        return new Intl.NumberFormat("fr-FR", {
+          style: "currency",
+          currency: "EUR",
+          maximumFractionDigits: 0,
+        }).format(v || 0);
+      }
+      function fmtEuroCpa(v) {
+        if (v == null) return '<span class="na">—</span>';
+        return new Intl.NumberFormat("fr-FR", {
+          style: "currency",
+          currency: "EUR",
+          maximumFractionDigits: 2,
+          minimumFractionDigits: 2,
+        }).format(v);
+      }
+      function fmtEuroCpaRaw(v) {
+        return new Intl.NumberFormat("fr-FR", {
+          style: "currency",
+          currency: "EUR",
+          maximumFractionDigits: 2,
+          minimumFractionDigits: 2,
+        }).format(v || 0);
+      }
+      function fmtDelta(pct, invert = false) {
+        if (pct == null) return '<span class="delta-neu">—</span>';
+        const effective = invert ? -pct : pct;
+        const sign = pct >= 0 ? "+" : "";
+        const cls =
+          effective > 1
+            ? "delta-up"
+            : effective < -1
+              ? "delta-down"
+              : "delta-neu";
+        return `<span class="${cls}">${sign}${pct.toFixed(1)}%</span>`;
+      }
+      function fmtPct(dep, bud) {
+        if (!dep || !bud || bud <= 0) return '<span class="na">—</span>';
+        const p = (dep / bud) * 100;
+        const cls = p > 105 ? "delta-down" : p >= 90 ? "delta-up" : "";
+        return `<span class="${cls || "delta-neu"}">${p.toFixed(0)}%</span>`;
+      }
+      function pctDelta(cur, ref) {
+        if (cur == null || ref == null || ref === 0) return null;
+        return ((cur - ref) / ref) * 100;
+      }
+      function cpa(dep, rdm) {
+        if (!dep || !rdm || dep <= 0 || rdm <= 0) return null;
+        return dep / rdm;
+      }
+      function sortMois(arr) {
+        return [...arr].sort((a, b) => {
+          const [ma, ya] = a.split("/");
+          const [mb, yb] = b.split("/");
+          return (
+            parseInt(ya) * 12 +
+            parseInt(ma) -
+            (parseInt(yb) * 12 + parseInt(mb))
+          );
+        });
+      }
 
-// ═══════════════════════════════════════════════
-// PLAN DE COM HELPERS
-// ═══════════════════════════════════════════════
+      // ═══════════════════════════════════════════════
+      // PLAN DE COM HELPERS
+      // ═══════════════════════════════════════════════
 
-// Accepte DD/MM/YYYY ou MM/YYYY — retourne un objet Date (minuit)
-function parseExactDate(s) {
-  const parts = s.split('/');
-  if (parts.length === 3) {
-    // DD/MM/YYYY
-    return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-  } else if (parts.length === 2) {
-    // MM/YYYY → 1er du mois
-    return new Date(parseInt(parts[1]), parseInt(parts[0]) - 1, 1);
-  }
-  return null;
-}
+      // Accepte DD/MM/YYYY ou MM/YYYY — retourne un objet Date (minuit)
+      function parseExactDate(s) {
+        const parts = s.split("/");
+        if (parts.length === 3) {
+          // DD/MM/YYYY
+          return new Date(
+            parseInt(parts[2]),
+            parseInt(parts[1]) - 1,
+            parseInt(parts[0]),
+          );
+        } else if (parts.length === 2) {
+          // MM/YYYY → 1er du mois
+          return new Date(parseInt(parts[1]), parseInt(parts[0]) - 1, 1);
+        }
+        return null;
+      }
 
-function monthInRange(mois, debut, fin) {
-  if (Array.isArray(mois)) return mois.some(m => monthInRange(m, debut, fin));
-  const [mm, yy] = mois.split('/').map(Number);
-  // Construit un intervalle couvrant tout le mois sélectionné
-  const monthStart = new Date(yy, mm - 1, 1);
-  const monthEnd   = new Date(yy, mm, 0); // dernier jour du mois
-  const dStart = parseExactDate(debut);
-  const dEnd   = parseExactDate(fin);
-  if (!dStart || !dEnd) return false;
-  // Le plan est actif si la période chevauche le mois
-  return dStart <= monthEnd && dEnd >= monthStart;
-}
+      function monthInRange(mois, debut, fin) {
+        if (Array.isArray(mois))
+          return mois.some((m) => monthInRange(m, debut, fin));
+        const [mm, yy] = mois.split("/").map(Number);
+        // Construit un intervalle couvrant tout le mois sélectionné
+        const monthStart = new Date(yy, mm - 1, 1);
+        const monthEnd = new Date(yy, mm, 0); // dernier jour du mois
+        const dStart = parseExactDate(debut);
+        const dEnd = parseExactDate(fin);
+        if (!dStart || !dEnd) return false;
+        // Le plan est actif si la période chevauche le mois
+        return dStart <= monthEnd && dEnd >= monthStart;
+      }
 
-function getActivePlanCom(selMois) {
-  if (!_plancom || !_plancom.length) return [];
-  return _plancom.filter(r => r.periodeDebut && r.periodeFin && monthInRange(selMois, r.periodeDebut, r.periodeFin));
-}
+      function getActivePlanCom(selMois) {
+        if (!_plancom || !_plancom.length) return [];
+        return _plancom.filter(
+          (r) =>
+            r.periodeDebut &&
+            r.periodeFin &&
+            monthInRange(selMois, r.periodeDebut, r.periodeFin),
+        );
+      }
 
-// Formate une date pour affichage (DD/MM/YYYY → "18 mai")
-function fmtDateCourt(s) {
-  const d = parseExactDate(s);
-  if (!d) return s;
-  const MOIS = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
-  return d.getDate() + ' ' + MOIS[d.getMonth()];
-}
+      // Formate une date pour affichage (DD/MM/YYYY → "18 mai")
+      function fmtDateCourt(s) {
+        const d = parseExactDate(s);
+        if (!d) return s;
+        const MOIS = [
+          "jan",
+          "fév",
+          "mar",
+          "avr",
+          "mai",
+          "jun",
+          "jul",
+          "aoû",
+          "sep",
+          "oct",
+          "nov",
+          "déc",
+        ];
+        return d.getDate() + " " + MOIS[d.getMonth()];
+      }
 
-// ── Plan de com strip (entre les blocs budget et le tableau) ──
-function renderPlanComStrip(selMois) {
-  const active = _plancom && _plancom.length ? _plancom : [];
-  if (!active.length) return '';
+      // ── Plan de com strip (entre les blocs budget et le tableau) ──
+      function renderPlanComStrip(selMois) {
+        const active = _plancom && _plancom.length ? _plancom : [];
+        if (!active.length) return "";
 
-  // Période globale : plus tôt debut → plus tard fin
-  const debut = active.reduce((min, r) => {
-    const d = parseExactDate(r.periodeDebut), m = parseExactDate(min);
-    return (d && (!m || d < m)) ? r.periodeDebut : min;
-  }, active[0].periodeDebut);
-  const fin = active.reduce((max, r) => {
-    const d = parseExactDate(r.periodeFin), m = parseExactDate(max);
-    return (d && (!m || d > m)) ? r.periodeFin : max;
-  }, active[0].periodeFin);
-  const dStart = parseExactDate(debut);
-  const dEnd   = parseExactDate(fin);
-  const debutLbl = fmtDateCourt(debut);
-  const finLbl   = fmtDateCourt(fin);
+        // Période globale : plus tôt debut → plus tard fin
+        const debut = active.reduce((min, r) => {
+          const d = parseExactDate(r.periodeDebut),
+            m = parseExactDate(min);
+          return d && (!m || d < m) ? r.periodeDebut : min;
+        }, active[0].periodeDebut);
+        const fin = active.reduce((max, r) => {
+          const d = parseExactDate(r.periodeFin),
+            m = parseExactDate(max);
+          return d && (!m || d > m) ? r.periodeFin : max;
+        }, active[0].periodeFin);
+        const dStart = parseExactDate(debut);
+        const dEnd = parseExactDate(fin);
+        const debutLbl = fmtDateCourt(debut);
+        const finLbl = fmtDateCourt(fin);
 
-  // Ne pas afficher si le mois sélectionné est hors campagne
-  const gStart = parseExactDate(debut);
-  const gEnd   = parseExactDate(fin);
-  const _smStr = Array.isArray(selMois) ? selMois[selMois.length-1] : selMois;
-  const [smm, syy] = _smStr.split('/').map(Number);
-  const monthStart = new Date(syy, smm - 1, 1);
-  const monthEnd   = new Date(syy, smm, 0);
-  if (!gStart || !gEnd || gEnd < monthStart || gStart > monthEnd) return '';
-  
-  const totBud  = active.reduce((s, r) => s + (r.budgetTotal   || 0), 0);
-  const totDep  = active.reduce((s, r) => s + (r.budgetDepense || 0), 0);
-  const restant = Math.max(totBud - totDep, 0);
+        // Ne pas afficher si le mois sélectionné est hors campagne
+        const gStart = parseExactDate(debut);
+        const gEnd = parseExactDate(fin);
+        const _smStr = Array.isArray(selMois)
+          ? selMois[selMois.length - 1]
+          : selMois;
+        const [smm, syy] = _smStr.split("/").map(Number);
+        const monthStart = new Date(syy, smm - 1, 1);
+        const monthEnd = new Date(syy, smm, 0);
+        if (!gStart || !gEnd || gEnd < monthStart || gStart > monthEnd)
+          return "";
 
-  // Progression basée sur les dates exactes
-  const today = new Date(); today.setHours(0,0,0,0);
-  let pctTemps = 0, pctCons = 0;
-  if (dStart && dEnd) {
-    const totalMs = dEnd - dStart;
-    const elapsedMs = Math.min(Math.max(today - dStart, 0), totalMs);
-    pctTemps = totalMs > 0 ? elapsedMs / totalMs * 100 : 0;
-  }
-  pctCons = totBud > 0 ? Math.min(totDep / totBud * 100, 100) : 0;
+        const totBud = active.reduce((s, r) => s + (r.budgetTotal || 0), 0);
+        const totDep = active.reduce((s, r) => s + (r.budgetDepense || 0), 0);
+        const restant = Math.max(totBud - totDep, 0);
 
-  // Rythme branding = % budget / % temps
-  const rythme = pctTemps > 0 ? pctCons / pctTemps : null;
-  let rythmeLabel = 'On track', rythmeColor = '#16a34a', rythmeIcon = '✓';
-  if (rythme !== null) {
-    if      (rythme < 0.85) { rythmeLabel = 'Sous-rythme'; rythmeColor = '#f59e0b'; rythmeIcon = '~'; }
-    else if (rythme > 1.10) { rythmeLabel = 'Sur-rythme';  rythmeColor = '#dc2626'; rythmeIcon = '!'; }
-  }
+        // Progression basée sur les dates exactes
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        let pctTemps = 0,
+          pctCons = 0;
+        if (dStart && dEnd) {
+          const totalMs = dEnd - dStart;
+          const elapsedMs = Math.min(Math.max(today - dStart, 0), totalMs);
+          pctTemps = totalMs > 0 ? (elapsedMs / totalMs) * 100 : 0;
+        }
+        pctCons = totBud > 0 ? Math.min((totDep / totBud) * 100, 100) : 0;
 
-  const plateformes = [...new Set(active.map(r => r.plateforme))];
-  const chips = plateformes.map(p => `<span class="plancom-chip">${p}</span>`).join('');
+        // Rythme branding = % budget / % temps
+        const rythme = pctTemps > 0 ? pctCons / pctTemps : null;
+        let rythmeLabel = "On track",
+          rythmeColor = "#16a34a",
+          rythmeIcon = "✓";
+        if (rythme !== null) {
+          if (rythme < 0.85) {
+            rythmeLabel = "Sous-rythme";
+            rythmeColor = "#f59e0b";
+            rythmeIcon = "~";
+          } else if (rythme > 1.1) {
+            rythmeLabel = "Sur-rythme";
+            rythmeColor = "#dc2626";
+            rythmeIcon = "!";
+          }
+        }
 
-  // Dernière mise à jour branding
-  const majDates = active
-    .map(r => ({ str: r.derniereMAJ, date: r.derniereMAJ ? parseExactDate(r.derniereMAJ) : null }))
-    .filter(d => d.date)
-    .sort((a, b) => b.date - a.date);
-  const latestMAJ = majDates[0];
-  const majHtml = latestMAJ
-    ? `<div style="font-size:9px;color:#a16207;margin-top:5px">MàJ : ${fmtDateCourt(latestMAJ.str)}</div>`
-    : '';
+        const plateformes = [...new Set(active.map((r) => r.plateforme))];
+        const chips = plateformes
+          .map((p) => `<span class="plancom-chip">${p}</span>`)
+          .join("");
 
-  return `<div class="plancom-block">
+        // Dernière mise à jour branding
+        const majDates = active
+          .map((r) => ({
+            str: r.derniereMAJ,
+            date: r.derniereMAJ ? parseExactDate(r.derniereMAJ) : null,
+          }))
+          .filter((d) => d.date)
+          .sort((a, b) => b.date - a.date);
+        const latestMAJ = majDates[0];
+        const majHtml = latestMAJ
+          ? `<div style="font-size:9px;color:#a16207;margin-top:5px">MàJ : ${fmtDateCourt(latestMAJ.str)}</div>`
+          : "";
+
+        return `<div class="plancom-block">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
       <div>
         <div class="plancom-title" style="margin-bottom:2px">📡 Plan de communication</div>
@@ -594,111 +1588,157 @@ function renderPlanComStrip(selMois) {
       </div>
     </div>
   </div>`;
-}
+      }
 
-// ── Bloc branding cumulatif (après le tableau) ──
-function renderBrandingBlock(selMois) {
-  const active = _plancom && _plancom.length ? _plancom : [];
-  if (!active.length) return '';
+      // ── Bloc branding cumulatif (après le tableau) ──
+      function renderBrandingBlock(selMois) {
+        const active = _plancom && _plancom.length ? _plancom : [];
+        if (!active.length) return "";
 
-  // Période globale
-  const debut = active.reduce((min, r) => {
-    const d = parseExactDate(r.periodeDebut), m = parseExactDate(min);
-    return (d && (!m || d < m)) ? r.periodeDebut : min;
-  }, active[0].periodeDebut);
-  const fin = active.reduce((max, r) => {
-    const d = parseExactDate(r.periodeFin), m = parseExactDate(max);
-    return (d && (!m || d > m)) ? r.periodeFin : max;
-  }, active[0].periodeFin);
-  const debutLbl = fmtDateCourt(debut);
-  const finLbl   = fmtDateCourt(fin);
+        // Période globale
+        const debut = active.reduce((min, r) => {
+          const d = parseExactDate(r.periodeDebut),
+            m = parseExactDate(min);
+          return d && (!m || d < m) ? r.periodeDebut : min;
+        }, active[0].periodeDebut);
+        const fin = active.reduce((max, r) => {
+          const d = parseExactDate(r.periodeFin),
+            m = parseExactDate(max);
+          return d && (!m || d > m) ? r.periodeFin : max;
+        }, active[0].periodeFin);
+        const debutLbl = fmtDateCourt(debut);
+        const finLbl = fmtDateCourt(fin);
 
-// Ne pas afficher si le mois sélectionné est hors campagne
-const gStart = parseExactDate(debut);
-const gEnd   = parseExactDate(fin);
-const _sbStr = Array.isArray(selMois) ? selMois[selMois.length-1] : selMois;
-const [smm, syy] = _sbStr.split('/').map(Number);
-const monthStart = new Date(syy, smm - 1, 1);
-const monthEnd   = new Date(syy, smm, 0);
-if (!gStart || !gEnd || gEnd < monthStart || gStart > monthEnd) return '';
+        // Ne pas afficher si le mois sélectionné est hors campagne
+        const gStart = parseExactDate(debut);
+        const gEnd = parseExactDate(fin);
+        const _sbStr = Array.isArray(selMois)
+          ? selMois[selMois.length - 1]
+          : selMois;
+        const [smm, syy] = _sbStr.split("/").map(Number);
+        const monthStart = new Date(syy, smm - 1, 1);
+        const monthEnd = new Date(syy, smm, 0);
+        if (!gStart || !gEnd || gEnd < monthStart || gStart > monthEnd)
+          return "";
 
-  
-  // Grouper par plateforme
-  const byPlat = {};
-  for (const r of active) {
-    const p = r.plateforme;
-    if (!byPlat[p]) byPlat[p] = { budget: 0, depense: 0, impressions: 0, reach: 0, frequence: 0, clics: 0, trueview: 0, derniereMAJ: null };
-    byPlat[p].budget      += r.budgetTotal   || 0;
-    byPlat[p].depense     += r.budgetDepense || 0;
-    byPlat[p].impressions += r.impressions   || 0;
-    byPlat[p].reach       += r.reach         || 0;
-    byPlat[p].clics       += r.clics         || 0;
-    byPlat[p].trueview    += r.trueview      || 0;
-    if (r.frequence)    byPlat[p].frequence    = r.frequence;
-    if (r.derniereMAJ) byPlat[p].derniereMAJ  = r.derniereMAJ;
-  }
+        // Grouper par plateforme
+        const byPlat = {};
+        for (const r of active) {
+          const p = r.plateforme;
+          if (!byPlat[p])
+            byPlat[p] = {
+              budget: 0,
+              depense: 0,
+              impressions: 0,
+              reach: 0,
+              frequence: 0,
+              clics: 0,
+              trueview: 0,
+              derniereMAJ: null,
+            };
+          byPlat[p].budget += r.budgetTotal || 0;
+          byPlat[p].depense += r.budgetDepense || 0;
+          byPlat[p].impressions += r.impressions || 0;
+          byPlat[p].reach += r.reach || 0;
+          byPlat[p].clics += r.clics || 0;
+          byPlat[p].trueview += r.trueview || 0;
+          if (r.frequence) byPlat[p].frequence = r.frequence;
+          if (r.derniereMAJ) byPlat[p].derniereMAJ = r.derniereMAJ;
+        }
 
-  const totBud    = Object.values(byPlat).reduce((s, p) => s + p.budget,      0);
-  const totDep    = Object.values(byPlat).reduce((s, p) => s + p.depense,     0);
-  const totImp    = Object.values(byPlat).reduce((s, p) => s + p.impressions, 0);
-  const totClics  = Object.values(byPlat).reduce((s, p) => s + p.clics,       0);
-  const totCpm    = totImp   > 0 ? totDep / totImp   * 1000 : null;
-  const totCpc    = totClics > 0 ? totDep / totClics        : null;
+        const totBud = Object.values(byPlat).reduce((s, p) => s + p.budget, 0);
+        const totDep = Object.values(byPlat).reduce((s, p) => s + p.depense, 0);
+        const totImp = Object.values(byPlat).reduce(
+          (s, p) => s + p.impressions,
+          0,
+        );
+        const totClics = Object.values(byPlat).reduce((s, p) => s + p.clics, 0);
+        const totCpm = totImp > 0 ? (totDep / totImp) * 1000 : null;
+        const totCpc = totClics > 0 ? totDep / totClics : null;
 
-  const fmtCpm2 = v => v != null
-    ? new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:2}).format(v)
-    : '<span class="na">—</span>';
-  const fmtFreq = v => v > 0 ? v.toFixed(1) : '<span class="na">—</span>';
+        const fmtCpm2 = (v) =>
+          v != null
+            ? new Intl.NumberFormat("fr-FR", {
+                style: "currency",
+                currency: "EUR",
+                maximumFractionDigits: 2,
+              }).format(v)
+            : '<span class="na">—</span>';
+        const fmtFreq = (v) =>
+          v > 0 ? v.toFixed(1) : '<span class="na">—</span>';
 
-  const fmtPctBar2 = (dep, bud) => {
-    if (!dep || !bud || bud <= 0) return '<span class="na">—</span>';
-    const p = Math.min(dep / bud * 100, 100);
-    const col = p > 90 ? '#16a34a' : p > 60 ? '#2563eb' : '#f59e0b';
-    return `<div style="display:flex;align-items:center;gap:4px">
+        const fmtPctBar2 = (dep, bud) => {
+          if (!dep || !bud || bud <= 0) return '<span class="na">—</span>';
+          const p = Math.min((dep / bud) * 100, 100);
+          const col = p > 90 ? "#16a34a" : p > 60 ? "#2563eb" : "#f59e0b";
+          return `<div style="display:flex;align-items:center;gap:4px">
       <span style="min-width:26px;font-size:11px;font-weight:600;color:${col}">${p.toFixed(0)}%</span>
       <div style="width:32px;height:4px;background:#e2e8f0;border-radius:2px;flex-shrink:0">
         <div style="width:${p.toFixed(1)}%;height:100%;background:${col};border-radius:2px"></div>
       </div>
     </div>`;
-  };
-  const fmtCoutKReach = (dep, reach) => {
-    if (!dep || !reach || reach <= 0) return '<span class="na">—</span>';
-    return new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:2}).format(dep / reach * 1000);
-  };
-  const fmtMAJ = s => {
-    if (!s) return '<span class="na">—</span>';
-    const d = parseExactDate(s);
-    if (!d) return s;
-    const MOIS = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
-    return `<span style="font-size:10px;color:#64748b">${d.getDate()} ${MOIS[d.getMonth()]}</span>`;
-  };
+        };
+        const fmtCoutKReach = (dep, reach) => {
+          if (!dep || !reach || reach <= 0) return '<span class="na">—</span>';
+          return new Intl.NumberFormat("fr-FR", {
+            style: "currency",
+            currency: "EUR",
+            maximumFractionDigits: 2,
+          }).format((dep / reach) * 1000);
+        };
+        const fmtMAJ = (s) => {
+          if (!s) return '<span class="na">—</span>';
+          const d = parseExactDate(s);
+          if (!d) return s;
+          const MOIS = [
+            "jan",
+            "fév",
+            "mar",
+            "avr",
+            "mai",
+            "jun",
+            "jul",
+            "aoû",
+            "sep",
+            "oct",
+            "nov",
+            "déc",
+          ];
+          return `<span style="font-size:10px;color:#64748b">${d.getDate()} ${MOIS[d.getMonth()]}</span>`;
+        };
 
-  let rows = '';
-  for (const [plat, d] of Object.entries(byPlat)) {
-    const cpm2 = d.impressions > 0 ? d.depense / d.impressions * 1000 : null;
-    const cpc2 = d.clics       > 0 ? d.depense / d.clics             : null;
-    const freq = d.frequence > 0   ? d.frequence
-               : d.reach > 0       ? d.impressions / d.reach
-               : null;
-    rows += `<tr>
+        let rows = "";
+        for (const [plat, d] of Object.entries(byPlat)) {
+          const cpm2 =
+            d.impressions > 0 ? (d.depense / d.impressions) * 1000 : null;
+          const cpc2 = d.clics > 0 ? d.depense / d.clics : null;
+          const freq =
+            d.frequence > 0
+              ? d.frequence
+              : d.reach > 0
+                ? d.impressions / d.reach
+                : null;
+          rows += `<tr>
       <td class="left">${plat}</td>
       <td>${fmtEuroRaw(d.budget)}</td>
       <td>${fmtEuroRaw(d.depense)}</td>
       <td>${fmtPctBar2(d.depense, d.budget)}</td>
       <td>${fmtCoutKReach(d.depense, d.reach)}</td>
       <td>${d.impressions ? fmtK(d.impressions) : '<span class="na">—</span>'}</td>
-      <td>${d.reach       ? fmtK(d.reach)       : '<span class="na">—</span>'}</td>
+      <td>${d.reach ? fmtK(d.reach) : '<span class="na">—</span>'}</td>
       <td>${fmtCpm2(cpm2)}</td>
       <td>${fmtFreq(freq)}</td>
-      <td>${d.clics    ? fmtK(d.clics)    : '<span class="na">—</span>'}</td>
+      <td>${d.clics ? fmtK(d.clics) : '<span class="na">—</span>'}</td>
       <td>${fmtCpm2(cpc2)}</td>
       <td>${d.trueview ? fmtK(d.trueview) : '<span class="na">—</span>'}</td>
       <td>${fmtMAJ(d.derniereMAJ)}</td>
     </tr>`;
-  }
-  const totPctDep = totBud > 0 ? Math.min(totDep / totBud * 100, 100) : 0;
-  const totCol = totPctDep > 90 ? '#16a34a' : totPctDep > 60 ? '#2563eb' : '#f59e0b';
-  rows += `<tr class="total-row">
+        }
+        const totPctDep =
+          totBud > 0 ? Math.min((totDep / totBud) * 100, 100) : 0;
+        const totCol =
+          totPctDep > 90 ? "#16a34a" : totPctDep > 60 ? "#2563eb" : "#f59e0b";
+        rows += `<tr class="total-row">
     <td class="left">Total période</td>
     <td>${fmtEuroRaw(totBud)}</td>
     <td>${fmtEuroRaw(totDep)}</td>
@@ -719,23 +1759,28 @@ if (!gStart || !gEnd || gEnd < monthStart || gStart > monthEnd) return '';
     <td><span class="na">—</span></td>
   </tr>`;
 
-  const colgroup = `<colgroup>
+        const colgroup = `<colgroup>
     <col style="width:12%">
     <col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:7%">
     <col style="width:8%"><col style="width:7%"><col style="width:7%"><col style="width:6%">
     <col style="width:7%"><col style="width:7%"><col style="width:7%"><col style="width:6%">
   </colgroup>`;
 
-  // Mini KPIs au-dessus du tableau
-  const totRestant  = Math.max(totBud - totDep, 0);
-  const totPctConso = totBud > 0 ? (totDep / totBud * 100).toFixed(0) : '—';
-  const fmtImpK = v => v >= 1e6 ? (v/1e6).toFixed(2).replace('.',',') + ' M'
-                      : v >= 1e3 ? (v/1e3).toFixed(0) + ' k' : String(v);
-  const kpiStyle = `background:#fffbeb;border:0.5px solid #fde68a;border-radius:8px;padding:8px 12px;`;
-  const kpiLbl   = `font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#92400e;opacity:.7;margin-bottom:3px`;
-  const kpiVal   = `font-size:15px;font-weight:700;color:#78350f;line-height:1.1`;
-  const kpiSub   = `font-size:10px;color:#92400e;opacity:.75;margin-top:1px`;
-  const miniKpis = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 14px 10px;border-bottom:0.5px solid #fde68a;background:#fffbeb">
+        // Mini KPIs au-dessus du tableau
+        const totRestant = Math.max(totBud - totDep, 0);
+        const totPctConso =
+          totBud > 0 ? ((totDep / totBud) * 100).toFixed(0) : "—";
+        const fmtImpK = (v) =>
+          v >= 1e6
+            ? (v / 1e6).toFixed(2).replace(".", ",") + " M"
+            : v >= 1e3
+              ? (v / 1e3).toFixed(0) + " k"
+              : String(v);
+        const kpiStyle = `background:#fffbeb;border:0.5px solid #fde68a;border-radius:8px;padding:8px 12px;`;
+        const kpiLbl = `font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#92400e;opacity:.7;margin-bottom:3px`;
+        const kpiVal = `font-size:15px;font-weight:700;color:#78350f;line-height:1.1`;
+        const kpiSub = `font-size:10px;color:#92400e;opacity:.75;margin-top:1px`;
+        const miniKpis = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 14px 10px;border-bottom:0.5px solid #fde68a;background:#fffbeb">
     <div style="${kpiStyle}">
       <div style="${kpiLbl}">Dépensé</div>
       <div style="${kpiVal}">${fmtEuroRaw(totDep)}</div>
@@ -748,29 +1793,39 @@ if (!gStart || !gEnd || gEnd < monthStart || gStart > monthEnd) return '';
     </div>
     <div style="${kpiStyle}">
       <div style="${kpiLbl}">Impressions</div>
-      <div style="${kpiVal}">${totImp ? fmtImpK(totImp) : '—'}</div>
+      <div style="${kpiVal}">${totImp ? fmtImpK(totImp) : "—"}</div>
       <div style="${kpiSub}">toutes plateformes</div>
     </div>
     <div style="${kpiStyle}">
       <div style="${kpiLbl}">CPC moyen</div>
-      <div style="${kpiVal}">${totCpc ? fmtCpm2(totCpc) : '—'}</div>
-      <div style="${kpiSub}">${totClics ? fmtK(totClics) + ' clics' : 'aucun clic'}</div>
+      <div style="${kpiVal}">${totCpc ? fmtCpm2(totCpc) : "—"}</div>
+      <div style="${kpiSub}">${totClics ? fmtK(totClics) + " clics" : "aucun clic"}</div>
     </div>
   </div>`;
 
-  // Stocker les données pour les charts (initialisés après injection HTML)
-  const platColors = ['#2563eb','#16a34a','#f59e0b','#ef4444','#a855f7','#14b8a6','#f97316','#06b6d4'];
-  const platLabels  = Object.keys(byPlat);
-  _brandingChartData = {
-    labels:   platLabels,
-    depenses: platLabels.map(p => byPlat[p].depense),
-    reaches:  platLabels.map(p => byPlat[p].reach),
-    restant:  Math.max(totBud - totDep, 0),
-    totBud, totDep,
-    colors:   platLabels.map((_, i) => platColors[i % platColors.length]),
-  };
+        // Stocker les données pour les charts (initialisés après injection HTML)
+        const platColors = [
+          "#2563eb",
+          "#16a34a",
+          "#f59e0b",
+          "#ef4444",
+          "#a855f7",
+          "#14b8a6",
+          "#f97316",
+          "#06b6d4",
+        ];
+        const platLabels = Object.keys(byPlat);
+        _brandingChartData = {
+          labels: platLabels,
+          depenses: platLabels.map((p) => byPlat[p].depense),
+          reaches: platLabels.map((p) => byPlat[p].reach),
+          restant: Math.max(totBud - totDep, 0),
+          totBud,
+          totDep,
+          colors: platLabels.map((_, i) => platColors[i % platColors.length]),
+        };
 
-  return `<div class="branding-wrap">
+        return `<div class="branding-wrap">
     <div class="branding-hdr">
       <div class="branding-title">📊 Branding — Cumul ${debutLbl} → ${finLbl}</div>
       <span class="plancom-period">Campagne globale</span>
@@ -806,36 +1861,44 @@ if (!gStart || !gEnd || gEnd < monthStart || gStart > monthEnd) return '';
     </div>
     <div class="branding-note">Reach inter-plateformes non cumulable · CPM = Dépensé ÷ Impressions × 1 000 · Coût/k reach = Dépensé ÷ Reach × 1 000 · CPC = Dépensé ÷ Clics · TrueView = vues YouTube ≥ 30s</div>
   </div>`;
-}
+      }
 
-// ═══════════════════════════════════════════════
-// BUDGET BLOCKS
-// ═══════════════════════════════════════════════
-function renderBudgetBlocks(t, pctElapsed) {
-  if (!t.budget || t.budget <= 0) return '';
-  const dep = t.depenses || 0;
-  const bud = t.budget;
-  const pctDep  = dep / bud * 100;
-  const restant = Math.max(bud - dep, 0);
+      // ═══════════════════════════════════════════════
+      // BUDGET BLOCKS
+      // ═══════════════════════════════════════════════
+      function renderBudgetBlocks(t, pctElapsed) {
+        if (!t.budget || t.budget <= 0) return "";
+        const dep = t.depenses || 0;
+        const bud = t.budget;
+        const pctDep = (dep / bud) * 100;
+        const restant = Math.max(bud - dep, 0);
 
-  // Rythme = (% budget consommé) / (% temps écoulé)
-  const rythme = pctElapsed > 0 ? pctDep / (pctElapsed * 100) : null;
-  let rythmeLabel = 'On track', rythmeColor = '#16a34a';
-  if (rythme !== null) {
-    if      (rythme < 0.85) { rythmeLabel = 'Sous-dépense'; rythmeColor = '#f59e0b'; }
-    else if (rythme > 1.10) { rythmeLabel = 'Sur-dépense';  rythmeColor = '#dc2626'; }
-  }
-  const rythmeBar = rythme ? Math.min(rythme * 100, 100).toFixed(1) : 0;
+        // Rythme = (% budget consommé) / (% temps écoulé)
+        const rythme = pctElapsed > 0 ? pctDep / (pctElapsed * 100) : null;
+        let rythmeLabel = "On track",
+          rythmeColor = "#16a34a";
+        if (rythme !== null) {
+          if (rythme < 0.85) {
+            rythmeLabel = "Sous-dépense";
+            rythmeColor = "#f59e0b";
+          } else if (rythme > 1.1) {
+            rythmeLabel = "Sur-dépense";
+            rythmeColor = "#dc2626";
+          }
+        }
+        const rythmeBar = rythme ? Math.min(rythme * 100, 100).toFixed(1) : 0;
 
-  const isCurrent = pctElapsed < 1;
-  const projDep   = isCurrent && pctElapsed > 0 ? dep / pctElapsed : null;
-  const barColor  = pctDep > 105 ? '#dc2626' : pctDep > 90 ? '#16a34a' : '#2563eb';
+        const isCurrent = pctElapsed < 1;
+        const projDep = isCurrent && pctElapsed > 0 ? dep / pctElapsed : null;
+        const barColor =
+          pctDep > 105 ? "#dc2626" : pctDep > 90 ? "#16a34a" : "#2563eb";
 
-  const restantHtml = restant > 0
-    ? `<strong style="color:#0f172a">${fmtEuroRaw(restant)} restant</strong>`
-    : `<strong style="color:#dc2626">Budget épuisé</strong>`;
+        const restantHtml =
+          restant > 0
+            ? `<strong style="color:#0f172a">${fmtEuroRaw(restant)} restant</strong>`
+            : `<strong style="color:#dc2626">Budget épuisé</strong>`;
 
-  return `<div style="margin-bottom:16px">
+        return `<div style="margin-bottom:16px">
     <div style="display:flex;align-items:center;gap:7px;padding:0 2px 8px">
       <span style="font-size:14px" aria-hidden="true">🌤</span>
       <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b">Météo budgétaire</span>
@@ -843,40 +1906,40 @@ function renderBudgetBlocks(t, pctElapsed) {
     <div class="budget-blocks" style="margin-bottom:0">
     <div class="budget-block">
       <div class="bb-label">Budget acquisition restant</div>
-      <div class="bb-bar-wrap"><div class="bb-bar-fill" style="width:${Math.min(pctDep,100).toFixed(1)}%;background:${barColor}"></div></div>
+      <div class="bb-bar-wrap"><div class="bb-bar-fill" style="width:${Math.min(pctDep, 100).toFixed(1)}%;background:${barColor}"></div></div>
       <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#64748b">
         <span><strong>Budget ${fmtEuroRaw(bud)} ·</strong> ${pctDep.toFixed(0)}% consommé</span>${restantHtml}
       </div>
-      ${projDep ? `<div style="font-size:10px;color:#94a3b8;margin-top:5px">Projeté fin de mois : ${fmtEuroRaw(projDep)} sur ${fmtEuroRaw(bud)}</div>` : ''}
+      ${projDep ? `<div style="font-size:10px;color:#94a3b8;margin-top:5px">Projeté fin de mois : ${fmtEuroRaw(projDep)} sur ${fmtEuroRaw(bud)}</div>` : ""}
     </div>
     <div class="budget-block">
       <div class="bb-label">Rythme de dépense</div>
       <div class="bb-bar-wrap"><div class="bb-bar-fill" style="width:${rythmeBar}%;background:${rythmeColor}"></div></div>
       <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#64748b">
-        <span>Ratio dépensé / temps : ${rythme ? (rythme * 100).toFixed(0) + '%' : '—'}</span>
+        <span>Ratio dépensé / temps : ${rythme ? (rythme * 100).toFixed(0) + "%" : "—"}</span>
         <strong style="color:${rythmeColor}">${rythmeLabel}</strong>
       </div>
-      ${projDep ? `<div style="font-size:10px;color:#94a3b8;margin-top:5px">Projection fin de mois : ${fmtEuroRaw(projDep)}</div>` : ''}
+      ${projDep ? `<div style="font-size:10px;color:#94a3b8;margin-top:5px">Projection fin de mois : ${fmtEuroRaw(projDep)}</div>` : ""}
     </div>
   </div>
   </div>`;
-}
+      }
 
-// ═══════════════════════════════════════════════
-// TOGGLE LEVIERS
-// ═══════════════════════════════════════════════
-function toggleLeviers(cb) {
-  const panel = cb.closest('.tab-panel');
-  if (!panel) return;
-  panel.querySelectorAll('tr.levier-row').forEach(r => {
-    r.style.display = cb.checked ? '' : 'none';
-  });
-  const tag = cb.closest('.toggle-bar').querySelector('.toggle-tag');
-  tag.textContent = cb.checked ? 'Leviers visibles' : 'Catégories seules';
-  tag.className   = cb.checked ? 'toggle-tag on' : 'toggle-tag';
-}
-function toggleBar() {
-  return `<div class="toggle-bar">
+      // ═══════════════════════════════════════════════
+      // TOGGLE LEVIERS
+      // ═══════════════════════════════════════════════
+      function toggleLeviers(cb) {
+        const panel = cb.closest(".tab-panel");
+        if (!panel) return;
+        panel.querySelectorAll("tr.levier-row").forEach((r) => {
+          r.style.display = cb.checked ? "" : "none";
+        });
+        const tag = cb.closest(".toggle-bar").querySelector(".toggle-tag");
+        tag.textContent = cb.checked ? "Leviers visibles" : "Catégories seules";
+        tag.className = cb.checked ? "toggle-tag on" : "toggle-tag";
+      }
+      function toggleBar() {
+        return `<div class="toggle-bar">
     <span class="toggle-label">Afficher les leviers</span>
     <label class="toggle-switch">
       <input type="checkbox" onchange="toggleLeviers(this)">
@@ -884,50 +1947,103 @@ function toggleBar() {
     </label>
     <span class="toggle-tag">Catégories seules</span>
   </div>`;
-}
+      }
 
-// ═══════════════════════════════════════════════
-// AGGREGATION
-// ═══════════════════════════════════════════════
-function aggregate(rows, mois) {
-  const moisArr = Array.isArray(mois) ? mois : [mois];
-  const subset = rows.filter(r => moisArr.includes(r.mois));
-  const byCat = {}, byCan = {};
-  for (const r of subset) {
-    const dep = r.depenses ?? 0, rdm = r.rdm ?? 0, alrt = r.alertiste ?? 0;
-    const cv = r.cv ?? 0, bud = r.budget ?? 0;
-    const cat = r.categorie, can = r.canal;
-    if (!byCat[cat]) byCat[cat] = { depenses:0, rdm:0, alertiste:0, cv:0, budget:0 };
-    byCat[cat].depenses += dep; byCat[cat].rdm += rdm; byCat[cat].alertiste += alrt;
-    byCat[cat].cv += cv; byCat[cat].budget += bud;
-    if (!byCan[can]) byCan[can] = { categorie:cat, depenses:0, rdm:0, alertiste:0, cv:0, budget:0 };
-    byCan[can].depenses += dep; byCan[can].rdm += rdm; byCan[can].alertiste += alrt;
-    byCan[can].cv += cv; byCan[can].budget += bud;
-  }
-  const totDep  = Object.values(byCat).reduce((s,c) => s + c.depenses,  0);
-  const totRdm  = Object.values(byCat).reduce((s,c) => s + c.rdm,       0);
-  const totAlrt = Object.values(byCat).reduce((s,c) => s + c.alertiste, 0);
-  const totCv   = Object.values(byCat).reduce((s,c) => s + c.cv,        0);
-  const totBud  = Object.values(byCat).reduce((s,c) => s + c.budget,    0);
-  // CPA : leviers payants = ceux avec des dépenses (budget peut être vide pour l'historique)
-  const paidRows = subset.filter(r => (r.depenses ?? 0) > 0);
-  const paidDep  = paidRows.reduce((s,r) => s + (r.depenses  ?? 0), 0);
-  const paidRdm  = paidRows.reduce((s,r) => s + (r.rdm       ?? 0), 0);
-  const paidAlrt = paidRows.reduce((s,r) => s + (r.alertiste ?? 0), 0);
-  const paidCv   = paidRows.reduce((s,r) => s + (r.cv        ?? 0), 0);
-  return {
-    total: { depenses:totDep, rdm:totRdm, alertiste:totAlrt, cv:totCv, budget:totBud,
-             cpa:cpa(paidDep,paidRdm), cpaAlrt:cpa(paidDep,paidAlrt), cpaCv:cpa(paidDep,paidCv) },
-    paid:  { depenses:paidDep, rdm:paidRdm, alertiste:paidAlrt, cv:paidCv },
-    byCat, byCan
-  };
-}
+      // ═══════════════════════════════════════════════
+      // AGGREGATION
+      // ═══════════════════════════════════════════════
+      function aggregate(rows, mois) {
+        const moisArr = Array.isArray(mois) ? mois : [mois];
+        const subset = rows.filter((r) => moisArr.includes(r.mois));
+        const byCat = {},
+          byCan = {};
+        for (const r of subset) {
+          const dep = r.depenses ?? 0,
+            rdm = r.rdm ?? 0,
+            alrt = r.alertiste ?? 0;
+          const cv = r.cv ?? 0,
+            bud = r.budget ?? 0;
+          const cat = r.categorie,
+            can = r.canal;
+          if (!byCat[cat])
+            byCat[cat] = {
+              depenses: 0,
+              rdm: 0,
+              alertiste: 0,
+              cv: 0,
+              budget: 0,
+            };
+          byCat[cat].depenses += dep;
+          byCat[cat].rdm += rdm;
+          byCat[cat].alertiste += alrt;
+          byCat[cat].cv += cv;
+          byCat[cat].budget += bud;
+          if (!byCan[can])
+            byCan[can] = {
+              categorie: cat,
+              depenses: 0,
+              rdm: 0,
+              alertiste: 0,
+              cv: 0,
+              budget: 0,
+            };
+          byCan[can].depenses += dep;
+          byCan[can].rdm += rdm;
+          byCan[can].alertiste += alrt;
+          byCan[can].cv += cv;
+          byCan[can].budget += bud;
+        }
+        const totDep = Object.values(byCat).reduce((s, c) => s + c.depenses, 0);
+        const totRdm = Object.values(byCat).reduce((s, c) => s + c.rdm, 0);
+        const totAlrt = Object.values(byCat).reduce(
+          (s, c) => s + c.alertiste,
+          0,
+        );
+        const totCv = Object.values(byCat).reduce((s, c) => s + c.cv, 0);
+        const totBud = Object.values(byCat).reduce((s, c) => s + c.budget, 0);
+        // CPA : leviers payants = ceux avec des dépenses (budget peut être vide pour l'historique)
+        const paidRows = subset.filter((r) => (r.depenses ?? 0) > 0);
+        const paidDep = paidRows.reduce((s, r) => s + (r.depenses ?? 0), 0);
+        const paidRdm = paidRows.reduce((s, r) => s + (r.rdm ?? 0), 0);
+        const paidAlrt = paidRows.reduce((s, r) => s + (r.alertiste ?? 0), 0);
+        const paidCv = paidRows.reduce((s, r) => s + (r.cv ?? 0), 0);
+        return {
+          total: {
+            depenses: totDep,
+            rdm: totRdm,
+            alertiste: totAlrt,
+            cv: totCv,
+            budget: totBud,
+            cpa: cpa(paidDep, paidRdm),
+            cpaAlrt: cpa(paidDep, paidAlrt),
+            cpaCv: cpa(paidDep, paidCv),
+          },
+          paid: {
+            depenses: paidDep,
+            rdm: paidRdm,
+            alertiste: paidAlrt,
+            cv: paidCv,
+          },
+          byCat,
+          byCan,
+        };
+      }
 
-// ═══════════════════════════════════════════════
-// KPI CARD
-// ═══════════════════════════════════════════════
-function kpiCard(label, valHtml, deltaM1, deltaA1, m1Label, a1Label, invertDelta, extraHtml='', projHtml='') {
-  return `<div class="kpi-card">
+      // ═══════════════════════════════════════════════
+      // KPI CARD
+      // ═══════════════════════════════════════════════
+      function kpiCard(
+        label,
+        valHtml,
+        deltaM1,
+        deltaA1,
+        m1Label,
+        a1Label,
+        invertDelta,
+        extraHtml = "",
+        projHtml = "",
+      ) {
+        return `<div class="kpi-card">
     <div class="kpi-label">${label}</div>
     <div class="kpi-value">${valHtml}</div>
     ${projHtml}
@@ -937,40 +2053,51 @@ function kpiCard(label, valHtml, deltaM1, deltaA1, m1Label, a1Label, invertDelta
       <div class="kpi-compare-line"><span>vs ${m1Label}</span>${fmtDelta(deltaM1, invertDelta)}</div>
     </div>
   </div>`;
-}
+      }
 
-// ═══════════════════════════════════════════════
-// STATUS CHIP (Statut vs prorata M-1)
-// ═══════════════════════════════════════════════
-function statusChip(actual, expected) {
-  if (actual == null || !actual || expected == null || !expected) return '<span class="na">—</span>';
-  const ratio = actual / expected * 100;
-  if (ratio >= 90) return `<span class="statut-chip ok">✓</span>`;
-  if (ratio >= 70) return `<span class="statut-chip warn">~</span>`;
-  return `<span class="statut-chip bad">✗</span>`;
-}
+      // ═══════════════════════════════════════════════
+      // STATUS CHIP (Statut vs prorata M-1)
+      // ═══════════════════════════════════════════════
+      function statusChip(actual, expected) {
+        if (actual == null || !actual || expected == null || !expected)
+          return '<span class="na">—</span>';
+        const ratio = (actual / expected) * 100;
+        if (ratio >= 90) return `<span class="statut-chip ok">✓</span>`;
+        if (ratio >= 70) return `<span class="statut-chip warn">~</span>`;
+        return `<span class="statut-chip bad">✗</span>`;
+      }
 
-// ═══════════════════════════════════════════════
-// TABLE FUSIONNÉE (cat-rows + levier-rows + total)
-// ═══════════════════════════════════════════════
-function buildTable(cur, m1, a1, pro, metricKey, metricLabel, m1Label, a1Label, pctElapsed=1) {
-
-  // Mini barre % consommé colorée selon rythme vs temps écoulé
-  function fmtPctBar(dep, bud) {
-    if (!dep || !bud || bud <= 0) return '<span class="na">—</span>';
-    const p = Math.min(dep / bud * 100, 100);
-    const expected = pctElapsed * 100;
-    const ratio = expected > 0 ? p / expected : 1;
-    const col = ratio >= 0.9 ? '#16a34a' : ratio >= 0.6 ? '#2563eb' : '#f59e0b';
-    return `<div style="display:flex;align-items:center;gap:4px;justify-content:flex-end">
+      // ═══════════════════════════════════════════════
+      // TABLE FUSIONNÉE (cat-rows + levier-rows + total)
+      // ═══════════════════════════════════════════════
+      function buildTable(
+        cur,
+        m1,
+        a1,
+        pro,
+        metricKey,
+        metricLabel,
+        m1Label,
+        a1Label,
+        pctElapsed = 1,
+      ) {
+        // Mini barre % consommé colorée selon rythme vs temps écoulé
+        function fmtPctBar(dep, bud) {
+          if (!dep || !bud || bud <= 0) return '<span class="na">—</span>';
+          const p = Math.min((dep / bud) * 100, 100);
+          const expected = pctElapsed * 100;
+          const ratio = expected > 0 ? p / expected : 1;
+          const col =
+            ratio >= 0.9 ? "#16a34a" : ratio >= 0.6 ? "#2563eb" : "#f59e0b";
+          return `<div style="display:flex;align-items:center;gap:4px;justify-content:flex-end">
       <span style="font-size:10px;font-weight:600;color:${col};min-width:24px;text-align:right">${p.toFixed(0)}%</span>
       <div style="width:28px;height:4px;background:#e2e8f0;border-radius:2px;flex-shrink:0">
         <div style="width:${p.toFixed(1)}%;height:100%;background:${col};border-radius:2px"></div>
       </div>
     </div>`;
-  }
+        }
 
-  const theadHtml = `<thead>
+        const theadHtml = `<thead>
     <tr>
       <th class="left" rowspan="2">Canal</th>
       <th class="group" colspan="5">Dépenses</th>
@@ -984,72 +2111,79 @@ function buildTable(cur, m1, a1, pro, metricKey, metricLabel, m1Label, a1Label, 
     </tr>
   </thead>`;
 
-  let rows = '';
-  for (const cat of CAT_ORDER) {
-    const cd = cur.byCat[cat]; if (!cd) continue;
-    const md = m1.byCat[cat] || {}, ad = a1.byCat[cat] || {};
-    const isOrg = cat === 'Organic';
-    const val  = cd[metricKey] || 0;
-    const mVal = md[metricKey] || 0;
-    const aVal = ad[metricKey] || 0;
-    const curCpa = cpa(cd.depenses, val);
-    const mCpa   = cpa(md.depenses, mVal);
-    const aCpa   = cpa(ad.depenses, aVal);
-    const dot = `<span class="cat-dot" style="background:${CAT_COLORS[cat]||'#94a3b8'}"></span>`;
+        let rows = "";
+        for (const cat of CAT_ORDER) {
+          const cd = cur.byCat[cat];
+          if (!cd) continue;
+          const md = m1.byCat[cat] || {},
+            ad = a1.byCat[cat] || {};
+          const isOrg = cat === "Organic";
+          const val = cd[metricKey] || 0;
+          const mVal = md[metricKey] || 0;
+          const aVal = ad[metricKey] || 0;
+          const curCpa = cpa(cd.depenses, val);
+          const mCpa = cpa(md.depenses, mVal);
+          const aCpa = cpa(ad.depenses, aVal);
+          const dot = `<span class="cat-dot" style="background:${CAT_COLORS[cat] || "#94a3b8"}"></span>`;
 
-    rows += `<tr class="cat-row">
+          rows += `<tr class="cat-row">
       <td class="left">${dot}${cat}</td>
       <td class="sep">${isOrg ? '<span class="na">—</span>' : fmtEuro(cd.budget)}</td>
       <td class="act">${isOrg ? '<span class="na">—</span>' : fmtEuro(cd.depenses)}</td>
       <td>${isOrg ? '<span class="na">—</span>' : fmtPctBar(cd.depenses, cd.budget)}</td>
-      <td>${isOrg ? '' : fmtDelta(pctDelta(cd.depenses, pro(ad.depenses)))}</td>
-      <td class="pre-sep">${isOrg ? '' : fmtDelta(pctDelta(cd.depenses, pro(md.depenses)))}</td>
+      <td>${isOrg ? "" : fmtDelta(pctDelta(cd.depenses, pro(ad.depenses)))}</td>
+      <td class="pre-sep">${isOrg ? "" : fmtDelta(pctDelta(cd.depenses, pro(md.depenses)))}</td>
       <td class="sep act">${fmtK(val)}</td>
       <td>${fmtDelta(pctDelta(val, pro(aVal)))}</td>
       <td class="pre-sep">${fmtDelta(pctDelta(val, pro(mVal)))}</td>
       <td class="sep act">${isOrg ? '<span class="na">—</span>' : fmtEuroCpa(curCpa)}</td>
-      <td>${isOrg ? '' : fmtDelta(pctDelta(curCpa, aCpa), true)}</td>
-      <td>${isOrg ? '' : fmtDelta(pctDelta(curCpa, mCpa), true)}</td>
+      <td>${isOrg ? "" : fmtDelta(pctDelta(curCpa, aCpa), true)}</td>
+      <td>${isOrg ? "" : fmtDelta(pctDelta(curCpa, mCpa), true)}</td>
     </tr>`;
 
-    const canals = Object.entries(cur.byCan).filter(([, d]) => d.categorie === cat);
-    const color  = CAT_COLORS[cat] || '#94a3b8';
-    for (const [canal, lcd] of canals) {
-      const lmd = m1.byCan[canal] || {}, lad = a1.byCan[canal] || {};
-      const lVal  = lcd[metricKey] || 0;
-      const lmVal = lmd[metricKey] || 0;
-      const laVal = lad[metricKey] || 0;
-      const lCurCpa = cpa(lcd.depenses, lVal);
-      const lmCpa   = cpa(lmd.depenses, lmVal);
-      const laCpa   = cpa(lad.depenses, laVal);
-      rows += `<tr class="levier-row" style="display:none">
+          const canals = Object.entries(cur.byCan).filter(
+            ([, d]) => d.categorie === cat,
+          );
+          const color = CAT_COLORS[cat] || "#94a3b8";
+          for (const [canal, lcd] of canals) {
+            const lmd = m1.byCan[canal] || {},
+              lad = a1.byCan[canal] || {};
+            const lVal = lcd[metricKey] || 0;
+            const lmVal = lmd[metricKey] || 0;
+            const laVal = lad[metricKey] || 0;
+            const lCurCpa = cpa(lcd.depenses, lVal);
+            const lmCpa = cpa(lmd.depenses, lmVal);
+            const laCpa = cpa(lad.depenses, laVal);
+            rows += `<tr class="levier-row" style="display:none">
         <td class="left"><span class="cat-chip"><span class="cat-dot" style="background:${color}"></span></span>${canal}</td>
         <td class="sep">${isOrg ? '<span class="na">—</span>' : fmtEuro(lcd.budget)}</td>
         <td class="act">${isOrg ? '<span class="na">—</span>' : fmtEuro(lcd.depenses)}</td>
         <td>${isOrg ? '<span class="na">—</span>' : fmtPctBar(lcd.depenses, lcd.budget)}</td>
-        <td>${isOrg ? '' : fmtDelta(pctDelta(lcd.depenses, pro(lad.depenses)))}</td>
-        <td class="pre-sep">${isOrg ? '' : fmtDelta(pctDelta(lcd.depenses, pro(lmd.depenses)))}</td>
+        <td>${isOrg ? "" : fmtDelta(pctDelta(lcd.depenses, pro(lad.depenses)))}</td>
+        <td class="pre-sep">${isOrg ? "" : fmtDelta(pctDelta(lcd.depenses, pro(lmd.depenses)))}</td>
         <td class="sep act">${fmtK(lVal)}</td>
         <td>${fmtDelta(pctDelta(lVal, pro(laVal)))}</td>
         <td class="pre-sep">${fmtDelta(pctDelta(lVal, pro(lmVal)))}</td>
         <td class="sep act">${isOrg ? '<span class="na">—</span>' : fmtEuroCpa(lCurCpa)}</td>
-        <td>${isOrg ? '' : fmtDelta(pctDelta(lCurCpa, laCpa), true)}</td>
-        <td>${isOrg ? '' : fmtDelta(pctDelta(lCurCpa, lmCpa), true)}</td>
+        <td>${isOrg ? "" : fmtDelta(pctDelta(lCurCpa, laCpa), true)}</td>
+        <td>${isOrg ? "" : fmtDelta(pctDelta(lCurCpa, lmCpa), true)}</td>
       </tr>`;
-    }
-  }
+          }
+        }
 
-  // ── Ligne Total acquisition ──────────────────
-  const tc  = cur.total, tm1 = m1.total, ta1 = a1.total;
-  const totMetric    = tc[metricKey]  || 0;
-  const m1TotMetric  = tm1[metricKey] || 0;
-  const a1TotMetric  = ta1[metricKey] || 0;
-  // CPA total : leviers payants uniquement
-  const totCpa2   = cpa(cur.paid.depenses, cur.paid[metricKey] || 0);
-  const m1TotCpa2 = cpa(m1.paid.depenses,  m1.paid[metricKey] || 0);
-  const a1TotCpa2 = cpa(a1.paid.depenses,  a1.paid[metricKey] || 0);
+        // ── Ligne Total acquisition ──────────────────
+        const tc = cur.total,
+          tm1 = m1.total,
+          ta1 = a1.total;
+        const totMetric = tc[metricKey] || 0;
+        const m1TotMetric = tm1[metricKey] || 0;
+        const a1TotMetric = ta1[metricKey] || 0;
+        // CPA total : leviers payants uniquement
+        const totCpa2 = cpa(cur.paid.depenses, cur.paid[metricKey] || 0);
+        const m1TotCpa2 = cpa(m1.paid.depenses, m1.paid[metricKey] || 0);
+        const a1TotCpa2 = cpa(a1.paid.depenses, a1.paid[metricKey] || 0);
 
-  rows += `<tr class="total-row">
+        rows += `<tr class="total-row">
     <td class="left">◉ Total acquisition</td>
     <td class="sep">${fmtEuro(tc.budget)}</td>
     <td class="act">${fmtEuro(tc.depenses)}</td>
@@ -1064,151 +2198,279 @@ function buildTable(cur, m1, a1, pro, metricKey, metricLabel, m1Label, a1Label, 
     <td>${fmtDelta(pctDelta(totCpa2, m1TotCpa2), true)}</td>
   </tr>`;
 
-  return `${toggleBar()}<div class="table-wrap"><table>${COLGROUP}${theadHtml}<tbody>${rows}</tbody></table></div>`;
-}
+        return `${toggleBar()}<div class="table-wrap"><table>${COLGROUP}${theadHtml}<tbody>${rows}</tbody></table></div>`;
+      }
 
-// ═══════════════════════════════════════════════
-// RENDER — MOIS EN COURS
-// ═══════════════════════════════════════════════
-function renderMois(rows, curMois, pctElapsed, m1Mois, a1Mois, daysElapsed, workingDaysElapsed, m1Label, a1Label) {
-  const cur = aggregate(rows, curMois);
-  const m1  = aggregate(rows, m1Mois);
-  const a1  = aggregate(rows, a1Mois);
-  const pro = v => v != null ? v * pctElapsed : null;
+      // ═══════════════════════════════════════════════
+      // RENDER — MOIS EN COURS
+      // ═══════════════════════════════════════════════
+      function renderMois(
+        rows,
+        curMois,
+        pctElapsed,
+        m1Mois,
+        a1Mois,
+        daysElapsed,
+        workingDaysElapsed,
+        m1Label,
+        a1Label,
+      ) {
+        const cur = aggregate(rows, curMois);
+        const m1 = aggregate(rows, m1Mois);
+        const a1 = aggregate(rows, a1Mois);
+        const pro = (v) => (v != null ? v * pctElapsed : null);
 
-  if (!m1Label) { const [m1mm,m1yy]=(Array.isArray(m1Mois)?m1Mois[0]:m1Mois).split('/'); m1Label=MONTH_NAMES[parseInt(m1mm)]+' '+m1yy.slice(2); }
-  if (!a1Label) { const [a1mm,a1yy]=(Array.isArray(a1Mois)?a1Mois[0]:a1Mois).split('/'); a1Label=MONTH_NAMES[parseInt(a1mm)]+' '+a1yy.slice(2); }
-  const t = cur.total;
+        if (!m1Label) {
+          const [m1mm, m1yy] = (
+            Array.isArray(m1Mois) ? m1Mois[0] : m1Mois
+          ).split("/");
+          m1Label = MONTH_NAMES[parseInt(m1mm)] + " " + m1yy.slice(2);
+        }
+        if (!a1Label) {
+          const [a1mm, a1yy] = (
+            Array.isArray(a1Mois) ? a1Mois[0] : a1Mois
+          ).split("/");
+          a1Label = MONTH_NAMES[parseInt(a1mm)] + " " + a1yy.slice(2);
+        }
+        const t = cur.total;
 
-  // ── Projections (mois en cours, à partir de J5) ──
-  const showProj  = pctElapsed < 1 && daysElapsed >= 5;
-  const pjFactor  = pctElapsed > 0 ? 1 / pctElapsed : 1;
-  const projDep   = showProj && t.depenses  ? t.depenses  * pjFactor : null;
-  const projRdm   = showProj && t.rdm       ? t.rdm       * pjFactor : null;
-  const projAlrt  = showProj && t.alertiste ? t.alertiste * pjFactor : null;
-  const projCv    = showProj && t.cv        ? t.cv        * pjFactor : null;
-  const projCpa   = showProj && t.cpa       ? t.cpa                  : null; // = actuel (extrapolation linéaire)
+        // ── Projections (mois en cours, à partir de J5) ──
+        const showProj = pctElapsed < 1 && daysElapsed >= 5;
+        const pjFactor = pctElapsed > 0 ? 1 / pctElapsed : 1;
+        const projDep = showProj && t.depenses ? t.depenses * pjFactor : null;
+        const projRdm = showProj && t.rdm ? t.rdm * pjFactor : null;
+        const projAlrt =
+          showProj && t.alertiste ? t.alertiste * pjFactor : null;
+        const projCv = showProj && t.cv ? t.cv * pjFactor : null;
+        const projCpa = showProj && t.cpa ? t.cpa : null; // = actuel (extrapolation linéaire)
 
-  const pj = (v, fmt) => v != null
-    ? `<div class="kpi-proj">↗ Projeté ${fmt(v)}</div>` : '';
-  const pjCpaHtml = projCpa != null
-    ? `<div class="kpi-proj neutral">⟳ Projeté ${fmtEuroCpaRaw(projCpa)}</div>` : '';
+        const pj = (v, fmt) =>
+          v != null ? `<div class="kpi-proj">↗ Projeté ${fmt(v)}</div>` : "";
+        const pjCpaHtml =
+          projCpa != null
+            ? `<div class="kpi-proj neutral">⟳ Projeté ${fmtEuroCpaRaw(projCpa)}</div>`
+            : "";
 
-  // ── Note prorata ──
-  const isSingleMonth = !Array.isArray(curMois) || curMois.length === 1;
-  let html = pctElapsed < 1
-    ? `<div class="prorate-note">⏱ ${isSingleMonth ? `Mois en cours : ${daysElapsed} j écoulés (${workingDaysElapsed} ouvrés)` : `Période en cours : ${(pctElapsed*100).toFixed(0)}% écoulé`} — comparatifs au prorata (×${(pctElapsed*100).toFixed(0)}%)</div>`
-    : `<div class="prorate-note">✅ ${isSingleMonth ? 'Mois complet' : 'Période complète'} — comparatifs sur la totalité de la période</div>`;
+        let html = "";
 
-  // ── KPI grid ──
-  html += `<div class="kpi-grid">
-    ${kpiCard('Dépenses', fmtEuro(t.depenses),
-        pctDelta(t.depenses, pro(m1.total.depenses)), pctDelta(t.depenses, pro(a1.total.depenses)),
-        m1Label, a1Label, false,
-        '',
-        pj(projDep, fmtEuro))}
-    ${kpiCard('Rdm (candidatures)', fmtK(t.rdm),
-        pctDelta(t.rdm, pro(m1.total.rdm)), pctDelta(t.rdm, pro(a1.total.rdm)),
-        m1Label, a1Label, false, '', pj(projRdm, fmtK))}
-    ${kpiCard('Alertistes', fmtK(t.alertiste),
-        pctDelta(t.alertiste, pro(m1.total.alertiste)), pctDelta(t.alertiste, pro(a1.total.alertiste)),
-        m1Label, a1Label, false, '', pj(projAlrt, fmtK))}
-    ${kpiCard('CV déposés', fmtK(t.cv),
-        pctDelta(t.cv, pro(m1.total.cv)), pctDelta(t.cv, pro(a1.total.cv)),
-        m1Label, a1Label, false, '', pj(projCv, fmtK))}
-    ${kpiCard('CPA Rdm global', fmtEuroCpa(t.cpa),
-        pctDelta(t.cpa, m1.total.cpa), pctDelta(t.cpa, a1.total.cpa),
-        m1Label, a1Label, true, '', pjCpaHtml)}
+        // ── KPI grid ──
+        html += `<div class="kpi-grid">
+    ${kpiCard(
+      "Dépenses",
+      fmtEuro(t.depenses),
+      pctDelta(t.depenses, pro(m1.total.depenses)),
+      pctDelta(t.depenses, pro(a1.total.depenses)),
+      m1Label,
+      a1Label,
+      false,
+      "",
+      pj(projDep, fmtEuro),
+    )}
+    ${kpiCard(
+      "Rdm (candidatures)",
+      fmtK(t.rdm),
+      pctDelta(t.rdm, pro(m1.total.rdm)),
+      pctDelta(t.rdm, pro(a1.total.rdm)),
+      m1Label,
+      a1Label,
+      false,
+      "",
+      pj(projRdm, fmtK),
+    )}
+    ${kpiCard(
+      "Alertistes",
+      fmtK(t.alertiste),
+      pctDelta(t.alertiste, pro(m1.total.alertiste)),
+      pctDelta(t.alertiste, pro(a1.total.alertiste)),
+      m1Label,
+      a1Label,
+      false,
+      "",
+      pj(projAlrt, fmtK),
+    )}
+    ${kpiCard(
+      "CV déposés",
+      fmtK(t.cv),
+      pctDelta(t.cv, pro(m1.total.cv)),
+      pctDelta(t.cv, pro(a1.total.cv)),
+      m1Label,
+      a1Label,
+      false,
+      "",
+      pj(projCv, fmtK),
+    )}
+    ${kpiCard(
+      "CPA Rdm global",
+      fmtEuroCpa(t.cpa),
+      pctDelta(t.cpa, m1.total.cpa),
+      pctDelta(t.cpa, a1.total.cpa),
+      m1Label,
+      a1Label,
+      true,
+      "",
+      pjCpaHtml,
+    )}
   </div>`;
 
-  // ── Blocs budget ──
-  html += renderBudgetBlocks(t, pctElapsed);
+        // ── Blocs budget ──
+        html += renderBudgetBlocks(t, pctElapsed);
 
-  // ── Plan de com (si actif) ──
-  html += renderPlanComStrip(curMois);
+        // ── Plan de com (si actif) ──
+        html += renderPlanComStrip(curMois);
 
-  // ── Tableau canaux & leviers ──
-  html += `<div class="section-title">Canaux &amp; leviers</div>`;
-  html += buildTable(cur, m1, a1, pro, 'rdm', 'Rdm', m1Label, a1Label, pctElapsed);
+        // ── Tableau canaux & leviers ──
+        html += `<div class="section-title">Canaux &amp; leviers</div>`;
+        html += buildTable(
+          cur,
+          m1,
+          a1,
+          pro,
+          "rdm",
+          "Rdm",
+          m1Label,
+          a1Label,
+          pctElapsed,
+        );
 
-  // ── Branding cumulatif (si actif) ──
-  html += renderBrandingBlock(curMois);
+        // ── Branding cumulatif (si actif) ──
+        html += renderBrandingBlock(curMois);
 
-  document.getElementById('tab-mois').innerHTML = html;
-  initBrandingCharts();
-}
+        document.getElementById("tab-mois").innerHTML = html;
+        initBrandingCharts();
+      }
 
-// ═══════════════════════════════════════════════
-// RENDER — ALERTISTES / CV
-// ═══════════════════════════════════════════════
-function renderConvTab(rows, tabId, metricKey, metricLabel, curMois, pctElapsed, m1Mois, a1Mois, daysElapsed, workingDaysElapsed, m1Label, a1Label) {
-  const cur = aggregate(rows, curMois);
-  const m1  = aggregate(rows, m1Mois);
-  const a1  = aggregate(rows, a1Mois);
-  const pro = v => v != null ? v * pctElapsed : null;
+      // ═══════════════════════════════════════════════
+      // RENDER — ALERTISTES / CV
+      // ═══════════════════════════════════════════════
+      function renderConvTab(
+        rows,
+        tabId,
+        metricKey,
+        metricLabel,
+        curMois,
+        pctElapsed,
+        m1Mois,
+        a1Mois,
+        daysElapsed,
+        workingDaysElapsed,
+        m1Label,
+        a1Label,
+      ) {
+        const cur = aggregate(rows, curMois);
+        const m1 = aggregate(rows, m1Mois);
+        const a1 = aggregate(rows, a1Mois);
+        const pro = (v) => (v != null ? v * pctElapsed : null);
 
-  if (!m1Label) { const [m1mm,m1yy]=(Array.isArray(m1Mois)?m1Mois[0]:m1Mois).split('/'); m1Label=MONTH_NAMES[parseInt(m1mm)]+' '+m1yy.slice(2); }
-  if (!a1Label) { const [a1mm,a1yy]=(Array.isArray(a1Mois)?a1Mois[0]:a1Mois).split('/'); a1Label=MONTH_NAMES[parseInt(a1mm)]+' '+a1yy.slice(2); }
+        if (!m1Label) {
+          const [m1mm, m1yy] = (
+            Array.isArray(m1Mois) ? m1Mois[0] : m1Mois
+          ).split("/");
+          m1Label = MONTH_NAMES[parseInt(m1mm)] + " " + m1yy.slice(2);
+        }
+        if (!a1Label) {
+          const [a1mm, a1yy] = (
+            Array.isArray(a1Mois) ? a1Mois[0] : a1Mois
+          ).split("/");
+          a1Label = MONTH_NAMES[parseInt(a1mm)] + " " + a1yy.slice(2);
+        }
 
-  const kpiM   = cur.total[metricKey] || 0;
-  const kpiDep = cur.total.depenses;
-  const kpiCpa = cpa(cur.paid.depenses, cur.paid[metricKey] || 0);
-  const m1M    = m1.total[metricKey] || 0;
-  const a1M    = a1.total[metricKey] || 0;
+        const kpiM = cur.total[metricKey] || 0;
+        const kpiDep = cur.total.depenses;
+        const kpiCpa = cpa(cur.paid.depenses, cur.paid[metricKey] || 0);
+        const m1M = m1.total[metricKey] || 0;
+        const a1M = a1.total[metricKey] || 0;
 
-  // Projections
-  const showProj = pctElapsed < 1 && daysElapsed >= 5;
-  const pjF = pctElapsed > 0 ? 1 / pctElapsed : 1;
-  const projM   = showProj && kpiM   ? kpiM   * pjF : null;
-  const projDep = showProj && kpiDep ? kpiDep * pjF : null;
-  const projCpa = showProj && kpiCpa ? kpiCpa        : null;
-  const pj = (v, fmt) => v != null ? `<div class="kpi-proj">↗ Projeté ${fmt(v)}</div>` : '';
+        // Projections
+        const showProj = pctElapsed < 1 && daysElapsed >= 5;
+        const pjF = pctElapsed > 0 ? 1 / pctElapsed : 1;
+        const projM = showProj && kpiM ? kpiM * pjF : null;
+        const projDep = showProj && kpiDep ? kpiDep * pjF : null;
+        const projCpa = showProj && kpiCpa ? kpiCpa : null;
+        const pj = (v, fmt) =>
+          v != null ? `<div class="kpi-proj">↗ Projeté ${fmt(v)}</div>` : "";
 
-  const isSingleMonth2 = !Array.isArray(curMois) || curMois.length === 1;
-  let html = pctElapsed < 1
-    ? `<div class="prorate-note">⏱ ${isSingleMonth2 ? `Mois en cours : ${daysElapsed} j écoulés (${workingDaysElapsed} ouvrés)` : `Période en cours : ${(pctElapsed*100).toFixed(0)}% écoulé`} — comparatifs au prorata (×${(pctElapsed*100).toFixed(0)}%)</div>`
-    : `<div class="prorate-note">✅ ${isSingleMonth2 ? 'Mois complet' : 'Période complète'} — comparatifs sur la totalité de la période</div>`;
+        let html = "";
 
-  html += `<div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
-    ${kpiCard('Dépenses', fmtEuro(kpiDep),
-        pctDelta(kpiDep, pro(m1.total.depenses)), pctDelta(kpiDep, pro(a1.total.depenses)),
-        m1Label, a1Label, false,
-        cur.total.budget > 0 ? `<div style="font-size:11px;color:#64748b;margin:5px 0 2px">Budget <strong>${fmtEuro(cur.total.budget)}</strong> · ${fmtPct(kpiDep, cur.total.budget)} dépensé</div>` : '',
-        pj(projDep, fmtEuro))}
-    ${kpiCard(metricLabel, fmtK(kpiM),
-        pctDelta(kpiM, pro(m1M)), pctDelta(kpiM, pro(a1M)),
-        m1Label, a1Label, false, '', pj(projM, fmtK))}
-    ${kpiCard('CPA ' + metricLabel, fmtEuroCpa(kpiCpa),
-        pctDelta(kpiCpa, cpa(m1.paid.depenses, m1.paid[metricKey] || 0)), pctDelta(kpiCpa, cpa(a1.paid.depenses, a1.paid[metricKey] || 0)),
-        m1Label, a1Label, true, '',
-        projCpa != null ? `<div class="kpi-proj neutral">⟳ Projeté ${fmtEuroCpaRaw(projCpa)}</div>` : '')}
+        html += `<div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+    ${kpiCard(
+      "Dépenses",
+      fmtEuro(kpiDep),
+      pctDelta(kpiDep, pro(m1.total.depenses)),
+      pctDelta(kpiDep, pro(a1.total.depenses)),
+      m1Label,
+      a1Label,
+      false,
+      cur.total.budget > 0
+        ? `<div style="font-size:11px;color:#64748b;margin:5px 0 2px">Budget <strong>${fmtEuro(cur.total.budget)}</strong> · ${fmtPct(kpiDep, cur.total.budget)} dépensé</div>`
+        : "",
+      pj(projDep, fmtEuro),
+    )}
+    ${kpiCard(
+      metricLabel,
+      fmtK(kpiM),
+      pctDelta(kpiM, pro(m1M)),
+      pctDelta(kpiM, pro(a1M)),
+      m1Label,
+      a1Label,
+      false,
+      "",
+      pj(projM, fmtK),
+    )}
+    ${kpiCard(
+      "CPA " + metricLabel,
+      fmtEuroCpa(kpiCpa),
+      pctDelta(kpiCpa, cpa(m1.paid.depenses, m1.paid[metricKey] || 0)),
+      pctDelta(kpiCpa, cpa(a1.paid.depenses, a1.paid[metricKey] || 0)),
+      m1Label,
+      a1Label,
+      true,
+      "",
+      projCpa != null
+        ? `<div class="kpi-proj neutral">⟳ Projeté ${fmtEuroCpaRaw(projCpa)}</div>`
+        : "",
+    )}
   </div>`;
 
-  html += `<div class="section-title">Canaux &amp; leviers</div>`;
-  html += buildTable(cur, m1, a1, pro, metricKey, metricLabel, m1Label, a1Label, pctElapsed);
-  document.getElementById(tabId).innerHTML = html;
-}
+        html += `<div class="section-title">Canaux &amp; leviers</div>`;
+        html += buildTable(
+          cur,
+          m1,
+          a1,
+          pro,
+          metricKey,
+          metricLabel,
+          m1Label,
+          a1Label,
+          pctElapsed,
+        );
+        document.getElementById(tabId).innerHTML = html;
+      }
 
-// ═══════════════════════════════════════════════
-// RENDER — ÉVOLUTION
-// ═══════════════════════════════════════════════
-function renderEvol(rows, allMois) {
-  const months = allMois.slice(-13);
-  const labels = months.map(m => {
-    const [mm, yy] = m.split('/');
-    return MONTH_NAMES[parseInt(mm)] + ' ' + yy.slice(2);
-  });
+      // ═══════════════════════════════════════════════
+      // RENDER — ÉVOLUTION
+      // ═══════════════════════════════════════════════
+      function renderEvol(rows, allMois) {
+        const months = allMois.slice(-13);
+        const labels = months.map((m) => {
+          const [mm, yy] = m.split("/");
+          return MONTH_NAMES[parseInt(mm)] + " " + yy.slice(2);
+        });
 
-  const catDatasets = CAT_ORDER.filter(c => c !== 'Organic').map(cat => ({
-    label: cat,
-    data: months.map(m => aggregate(rows, m).byCat[cat]?.depenses || 0),
-    backgroundColor: (CAT_COLORS[cat] || '#94a3b8') + 'bb',
-    borderColor:     CAT_COLORS[cat] || '#94a3b8',
-    borderWidth: 1, stack: 'spend',
-  }));
+        const catDatasets = CAT_ORDER.filter((c) => c !== "Organic").map(
+          (cat) => ({
+            label: cat,
+            data: months.map(
+              (m) => aggregate(rows, m).byCat[cat]?.depenses || 0,
+            ),
+            backgroundColor: (CAT_COLORS[cat] || "#94a3b8") + "bb",
+            borderColor: CAT_COLORS[cat] || "#94a3b8",
+            borderWidth: 1,
+            stack: "spend",
+          }),
+        );
 
-  const lastIdx = months.length - 1;
-  document.getElementById('tab-evol').innerHTML = `
+        const lastIdx = months.length - 1;
+        document.getElementById("tab-evol").innerHTML = `
     <div class="charts-grid">
       <div class="chart-card"><div class="chart-title">🎯 Rdm par catégorie — empilés</div><div class="chart-wrap"><canvas id="chart-rdm-cat"></canvas></div></div>
       <div class="chart-card"><div class="chart-title">🔔 Alertistes par catégorie — empilés</div><div class="chart-wrap"><canvas id="chart-alert-cat"></canvas></div></div>
@@ -1217,425 +2479,884 @@ function renderEvol(rows, allMois) {
       <div class="chart-card"><div class="chart-title">💡 CPA Rdm par catégorie — évolution</div><div class="chart-wrap"><canvas id="chart-cpa"></canvas></div></div>
     </div>`;
 
-  const xScale = { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 45, color: '#64748b' } };
-  const yScale = { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 }, color: '#64748b' } };
-  const base   = { responsive: true, maintainAspectRatio: false, animation: false,
-                   plugins: { legend: { display: false }, tooltip: { bodyFont: { size: 11 }, titleFont: { size: 11 } } } };
+        const xScale = {
+          grid: { display: false },
+          ticks: { font: { size: 10 }, maxRotation: 45, color: "#64748b" },
+        };
+        const yScale = {
+          grid: { color: "#f1f5f9" },
+          ticks: { font: { size: 10 }, color: "#64748b" },
+        };
+        const base = {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { bodyFont: { size: 11 }, titleFont: { size: 11 } },
+          },
+        };
 
-  new Chart(document.getElementById('chart-cpa'), {
-    type: 'line',
-    data: { labels, datasets: CAT_ORDER.filter(c => c !== 'Social' && c !== 'Organic').map(cat => {
-      const color = CAT_COLORS[cat] || '#94a3b8';
-      return { label: cat,
-        data: months.map(m => { const c = aggregate(rows,m).byCat[cat]; return c ? cpa(c.depenses,c.rdm) : null; }),
-        borderColor: color, backgroundColor: color+'18', tension: 0.3,
-        pointRadius: months.map((_,i) => i===lastIdx?5:2), pointBackgroundColor: color, pointBorderWidth: 0, spanGaps: true };
-    })},
-    options: { ...base, plugins: { ...base.plugins,
-      legend: { display: true, position: 'bottom', labels: { font: { size: 10 }, boxWidth: 10, padding: 12 } } },
-      scales: { x: xScale, y: { ...yScale, ticks: { ...yScale.ticks, callback: v => v!=null?v.toFixed(2)+' €':'' } } } }
-  });
-
-  new Chart(document.getElementById('chart-cat'), {
-    type: 'bar', data: { labels, datasets: catDatasets },
-    options: { ...base, plugins: { ...base.plugins,
-      legend: { display: true, position: 'bottom', labels: { font: { size: 10 }, boxWidth: 10, padding: 12 } } },
-      scales: { x: { ...xScale, stacked: true }, y: { ...yScale, stacked: true, ticks: { ...yScale.ticks,
-        callback: v => new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',notation:'compact',maximumFractionDigits:0}).format(v) } } } }
-  });
-
-  const pctLabelPlugin = {
-    id: 'pctLabel',
-    afterDatasetsDraw(chart) {
-      if (!chart.options.plugins?.pctLabel?.enabled) return;
-      const SHOW = new Set(['SEA','Agrégateurs','Organic']);
-      const ctx = chart.ctx;
-      chart.data.datasets.forEach((dataset, dsIdx) => {
-        if (!SHOW.has(dataset.label)) return;
-        const meta = chart.getDatasetMeta(dsIdx);
-        meta.data.forEach((bar, i) => {
-          const total = chart.data.datasets.reduce((s,ds) => s+(ds.data[i]||0), 0);
-          if (!total) return;
-          const pct = Math.round((dataset.data[i]||0)/total*100);
-          if (pct < 6) return;
-          const props = bar.getProps(['x','y','width','height'], true);
-          if (props.height < 13) return;
-          ctx.save(); ctx.font = 'bold 8.5px -apple-system,sans-serif';
-          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.shadowColor = 'rgba(0,0,0,0.35)'; ctx.shadowBlur = 2;
-          ctx.fillStyle = 'rgba(255,255,255,0.93)';
-          ctx.fillText(pct+'%', props.x, props.y+props.height/2); ctx.restore();
+        new Chart(document.getElementById("chart-cpa"), {
+          type: "line",
+          data: {
+            labels,
+            datasets: CAT_ORDER.filter(
+              (c) => c !== "Social" && c !== "Organic",
+            ).map((cat) => {
+              const color = CAT_COLORS[cat] || "#94a3b8";
+              return {
+                label: cat,
+                data: months.map((m) => {
+                  const c = aggregate(rows, m).byCat[cat];
+                  return c ? cpa(c.depenses, c.rdm) : null;
+                }),
+                borderColor: color,
+                backgroundColor: color + "18",
+                tension: 0.3,
+                pointRadius: months.map((_, i) => (i === lastIdx ? 5 : 2)),
+                pointBackgroundColor: color,
+                pointBorderWidth: 0,
+                spanGaps: true,
+              };
+            }),
+          },
+          options: {
+            ...base,
+            plugins: {
+              ...base.plugins,
+              legend: {
+                display: true,
+                position: "bottom",
+                labels: { font: { size: 10 }, boxWidth: 10, padding: 12 },
+              },
+            },
+            scales: {
+              x: xScale,
+              y: {
+                ...yScale,
+                ticks: {
+                  ...yScale.ticks,
+                  callback: (v) => (v != null ? v.toFixed(2) + " €" : ""),
+                },
+              },
+            },
+          },
         });
-      });
-    }
-  };
-  Chart.register(pctLabelPlugin);
 
-  function makeConvStacked(metricKey) {
-    return CAT_ORDER.map(cat => ({
-      label: cat,
-      data: months.map(m => aggregate(rows,m).byCat[cat]?.[metricKey] || 0),
-      backgroundColor: (CAT_COLORS[cat]||'#94a3b8')+'bb',
-      borderColor: CAT_COLORS[cat]||'#94a3b8', borderWidth: 1, stack: 'conv',
-    }));
-  }
-  const stackedOpts = { ...base, plugins: { ...base.plugins,
-    legend: { display: true, position: 'bottom', labels: { font: { size: 10 }, boxWidth: 10, padding: 12 } },
-    pctLabel: { enabled: true } },
-    scales: { x: { ...xScale, stacked: true }, y: { ...yScale, stacked: true, ticks: { ...yScale.ticks,
-      callback: v => new Intl.NumberFormat('fr-FR',{notation:'compact'}).format(v) } } } };
+        new Chart(document.getElementById("chart-cat"), {
+          type: "bar",
+          data: { labels, datasets: catDatasets },
+          options: {
+            ...base,
+            plugins: {
+              ...base.plugins,
+              legend: {
+                display: true,
+                position: "bottom",
+                labels: { font: { size: 10 }, boxWidth: 10, padding: 12 },
+              },
+            },
+            scales: {
+              x: { ...xScale, stacked: true },
+              y: {
+                ...yScale,
+                stacked: true,
+                ticks: {
+                  ...yScale.ticks,
+                  callback: (v) =>
+                    new Intl.NumberFormat("fr-FR", {
+                      style: "currency",
+                      currency: "EUR",
+                      notation: "compact",
+                      maximumFractionDigits: 0,
+                    }).format(v),
+                },
+              },
+            },
+          },
+        });
 
-  new Chart(document.getElementById('chart-rdm-cat'),   { type:'bar', data:{labels, datasets:makeConvStacked('rdm')},       options:stackedOpts });
-  new Chart(document.getElementById('chart-alert-cat'), { type:'bar', data:{labels, datasets:makeConvStacked('alertiste')}, options:stackedOpts });
-  new Chart(document.getElementById('chart-cv-cat'),    { type:'bar', data:{labels, datasets:makeConvStacked('cv')},        options:stackedOpts });
-}
+        const pctLabelPlugin = {
+          id: "pctLabel",
+          afterDatasetsDraw(chart) {
+            if (!chart.options.plugins?.pctLabel?.enabled) return;
+            const SHOW = new Set(["SEA", "Agrégateurs", "Organic"]);
+            const ctx = chart.ctx;
+            chart.data.datasets.forEach((dataset, dsIdx) => {
+              if (!SHOW.has(dataset.label)) return;
+              const meta = chart.getDatasetMeta(dsIdx);
+              meta.data.forEach((bar, i) => {
+                const total = chart.data.datasets.reduce(
+                  (s, ds) => s + (ds.data[i] || 0),
+                  0,
+                );
+                if (!total) return;
+                const pct = Math.round(((dataset.data[i] || 0) / total) * 100);
+                if (pct < 6) return;
+                const props = bar.getProps(["x", "y", "width", "height"], true);
+                if (props.height < 13) return;
+                ctx.save();
+                ctx.font = "bold 8.5px -apple-system,sans-serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.shadowColor = "rgba(0,0,0,0.35)";
+                ctx.shadowBlur = 2;
+                ctx.fillStyle = "rgba(255,255,255,0.93)";
+                ctx.fillText(pct + "%", props.x, props.y + props.height / 2);
+                ctx.restore();
+              });
+            });
+          },
+        };
+        Chart.register(pctLabelPlugin);
 
-// ═══════════════════════════════════════════════
-// SIDEBAR
-// ═══════════════════════════════════════════════
-function renderSidebar(mois) {
-  const moisArr = Array.isArray(mois) ? mois : [mois];
-  if (moisArr.length === 1) { const [mm,yyyy]=moisArr[0].split('/'); document.getElementById('sidebar-mois').textContent=`${MONTH_FULL[parseInt(mm)]} ${yyyy}`; }
-  else { const [mm0]=moisArr[0].split('/'), [mmN,yyN]=moisArr[moisArr.length-1].split('/'); document.getElementById('sidebar-mois').textContent=`${MONTH_NAMES[parseInt(mm0)]} → ${MONTH_NAMES[parseInt(mmN)]} ${yyN}`; }
-  const TYPE_CLASS = { 'Alerte':'alerte', 'Levier':'', 'Produit':'produit', 'Marché':'marche', 'Résultat':'resultat' };
-  const items = (_contexte || []).filter(c => moisArr.includes(c.mois)).sort((a,b) => (a.poids||5)-(b.poids||5));
-  const body  = document.getElementById('sidebar-body');
-  if (!items.length) {
-    body.innerHTML = `<div class="sidebar-empty">Aucun événement.<br>Ajoutez des lignes dans l'onglet <em>Contexte</em>.</div>`;
-    return;
-  }
-  body.innerHTML = items.map(item => `
-    <div class="ctx-item ${TYPE_CLASS[item.type]??''}">
+        function makeConvStacked(metricKey) {
+          return CAT_ORDER.map((cat) => ({
+            label: cat,
+            data: months.map(
+              (m) => aggregate(rows, m).byCat[cat]?.[metricKey] || 0,
+            ),
+            backgroundColor: (CAT_COLORS[cat] || "#94a3b8") + "bb",
+            borderColor: CAT_COLORS[cat] || "#94a3b8",
+            borderWidth: 1,
+            stack: "conv",
+          }));
+        }
+        const stackedOpts = {
+          ...base,
+          plugins: {
+            ...base.plugins,
+            legend: {
+              display: true,
+              position: "bottom",
+              labels: { font: { size: 10 }, boxWidth: 10, padding: 12 },
+            },
+            pctLabel: { enabled: true },
+          },
+          scales: {
+            x: { ...xScale, stacked: true },
+            y: {
+              ...yScale,
+              stacked: true,
+              ticks: {
+                ...yScale.ticks,
+                callback: (v) =>
+                  new Intl.NumberFormat("fr-FR", {
+                    notation: "compact",
+                  }).format(v),
+              },
+            },
+          },
+        };
+
+        new Chart(document.getElementById("chart-rdm-cat"), {
+          type: "bar",
+          data: { labels, datasets: makeConvStacked("rdm") },
+          options: stackedOpts,
+        });
+        new Chart(document.getElementById("chart-alert-cat"), {
+          type: "bar",
+          data: { labels, datasets: makeConvStacked("alertiste") },
+          options: stackedOpts,
+        });
+        new Chart(document.getElementById("chart-cv-cat"), {
+          type: "bar",
+          data: { labels, datasets: makeConvStacked("cv") },
+          options: stackedOpts,
+        });
+      }
+
+      // ═══════════════════════════════════════════════
+      // SIDEBAR
+      // ═══════════════════════════════════════════════
+      const PERIOD_MODE_LABEL = {
+        mois: "mois",
+        trim: "trimestre",
+        sem: "semestre",
+        an: "année",
+      };
+
+      function renderSidebar(mois, mode = "mois") {
+        const moisArr = Array.isArray(mois) ? mois : [mois];
+        document.getElementById("sidebar-lbl").textContent =
+          `Contexte du ${PERIOD_MODE_LABEL[mode] || "mois"}`;
+        if (moisArr.length === 1) {
+          const [mm, yyyy] = moisArr[0].split("/");
+          document.getElementById("sidebar-mois").textContent =
+            `${MONTH_FULL[parseInt(mm)]} ${yyyy}`;
+        } else {
+          const [mm0] = moisArr[0].split("/"),
+            [mmN, yyN] = moisArr[moisArr.length - 1].split("/");
+          document.getElementById("sidebar-mois").textContent =
+            `${MONTH_NAMES[parseInt(mm0)]} → ${MONTH_NAMES[parseInt(mmN)]} ${yyN}`;
+        }
+        const TYPE_CLASS = {
+          Alerte: "alerte",
+          Levier: "",
+          Produit: "produit",
+          Marché: "marche",
+          Résultat: "resultat",
+        };
+        const items = (_contexte || [])
+          .filter((c) => moisArr.includes(c.mois))
+          .sort((a, b) => (a.poids || 5) - (b.poids || 5));
+        const body = document.getElementById("sidebar-body");
+        if (!items.length) {
+          body.innerHTML = `<div class="sidebar-empty">Aucun événement.<br>Ajoutez des lignes dans l'onglet <em>Contexte</em>.</div>`;
+          return;
+        }
+        body.innerHTML = items
+          .map(
+            (item) => `
+    <div class="ctx-item ${TYPE_CLASS[item.type] ?? ""}">
       <div class="ctx-lbl">${item.type}</div>
       <div class="ctx-titre">${item.titre}</div>
-      ${item.detail ? `<div class="ctx-detail">${item.detail}</div>` : ''}
-    </div>`).join('');
-}
+      ${item.detail ? `<div class="ctx-detail">${item.detail}</div>` : ""}
+    </div>`,
+          )
+          .join("");
+      }
 
-// ═══════════════════════════════════════════════
-// ═══════════════════════════════════════════════
-// NAVIGATION PÉRIODES
-// ═══════════════════════════════════════════════
-let _rows=null, _allMois=null, _selMoisIdx=0, _contexte=[], _plancom=[], _config=[];
-let _chartBrandingDonut=null, _chartBrandingBar=null, _brandingChartData=null;
-let _periodMode='mois', _allPeriods=null, _periodIdx=0;
+      // ═══════════════════════════════════════════════
+      // PROGRESSION DE PÉRIODE (source unique — mois/trim/sem/an)
+      // ═══════════════════════════════════════════════
+      // Calcule jours écoulés/total, %, et statut (en cours / complète) pour n'importe
+      // quel periodMode. Réutilisée par la barre de statut ET la sidebar : évite les
+      // calculs dupliqués (bug initial : l'encart "Mois en cours" restait câblé sur
+      // une logique mensuelle même en Trimestre/Semestre/Année).
+      function getPeriodProgress(periodMode, period) {
+        const months = period.months;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayKey = `${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
+        let joursTotal = 0,
+          joursEcoules = 0;
+        for (const m of months) {
+          const [mm, yy] = m.split("/").map(Number);
+          const d = daysInMonth(mm, yy);
+          joursTotal += d;
+          if (m < todayKey) joursEcoules += d;
+          else if (m === todayKey)
+            joursEcoules += Math.max(0, today.getDate() - 1);
+        }
+        const isCurrent = months.includes(todayKey);
+        const isComplete = !isCurrent && months[months.length - 1] < todayKey;
+        const pct =
+          joursTotal > 0 ? joursEcoules / joursTotal : isComplete ? 1 : 0;
+        return {
+          label: period.label || period.shortLabel || months[0],
+          joursEcoules,
+          joursTotal,
+          pct,
+          isCurrent,
+          isComplete,
+          dateData: today,
+        };
+      }
 
-function computePeriods(allMois, mode) {
-  if (mode === 'mois') return allMois.map(m => { const [mm,yy]=m.split('/'); return {key:m,label:`${MONTH_FULL[parseInt(mm)]} ${yy}`,shortLabel:`${MONTH_NAMES[parseInt(mm)]} ${yy.slice(2)}`,months:[m]}; });
-  const seen=new Set(), periods=[];
-  for (const m of allMois) {
-    const [mm,yy]=m.split('/').map(Number); let key,label,shortLabel,allM;
-    if (mode==='trim') { const q=Math.ceil(mm/3),s=(q-1)*3+1,e=q*3; allM=[s,s+1,e].map(n=>`${String(n).padStart(2,'0')}/${yy}`); key=`T${q}-${yy}`; label=`T${q} ${yy}`; shortLabel=label; }
-    else if (mode==='sem') { const s2=mm<=6?1:2,mN=s2===1?[1,2,3,4,5,6]:[7,8,9,10,11,12]; allM=mN.map(n=>`${String(n).padStart(2,'0')}/${yy}`); key=`S${s2}-${yy}`; label=`S${s2} ${yy} · ${MONTH_NAMES[mN[0]]}–${MONTH_NAMES[mN[5]]}`; shortLabel=`S${s2} ${yy}`; }
-    else { allM=Array.from({length:12},(_,i)=>`${String(i+1).padStart(2,'0')}/${yy}`); key=`${yy}`; label=`Année ${yy}`; shortLabel=`${yy}`; }
-    if (!seen.has(key)) { seen.add(key); periods.push({key,label,shortLabel,months:allM.filter(m2=>allMois.includes(m2))}); }
-  }
-  return periods;
-}
+      function renderPeriodStatusBar(p) {
+        const dd = String(p.dateData.getDate()).padStart(2, "0");
+        const mm = String(p.dateData.getMonth() + 1).padStart(2, "0");
+        const dateStr = `${dd}/${mm}`;
+        if (p.isComplete) {
+          return `<div class="period-status complete">✅ ${p.label} · période complète (${p.joursTotal}j) · comparatifs sur la totalité de la période</div>`;
+        }
+        const pctLbl = (p.pct * 100).toFixed(0);
+        return `<div class="period-status current">⏱ ${p.label} · J${p.joursEcoules}/${p.joursTotal} écoulés (${pctLbl}%) · données au ${dateStr} · comparatifs ajustés au prorata ×${pctLbl}%</div>`;
+      }
 
-function shiftPeriodBack(months, mode) {
-  if (mode==='mois'||mode==='an') return months.map(m=>{const [mm,yy]=m.split('/');return `${mm}/${parseInt(yy)-1}`;});
-  const len=mode==='trim'?3:6;
-  return months.map(m=>{const [mm,yy]=m.split('/').map(Number);let n=mm-len,y=yy;if(n<=0){n+=12;y--;}return `${String(n).padStart(2,'0')}/${y}`;});
-}
+      // ═══════════════════════════════════════════════
+      // NAVIGATION PÉRIODES
+      // ═══════════════════════════════════════════════
+      let _rows = null,
+        _allMois = null,
+        _selMoisIdx = 0,
+        _contexte = [],
+        _plancom = [],
+        _config = [];
+      let _chartBrandingDonut = null,
+        _chartBrandingBar = null,
+        _brandingChartData = null;
+      let _periodMode = "mois",
+        _allPeriods = null,
+        _periodIdx = 0;
 
-function prevYearMonths(months){return months.map(m=>{const [mm,yy]=m.split('/');return `${mm}/${parseInt(yy)-1}`;});}
-
-function computePctElapsedPeriod(months) {
-  const today=new Date();today.setHours(0,0,0,0);
-  const ts=`${String(today.getMonth()+1).padStart(2,'0')}/${today.getFullYear()}`;
-  if (!months.includes(ts)){const last=months[months.length-1];return{pctElapsed:last<ts?1:0,daysElapsed:0,workingDaysElapsed:0,isCurrent:false};}
-  let total=0,elapsed=0;
-  for(const m of months){const [mm,yy]=m.split('/').map(Number),d=daysInMonth(mm,yy);total+=d;if(m<ts)elapsed+=d;else if(m===ts)elapsed+=Math.max(0,today.getDate()-1);}
-  return{pctElapsed:total>0?elapsed/total:0,daysElapsed:elapsed,workingDaysElapsed:0,isCurrent:true};
-}
-
-function setPeriodMode(mode) {
-  _periodMode=mode;
-  document.querySelectorAll('.pmb').forEach(b=>b.classList.remove('active'));
-  const btn=document.getElementById('pmb-'+mode);if(btn)btn.classList.add('active');
-  _allPeriods=computePeriods(_allMois,mode);
-  _periodIdx=_allPeriods.findIndex(p=>p.months.includes(_allMois[_selMoisIdx]));
-  if(_periodIdx<0)_periodIdx=_allPeriods.length-1;
-  renderCurrentPeriod();
-}
-
-function navPeriod(dir) {
-  const next=_periodIdx+dir;
-  if(next<0||next>=_allPeriods.length)return;
-  _periodIdx=next;
-  const p=_allPeriods[_periodIdx],lastM=p.months[p.months.length-1];
-  _selMoisIdx=_allMois.indexOf(lastM);if(_selMoisIdx<0)_selMoisIdx=_allMois.length-1;
-  renderCurrentPeriod();
-}
-
-function navMonth(dir){navPeriod(dir);}
-
-function renderCurrentPeriod(){renderDetailTabs(_rows,_allMois,_allPeriods[_periodIdx]);}
-
-function switchTab(name) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab===name));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-  document.getElementById('month-nav').classList.toggle('hidden', name==='evol');
-}
-
-function renderDetailTabs(rows, allMois, periodOrMois) {
-  const period=(typeof periodOrMois==='string')?{key:periodOrMois,label:'',shortLabel:'',months:[periodOrMois]}:periodOrMois;
-  const curMonths=period.months, today=new Date(), mode=_periodMode||'mois';
-  const {pctElapsed,daysElapsed,workingDaysElapsed,isCurrent}=computePctElapsedPeriod(curMonths);
-  const m1Months=shiftPeriodBack(curMonths,mode), a1Months=prevYearMonths(curMonths);
-  let m1Label,a1Label;
-  if (mode==='mois'){const [m1mm,m1yy]=m1Months[0].split('/'), [a1mm,a1yy]=a1Months[0].split('/'); m1Label=MONTH_NAMES[parseInt(m1mm)]+' '+m1yy.slice(2); a1Label=MONTH_NAMES[parseInt(a1mm)]+' '+a1yy.slice(2);}
-  else if(mode==='trim'){const qm1=Math.ceil(parseInt(m1Months[0].split('/')[0])/3),qa1=Math.ceil(parseInt(a1Months[0].split('/')[0])/3); m1Label=`T${qm1} ${m1Months[0].split('/')[1].slice(2)}`; a1Label=`T${qa1} ${a1Months[0].split('/')[1].slice(2)}`;}
-  else if(mode==='sem'){const sm1=parseInt(m1Months[0].split('/')[0])<=6?1:2,sa1=parseInt(a1Months[0].split('/')[0])<=6?1:2; m1Label=`S${sm1} ${m1Months[0].split('/')[1].slice(2)}`; a1Label=`S${sa1} ${a1Months[0].split('/')[1].slice(2)}`;}
-  else{m1Label=m1Months[0].split('/')[1]; a1Label=a1Months[0].split('/')[1];}
-  const navLabel=period.label||curMonths[0];
-  const hdrTitle=mode==='mois'?`Dashboard Paid — ${MONTH_FULL[parseInt(curMonths[0].split('/')[0])]} ${curMonths[0].split('/')[1]}`:`Dashboard Paid — ${period.label}`;
-  document.getElementById('hdr-title').textContent=hdrTitle;
-  document.getElementById('hdr-meta').textContent=isCurrent
-    ?(mode==='mois'?`J${daysElapsed} (${(pctElapsed*100).toFixed(0)}% du mois) · Données au ${today.toLocaleDateString('fr-FR')} · Comparatifs au prorata`:`Période en cours : ${(pctElapsed*100).toFixed(0)}% écoulé · Données au ${today.toLocaleDateString('fr-FR')}`)
-    :(mode==='mois'?'Mois complet · Bilan définitif':'Période complète · Bilan définitif');
-  document.getElementById('mnav-label').textContent=navLabel;
-  document.getElementById('mnav-tag').textContent=isCurrent?'(en cours)':'(complet)';
-  document.getElementById('mnav-prev').disabled=_periodIdx===0;
-  document.getElementById('mnav-next').disabled=_periodIdx===_allPeriods.length-1;
-  renderMois(rows,curMonths,pctElapsed,m1Months,a1Months,daysElapsed,workingDaysElapsed,m1Label,a1Label);
-  renderConvTab(rows,'tab-alertistes','alertiste','Alertistes',curMonths,pctElapsed,m1Months,a1Months,daysElapsed,workingDaysElapsed,m1Label,a1Label);
-  renderConvTab(rows,'tab-cv','cv','CV déposés',curMonths,pctElapsed,m1Months,a1Months,daysElapsed,workingDaysElapsed,m1Label,a1Label);
-  renderSidebar(curMonths);
-  renderFreshnessChip(curMonths[curMonths.length-1]);
-}
-
-// ═══════════════════════════════════════════════
-// BRANDING CHARTS (donut + barres horizontales)
-// ═══════════════════════════════════════════════
-function initBrandingCharts() {
-  if (_chartBrandingDonut) { _chartBrandingDonut.destroy(); _chartBrandingDonut = null; }
-  if (_chartBrandingBar)   { _chartBrandingBar.destroy();   _chartBrandingBar   = null; }
-  if (!_brandingChartData) return;
-  const donutEl = document.getElementById('chart-brand-donut');
-  const barEl   = document.getElementById('chart-brand-bar');
-  if (!donutEl || !barEl) return;
-
-  const { labels, depenses, reaches, restant, totBud, totDep, colors } = _brandingChartData;
-
-  const fmtEurCompact = v =>
-    new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(v);
-
-  // Donut : dépensé par plateforme + restant
-  _chartBrandingDonut = new Chart(donutEl, {
-    type: 'doughnut',
-    data: {
-      labels: [...labels, 'Restant'],
-      datasets: [{ data: [...depenses, restant],
-        backgroundColor: [...colors, '#e2e8f0'], borderWidth: 0, hoverOffset: 4 }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, animation: false, cutout: '62%',
-      plugins: {
-        legend: { display: true, position: 'bottom',
-          labels: { font: { size: 9 }, boxWidth: 8, padding: 8,
-            generateLabels: chart => chart.data.labels.map((l, i) => ({
-              text: l, fillStyle: chart.data.datasets[0].backgroundColor[i],
-              fontColor: '#64748b', borderRadius: 3,
-            }))
+      function computePeriods(allMois, mode) {
+        if (mode === "mois")
+          return allMois.map((m) => {
+            const [mm, yy] = m.split("/");
+            return {
+              key: m,
+              label: `${MONTH_FULL[parseInt(mm)]} ${yy}`,
+              shortLabel: `${MONTH_NAMES[parseInt(mm)]} ${yy.slice(2)}`,
+              months: [m],
+            };
+          });
+        const seen = new Set(),
+          periods = [];
+        for (const m of allMois) {
+          const [mm, yy] = m.split("/").map(Number);
+          let key, label, shortLabel, allM;
+          if (mode === "trim") {
+            const q = Math.ceil(mm / 3),
+              s = (q - 1) * 3 + 1,
+              e = q * 3;
+            allM = [s, s + 1, e].map(
+              (n) => `${String(n).padStart(2, "0")}/${yy}`,
+            );
+            key = `T${q}-${yy}`;
+            label = `T${q} ${yy}`;
+            shortLabel = label;
+          } else if (mode === "sem") {
+            const s2 = mm <= 6 ? 1 : 2,
+              mN = s2 === 1 ? [1, 2, 3, 4, 5, 6] : [7, 8, 9, 10, 11, 12];
+            allM = mN.map((n) => `${String(n).padStart(2, "0")}/${yy}`);
+            key = `S${s2}-${yy}`;
+            label = `S${s2} ${yy} · ${MONTH_NAMES[mN[0]]}–${MONTH_NAMES[mN[5]]}`;
+            shortLabel = `S${s2} ${yy}`;
+          } else {
+            allM = Array.from(
+              { length: 12 },
+              (_, i) => `${String(i + 1).padStart(2, "0")}/${yy}`,
+            );
+            key = `${yy}`;
+            label = `Année ${yy}`;
+            shortLabel = `${yy}`;
           }
-        },
-        tooltip: { bodyFont: { size: 11 },
-          callbacks: { label: ctx => ` ${fmtEurCompact(ctx.parsed)}` }
+          if (!seen.has(key)) {
+            seen.add(key);
+            periods.push({
+              key,
+              label,
+              shortLabel,
+              months: allM.filter((m2) => allMois.includes(m2)),
+            });
+          }
         }
+        return periods;
       }
-    }
-  });
 
-  // Barres horizontales : reach par plateforme
-  _chartBrandingBar = new Chart(barEl, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{ data: reaches,
-        backgroundColor: colors.map(c => c + 'bb'), borderColor: colors,
-        borderWidth: 1, borderRadius: 3 }]
-    },
-    options: {
-      indexAxis: 'y', responsive: true, maintainAspectRatio: false, animation: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { bodyFont: { size: 11 },
-          callbacks: { label: ctx => ` ${new Intl.NumberFormat('fr-FR').format(ctx.parsed.x)}` }
+      function shiftPeriodBack(months, mode) {
+        if (mode === "mois" || mode === "an")
+          return months.map((m) => {
+            const [mm, yy] = m.split("/");
+            return `${mm}/${parseInt(yy) - 1}`;
+          });
+        const len = mode === "trim" ? 3 : 6;
+        return months.map((m) => {
+          const [mm, yy] = m.split("/").map(Number);
+          let n = mm - len,
+            y = yy;
+          if (n <= 0) {
+            n += 12;
+            y--;
+          }
+          return `${String(n).padStart(2, "0")}/${y}`;
+        });
+      }
+
+      function prevYearMonths(months) {
+        return months.map((m) => {
+          const [mm, yy] = m.split("/");
+          return `${mm}/${parseInt(yy) - 1}`;
+        });
+      }
+
+      function setPeriodMode(mode) {
+        _periodMode = mode;
+        document
+          .querySelectorAll(".pmb")
+          .forEach((b) => b.classList.remove("active"));
+        const btn = document.getElementById("pmb-" + mode);
+        if (btn) btn.classList.add("active");
+        _allPeriods = computePeriods(_allMois, mode);
+        _periodIdx = _allPeriods.findIndex((p) =>
+          p.months.includes(_allMois[_selMoisIdx]),
+        );
+        if (_periodIdx < 0) _periodIdx = _allPeriods.length - 1;
+        renderCurrentPeriod();
+      }
+
+      function navPeriod(dir) {
+        const next = _periodIdx + dir;
+        if (next < 0 || next >= _allPeriods.length) return;
+        _periodIdx = next;
+        const p = _allPeriods[_periodIdx],
+          lastM = p.months[p.months.length - 1];
+        _selMoisIdx = _allMois.indexOf(lastM);
+        if (_selMoisIdx < 0) _selMoisIdx = _allMois.length - 1;
+        renderCurrentPeriod();
+      }
+
+      function navMonth(dir) {
+        navPeriod(dir);
+      }
+
+      function renderCurrentPeriod() {
+        renderDetailTabs(_rows, _allMois, _allPeriods[_periodIdx]);
+      }
+
+      function switchTab(name) {
+        document
+          .querySelectorAll(".tab")
+          .forEach((t) => t.classList.toggle("active", t.dataset.tab === name));
+        document
+          .querySelectorAll(".tab-panel")
+          .forEach((p) => p.classList.remove("active"));
+        document.getElementById("tab-" + name).classList.add("active");
+        document
+          .getElementById("month-nav")
+          .classList.toggle("hidden", name === "evol");
+        document
+          .getElementById("period-status-bar")
+          .classList.toggle("hidden", name === "evol");
+      }
+
+      function renderDetailTabs(rows, allMois, periodOrMois) {
+        const period =
+          typeof periodOrMois === "string"
+            ? {
+                key: periodOrMois,
+                label: "",
+                shortLabel: "",
+                months: [periodOrMois],
+              }
+            : periodOrMois;
+        const curMonths = period.months,
+          mode = _periodMode || "mois";
+        const progress = getPeriodProgress(mode, period);
+        const {
+          pct: pctElapsed,
+          joursEcoules: daysElapsed,
+          isCurrent,
+        } = progress;
+        const workingDaysElapsed = 0; // non utilisé (dead code hérité, countWorkingDays jamais branché à l'affichage)
+        const m1Months = shiftPeriodBack(curMonths, mode),
+          a1Months = prevYearMonths(curMonths);
+        let m1Label, a1Label;
+        if (mode === "mois") {
+          const [m1mm, m1yy] = m1Months[0].split("/"),
+            [a1mm, a1yy] = a1Months[0].split("/");
+          m1Label = MONTH_NAMES[parseInt(m1mm)] + " " + m1yy.slice(2);
+          a1Label = MONTH_NAMES[parseInt(a1mm)] + " " + a1yy.slice(2);
+        } else if (mode === "trim") {
+          const qm1 = Math.ceil(parseInt(m1Months[0].split("/")[0]) / 3),
+            qa1 = Math.ceil(parseInt(a1Months[0].split("/")[0]) / 3);
+          m1Label = `T${qm1} ${m1Months[0].split("/")[1].slice(2)}`;
+          a1Label = `T${qa1} ${a1Months[0].split("/")[1].slice(2)}`;
+        } else if (mode === "sem") {
+          const sm1 = parseInt(m1Months[0].split("/")[0]) <= 6 ? 1 : 2,
+            sa1 = parseInt(a1Months[0].split("/")[0]) <= 6 ? 1 : 2;
+          m1Label = `S${sm1} ${m1Months[0].split("/")[1].slice(2)}`;
+          a1Label = `S${sa1} ${a1Months[0].split("/")[1].slice(2)}`;
+        } else {
+          m1Label = m1Months[0].split("/")[1];
+          a1Label = a1Months[0].split("/")[1];
         }
-      },
-      scales: {
-        x: { grid: { color: '#f1f5f9' }, border: { display: false },
-          ticks: { font: { size: 9 }, color: '#94a3b8',
-            callback: v => new Intl.NumberFormat('fr-FR',{notation:'compact'}).format(v) } },
-        y: { grid: { display: false }, border: { display: false },
-          ticks: { font: { size: 10 }, color: '#374151' } }
+        const navLabel = period.label || curMonths[0];
+        document.getElementById("hdr-title").textContent =
+          "Dashboard Paid Performance";
+        document.getElementById("period-status-bar").innerHTML =
+          renderPeriodStatusBar(progress);
+        document.getElementById("mnav-label").textContent = navLabel;
+        document.getElementById("mnav-tag").textContent = isCurrent
+          ? "(en cours)"
+          : "(complet)";
+        document.getElementById("mnav-prev").disabled = _periodIdx === 0;
+        document.getElementById("mnav-next").disabled =
+          _periodIdx === _allPeriods.length - 1;
+        renderMois(
+          rows,
+          curMonths,
+          pctElapsed,
+          m1Months,
+          a1Months,
+          daysElapsed,
+          workingDaysElapsed,
+          m1Label,
+          a1Label,
+        );
+        renderConvTab(
+          rows,
+          "tab-alertistes",
+          "alertiste",
+          "Alertistes",
+          curMonths,
+          pctElapsed,
+          m1Months,
+          a1Months,
+          daysElapsed,
+          workingDaysElapsed,
+          m1Label,
+          a1Label,
+        );
+        renderConvTab(
+          rows,
+          "tab-cv",
+          "cv",
+          "CV déposés",
+          curMonths,
+          pctElapsed,
+          m1Months,
+          a1Months,
+          daysElapsed,
+          workingDaysElapsed,
+          m1Label,
+          a1Label,
+        );
+        renderSidebar(curMonths, mode);
+        renderFreshnessChip(curMonths[curMonths.length - 1]);
       }
-    }
-  });
-}
 
-// ═══════════════════════════════════════════════
-// FRESHNESS CHIP (branding data)
-// ═══════════════════════════════════════════════
-function daysSince(dateStr) {
-  if (!dateStr) return null;
-  const d = parseExactDate(dateStr);
-  if (!d) return null;
-  const today = new Date(); today.setHours(0,0,0,0);
-  return Math.floor((today - d) / 86400000);
-}
+      // ═══════════════════════════════════════════════
+      // BRANDING CHARTS (donut + barres horizontales)
+      // ═══════════════════════════════════════════════
+      function initBrandingCharts() {
+        if (_chartBrandingDonut) {
+          _chartBrandingDonut.destroy();
+          _chartBrandingDonut = null;
+        }
+        if (_chartBrandingBar) {
+          _chartBrandingBar.destroy();
+          _chartBrandingBar = null;
+        }
+        if (!_brandingChartData) return;
+        const donutEl = document.getElementById("chart-brand-donut");
+        const barEl = document.getElementById("chart-brand-bar");
+        if (!donutEl || !barEl) return;
 
-function renderFreshnessChip(selMois) {
-  const chip = document.getElementById('freshness-chip');
-  if (!chip) return;
+        const { labels, depenses, reaches, restant, totBud, totDep, colors } =
+          _brandingChartData;
 
-  const MOIS_SHORT = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
-  const fmtDay    = s => { const d = parseExactDate(s); return d ? `${d.getDate()} ${MOIS_SHORT[d.getMonth()]}` : (s || '—'); };
-  const fmtDaysLbl = days => days === null ? '—' : days === 0 ? "aujourd'hui" : days === 1 ? 'hier' : `il y a ${days}j`;
-  const dot = cls => `<span class="fr-dot ${cls}"></span>`;
+        const fmtEurCompact = (v) =>
+          new Intl.NumberFormat("fr-FR", {
+            style: "currency",
+            currency: "EUR",
+            maximumFractionDigits: 0,
+          }).format(v);
 
-  // ── Helper config : une plateforme est-elle active pour perf/branding ?
-  const isPerfActif = label => {
-    if (!_config.length) return true; // si pas de config, tout actif par défaut
-    const found = _config.find(c => c.plateforme.toLowerCase() === label.toLowerCase());
-    return found ? found.perfActif : true;
-  };
-  const isBrandingActif = label => {
-    if (!_config.length) return true;
-    const found = _config.find(c => c.plateforme.toLowerCase() === label.toLowerCase());
-    return found ? found.brandingActif : true;
-  };
+        // Donut : dépensé par plateforme + restant
+        _chartBrandingDonut = new Chart(donutEl, {
+          type: "doughnut",
+          data: {
+            labels: [...labels, "Restant"],
+            datasets: [
+              {
+                data: [...depenses, restant],
+                backgroundColor: [...colors, "#e2e8f0"],
+                borderWidth: 0,
+                hoverOffset: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            cutout: "62%",
+            plugins: {
+              legend: {
+                display: true,
+                position: "bottom",
+                labels: {
+                  font: { size: 9 },
+                  boxWidth: 8,
+                  padding: 8,
+                  generateLabels: (chart) =>
+                    chart.data.labels.map((l, i) => ({
+                      text: l,
+                      fillStyle: chart.data.datasets[0].backgroundColor[i],
+                      fontColor: "#64748b",
+                      borderRadius: 3,
+                    })),
+                },
+              },
+              tooltip: {
+                bodyFont: { size: 11 },
+                callbacks: { label: (ctx) => ` ${fmtEurCompact(ctx.parsed)}` },
+              },
+            },
+          },
+        });
 
-  // ── Acquisition ──
-  const acqByCanal = {};
-  for (const r of (_rows || [])) {
-    if (r.mois !== selMois || !r.derniereMAJ) continue;
-    if (!isPerfActif(r.canal)) continue; // plateforme pausée → ignorée
-    const d = parseExactDate(r.derniereMAJ);
-    if (!d) continue;
-    if (!acqByCanal[r.canal] || d > acqByCanal[r.canal].date)
-      acqByCanal[r.canal] = { date: d, str: r.derniereMAJ };
-  }
-  const acqStatuses = Object.entries(acqByCanal).map(([label, info]) => {
-    const days = daysSince(info.str);
-    const status = days === null ? 'na' : days <= 1 ? 'ok' : days <= 2 ? 'warn' : 'err';
-    return { label, days, str: info.str, status };
-  });
+        // Barres horizontales : reach par plateforme
+        _chartBrandingBar = new Chart(barEl, {
+          type: "bar",
+          data: {
+            labels,
+            datasets: [
+              {
+                data: reaches,
+                backgroundColor: colors.map((c) => c + "bb"),
+                borderColor: colors,
+                borderWidth: 1,
+                borderRadius: 3,
+              },
+            ],
+          },
+          options: {
+            indexAxis: "y",
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                bodyFont: { size: 11 },
+                callbacks: {
+                  label: (ctx) =>
+                    ` ${new Intl.NumberFormat("fr-FR").format(ctx.parsed.x)}`,
+                },
+              },
+            },
+            scales: {
+              x: {
+                grid: { color: "#f1f5f9" },
+                border: { display: false },
+                ticks: {
+                  font: { size: 9 },
+                  color: "#94a3b8",
+                  callback: (v) =>
+                    new Intl.NumberFormat("fr-FR", {
+                      notation: "compact",
+                    }).format(v),
+                },
+              },
+              y: {
+                grid: { display: false },
+                border: { display: false },
+                ticks: { font: { size: 10 }, color: "#374151" },
+              },
+            },
+          },
+        });
+      }
 
-  // ── Branding ──
-  const byPlat = {};
-  for (const r of (_plancom || [])) {
-    if (!r.derniereMAJ) continue;
-    if (!isBrandingActif(r.plateforme)) continue; // plateforme pausée → ignorée
-    const d = parseExactDate(r.derniereMAJ);
-    if (!d) continue;
-    if (!byPlat[r.plateforme] || d > byPlat[r.plateforme].date)
-      byPlat[r.plateforme] = { date: d, str: r.derniereMAJ };
-  }
-  const brandStatuses = Object.entries(byPlat).map(([label, info]) => {
-    const days = daysSince(info.str);
-    const status = days === null ? 'na' : days <= 3 ? 'ok' : days <= 7 ? 'warn' : 'err';
-    return { label, days, str: info.str, status };
-  });
+      // ═══════════════════════════════════════════════
+      // FRESHNESS CHIP (branding data)
+      // ═══════════════════════════════════════════════
+      function daysSince(dateStr) {
+        if (!dateStr) return null;
+        const d = parseExactDate(dateStr);
+        if (!d) return null;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return Math.floor((today - d) / 86400000);
+      }
 
-  // ── Helper : construit le bloc de dots pour une section ──
-  function sectionInner(statuses, label) {
-    const ok   = statuses.filter(s => s.status === 'ok').length;
-    const warn = statuses.filter(s => s.status === 'warn').length;
-    const err  = statuses.filter(s => s.status === 'err').length;
-    let html = `${dot('fr-dot-ok')} <span style="color:#374151;font-weight:500">${label}</span> <span style="color:#94a3b8">(${ok})</span>`;
-    if (warn > 0) html += ` <span style="color:#d1d5db">·</span> ${dot('fr-dot-warn')} <span style="color:#94a3b8">(${warn})</span>`;
-    if (err  > 0) html += ` <span style="color:#d1d5db">·</span> ${dot('fr-dot-err')} <span style="color:#94a3b8">(${err})</span>`;
-    return html;
-  }
+      function renderFreshnessChip(selMois) {
+        const chip = document.getElementById("freshness-chip");
+        if (!chip) return;
 
-  // ── Helper : tooltip rows ──
-  const makeRows = statuses => statuses
-    .sort((a, b) => (b.days ?? -1) - (a.days ?? -1))
-    .map(s => {
-      const dotC = s.status === 'ok' ? 'fr-dot-ok' : s.status === 'err' ? 'fr-dot-err' : 'fr-dot-warn';
-      return `<div class="fr-tooltip-row">
+        const MOIS_SHORT = [
+          "jan",
+          "fév",
+          "mar",
+          "avr",
+          "mai",
+          "jun",
+          "jul",
+          "aoû",
+          "sep",
+          "oct",
+          "nov",
+          "déc",
+        ];
+        const fmtDay = (s) => {
+          const d = parseExactDate(s);
+          return d ? `${d.getDate()} ${MOIS_SHORT[d.getMonth()]}` : s || "—";
+        };
+        const fmtDaysLbl = (days) =>
+          days === null
+            ? "—"
+            : days === 0
+              ? "aujourd'hui"
+              : days === 1
+                ? "hier"
+                : `il y a ${days}j`;
+        const dot = (cls) => `<span class="fr-dot ${cls}"></span>`;
+
+        // ── Helper config : une plateforme est-elle active pour perf/branding ?
+        const isPerfActif = (label) => {
+          if (!_config.length) return true; // si pas de config, tout actif par défaut
+          const found = _config.find(
+            (c) => c.plateforme.toLowerCase() === label.toLowerCase(),
+          );
+          return found ? found.perfActif : true;
+        };
+        const isBrandingActif = (label) => {
+          if (!_config.length) return true;
+          const found = _config.find(
+            (c) => c.plateforme.toLowerCase() === label.toLowerCase(),
+          );
+          return found ? found.brandingActif : true;
+        };
+
+        // ── Acquisition ──
+        const acqByCanal = {};
+        for (const r of _rows || []) {
+          if (r.mois !== selMois || !r.derniereMAJ) continue;
+          if (!isPerfActif(r.canal)) continue; // plateforme pausée → ignorée
+          const d = parseExactDate(r.derniereMAJ);
+          if (!d) continue;
+          if (!acqByCanal[r.canal] || d > acqByCanal[r.canal].date)
+            acqByCanal[r.canal] = { date: d, str: r.derniereMAJ };
+        }
+        const acqStatuses = Object.entries(acqByCanal).map(([label, info]) => {
+          const days = daysSince(info.str);
+          const status =
+            days === null
+              ? "na"
+              : days <= 1
+                ? "ok"
+                : days <= 2
+                  ? "warn"
+                  : "err";
+          return { label, days, str: info.str, status };
+        });
+
+        // ── Branding ──
+        const byPlat = {};
+        for (const r of _plancom || []) {
+          if (!r.derniereMAJ) continue;
+          if (!isBrandingActif(r.plateforme)) continue; // plateforme pausée → ignorée
+          const d = parseExactDate(r.derniereMAJ);
+          if (!d) continue;
+          if (!byPlat[r.plateforme] || d > byPlat[r.plateforme].date)
+            byPlat[r.plateforme] = { date: d, str: r.derniereMAJ };
+        }
+        const brandStatuses = Object.entries(byPlat).map(([label, info]) => {
+          const days = daysSince(info.str);
+          const status =
+            days === null
+              ? "na"
+              : days <= 3
+                ? "ok"
+                : days <= 7
+                  ? "warn"
+                  : "err";
+          return { label, days, str: info.str, status };
+        });
+
+        // ── Helper : construit le bloc de dots pour une section ──
+        function sectionInner(statuses, label) {
+          const ok = statuses.filter((s) => s.status === "ok").length;
+          const warn = statuses.filter((s) => s.status === "warn").length;
+          const err = statuses.filter((s) => s.status === "err").length;
+          let html = `${dot("fr-dot-ok")} <span style="color:#374151;font-weight:500">${label}</span> <span style="color:#94a3b8">(${ok})</span>`;
+          if (warn > 0)
+            html += ` <span style="color:#d1d5db">·</span> ${dot("fr-dot-warn")} <span style="color:#94a3b8">(${warn})</span>`;
+          if (err > 0)
+            html += ` <span style="color:#d1d5db">·</span> ${dot("fr-dot-err")} <span style="color:#94a3b8">(${err})</span>`;
+          return html;
+        }
+
+        // ── Helper : tooltip rows ──
+        const makeRows = (statuses) =>
+          statuses
+            .sort((a, b) => (b.days ?? -1) - (a.days ?? -1))
+            .map((s) => {
+              const dotC =
+                s.status === "ok"
+                  ? "fr-dot-ok"
+                  : s.status === "err"
+                    ? "fr-dot-err"
+                    : "fr-dot-warn";
+              return `<div class="fr-tooltip-row">
         <span style="display:flex;align-items:center;gap:5px">${dot(dotC)} ${s.label}</span>
         <span style="color:#94a3b8;white-space:nowrap">${fmtDay(s.str)} <em style="color:#cbd5e1">(${fmtDaysLbl(s.days)})</em></span>
       </div>`;
-    }).join('');
+            })
+            .join("");
 
-  const hasAcq   = acqStatuses.length > 0;
-  const hasBrand = brandStatuses.length > 0;
-  const [smm] = (selMois || '').split('/');
-  const moisLbl = smm ? MONTH_NAMES[parseInt(smm)] : '';
+        const hasAcq = acqStatuses.length > 0;
+        const hasBrand = brandStatuses.length > 0;
+        const [smm] = (selMois || "").split("/");
+        const moisLbl = smm ? MONTH_NAMES[parseInt(smm)] : "";
 
-  // ── Inner chip HTML ──
-  let innerHtml = `<span style="color:#94a3b8;font-size:11px;margin-right:2px">Fraîcheur ·</span>`;
-  if (hasAcq)   innerHtml += sectionInner(acqStatuses, 'Acq.');
-  if (hasAcq && hasBrand) innerHtml += ` <span class="fr-sep-pipe">|</span> `;
-  if (hasBrand) innerHtml += sectionInner(brandStatuses, 'Bran.');
-  if (!hasAcq && !hasBrand) {
-    innerHtml += `${dot('fr-dot-warn')} <span style="color:#94a3b8;font-style:italic">MàJ non renseignées</span>`;
-  }
+        // ── Inner chip HTML ──
+        let innerHtml = `<span style="color:#94a3b8;font-size:11px;margin-right:2px">Fraîcheur ·</span>`;
+        if (hasAcq) innerHtml += sectionInner(acqStatuses, "Acq.");
+        if (hasAcq && hasBrand)
+          innerHtml += ` <span class="fr-sep-pipe">|</span> `;
+        if (hasBrand) innerHtml += sectionInner(brandStatuses, "Bran.");
+        if (!hasAcq && !hasBrand) {
+          innerHtml += `${dot("fr-dot-warn")} <span style="color:#94a3b8;font-style:italic">MàJ non renseignées</span>`;
+        }
 
-  // ── Tooltip HTML ──
-  let tooltipHtml = '';
-  if (hasAcq) {
-    tooltipHtml += `<div class="fr-tooltip-hdr">📈 Acquisition — ${moisLbl}</div>${makeRows(acqStatuses)}`;
-  } else {
-    tooltipHtml += `<div class="fr-tooltip-hdr">📈 Acquisition — ${moisLbl}</div>
+        // ── Tooltip HTML ──
+        let tooltipHtml = "";
+        if (hasAcq) {
+          tooltipHtml += `<div class="fr-tooltip-hdr">📈 Acquisition — ${moisLbl}</div>${makeRows(acqStatuses)}`;
+        } else {
+          tooltipHtml += `<div class="fr-tooltip-hdr">📈 Acquisition — ${moisLbl}</div>
       <div class="fr-tooltip-row"><span style="color:#94a3b8;font-style:italic">Colonne MàJ non renseignée dans le Sheet</span></div>`;
-  }
-  if (hasBrand) {
-    tooltipHtml += `<div class="fr-tooltip-hdr">📡 Branding</div>${makeRows(brandStatuses)}`;
-  } else if (_plancom && _plancom.length) {
-    tooltipHtml += `<div class="fr-tooltip-hdr">📡 Branding</div>
+        }
+        if (hasBrand) {
+          tooltipHtml += `<div class="fr-tooltip-hdr">📡 Branding</div>${makeRows(brandStatuses)}`;
+        } else if (_plancom && _plancom.length) {
+          tooltipHtml += `<div class="fr-tooltip-hdr">📡 Branding</div>
       <div class="fr-tooltip-row"><span style="color:#94a3b8;font-style:italic">Colonne MàJ non renseignée dans PlanCom</span></div>`;
-  }
+        }
 
-  document.getElementById('freshness-inner').innerHTML  = innerHtml;
-  document.getElementById('freshness-tooltip').innerHTML = tooltipHtml;
-  chip.className     = 'fr-chip';
-  chip.style.display = 'flex';
-}
+        document.getElementById("freshness-inner").innerHTML = innerHtml;
+        document.getElementById("freshness-tooltip").innerHTML = tooltipHtml;
+        chip.className = "fr-chip";
+        chip.style.display = "flex";
+      }
 
-// ═══════════════════════════════════════════════
-// MAIN
-// ═══════════════════════════════════════════════
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxc64I1H3_zc30tLuaTMizABbPJ8fNFCVw3nfdJGYZES01IBCAN4KGK5gPkq0JDN0_PJg/exec';
+      // ═══════════════════════════════════════════════
+      // MAIN
+      // ═══════════════════════════════════════════════
+      const APPS_SCRIPT_URL =
+        "https://script.google.com/macros/s/AKfycbxc64I1H3_zc30tLuaTMizABbPJ8fNFCVw3nfdJGYZES01IBCAN4KGK5gPkq0JDN0_PJg/exec";
 
-async function main() {
-  try {
-    const res = await fetch(APPS_SCRIPT_URL);
-    if (!res.ok) throw new Error('Erreur HTTP ' + res.status);
-    const { rows, error, contexte, plancom, config } = await res.json();
-    if (error) throw new Error(error);
-    if (!rows || !rows.length) throw new Error('Aucune donnée — vérifier la structure du fichier.');
+      async function main() {
+        try {
+          const res = await fetch(APPS_SCRIPT_URL);
+          if (!res.ok) throw new Error("Erreur HTTP " + res.status);
+          const { rows, error, contexte, plancom, config } = await res.json();
+          if (error) throw new Error(error);
+          if (!rows || !rows.length)
+            throw new Error(
+              "Aucune donnée — vérifier la structure du fichier.",
+            );
 
-    _contexte = contexte || [];
-    _plancom  = plancom  || [];
-    _config   = config   || [];
+          _contexte = contexte || [];
+          _plancom = plancom || [];
+          _config = config || [];
 
-    const _today = new Date();
-    const todayMoisStr = `${String(_today.getMonth()+1).padStart(2,'0')}/${_today.getFullYear()}`;
-    const toKey = m => { const [mm,yy] = m.split('/'); return `${yy}-${mm}`; };
-    const todayKey = toKey(todayMoisStr);
-    // Filtrer les mois futurs (budget rempli à l'avance mais pas encore arrivés)
-    const allMois = sortMois([...new Set(rows.map(r => r.mois))]).filter(m => toKey(m) <= todayKey);
-    // Défaut = mois en cours, sinon dernier mois disponible
-    const curIdx = allMois.indexOf(todayMoisStr);
-    _rows = rows; _allMois = allMois; _selMoisIdx = curIdx >= 0 ? curIdx : allMois.length - 1;
-    _periodMode='mois'; _allPeriods=computePeriods(allMois,'mois'); _periodIdx=_selMoisIdx;
+          const _today = new Date();
+          const todayMoisStr = `${String(_today.getMonth() + 1).padStart(2, "0")}/${_today.getFullYear()}`;
+          const toKey = (m) => {
+            const [mm, yy] = m.split("/");
+            return `${yy}-${mm}`;
+          };
+          const todayKey = toKey(todayMoisStr);
+          // Filtrer les mois futurs (budget rempli à l'avance mais pas encore arrivés)
+          const allMois = sortMois([
+            ...new Set(rows.map((r) => r.mois)),
+          ]).filter((m) => toKey(m) <= todayKey);
+          // Défaut = mois en cours, sinon dernier mois disponible
+          const curIdx = allMois.indexOf(todayMoisStr);
+          _rows = rows;
+          _allMois = allMois;
+          _selMoisIdx = curIdx >= 0 ? curIdx : allMois.length - 1;
+          _periodMode = "mois";
+          _allPeriods = computePeriods(allMois, "mois");
+          _periodIdx = _selMoisIdx;
 
-    renderCurrentPeriod();
-    renderEvol(rows, allMois);
+          renderCurrentPeriod();
+          renderEvol(rows, allMois);
 
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-  } catch(e) {
-    document.getElementById('loading').innerHTML =
-      `<div class="error">⚠️ Erreur : ${e.message}<br><small>${e.stack||''}</small></div>`;
-  }
-}
-</script>
-</body>
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("app").style.display = "block";
+        } catch (e) {
+          document.getElementById("loading").innerHTML =
+            `<div class="error">⚠️ Erreur : ${e.message}<br><small>${e.stack || ""}</small></div>`;
+        }
+      }
+    </script>
+  </body>
 </html>
