@@ -1162,6 +1162,62 @@
       // ═══════════════════════════════════════════════
       let _idToken = null;
 
+      // ── SESSION PERSISTANTE ──
+      const SESSION_KEY = "cadremploi_dash_session";
+      const SESSION_TTL_MS = 45 * 24 * 60 * 60 * 1000; // 45j glissants
+
+      function saveSession(user) {
+        localStorage.setItem(
+          SESSION_KEY,
+          JSON.stringify({ ...user, ts: Date.now() }),
+        );
+      }
+      function loadSession() {
+        try {
+          const raw = localStorage.getItem(SESSION_KEY);
+          if (!raw) return null;
+          const s = JSON.parse(raw);
+          if (Date.now() - s.ts > SESSION_TTL_MS) {
+            localStorage.removeItem(SESSION_KEY);
+            return null;
+          }
+          return s;
+        } catch (e) {
+          return null;
+        }
+      }
+      function clearSession() {
+        localStorage.removeItem(SESSION_KEY);
+      }
+
+      function applyUserToHeader(email, name, picture) {
+        document.getElementById("hdr-name").textContent = name;
+        document.getElementById("hdr-email").textContent = email;
+        if (picture) {
+          const av = document.getElementById("hdr-avatar");
+          av.src = picture;
+          av.style.display = "block";
+        }
+      }
+
+      function logAccess(email, name) {
+        fetch(
+          APPS_SCRIPT_URL +
+            "?action=log&email=" +
+            encodeURIComponent(email) +
+            "&name=" +
+            encodeURIComponent(name),
+        ).catch(() => {});
+      }
+
+      function bootDashboard(email, name, picture) {
+        applyUserToHeader(email, name, picture);
+        logAccess(email, name); // log systématique, session restaurée ou pas
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("loading").style.display = "flex";
+        main();
+      }
+
       function handleCredentialResponse(response) {
         const token = response.credential;
         try {
@@ -1187,23 +1243,8 @@
             return;
           }
           _idToken = token;
-          document.getElementById("hdr-name").textContent = givenName;
-          document.getElementById("hdr-email").textContent = email;
-          if (picture) {
-            const av = document.getElementById("hdr-avatar");
-            av.src = picture;
-            av.style.display = "block";
-          }
-          fetch(
-            APPS_SCRIPT_URL +
-              "?action=log&email=" +
-              encodeURIComponent(email) +
-              "&name=" +
-              encodeURIComponent(name),
-          ).catch(() => {});
-          document.getElementById("login-screen").style.display = "none";
-          document.getElementById("loading").style.display = "flex";
-          main();
+          saveSession({ email, name: givenName, fullName: name, picture });
+          bootDashboard(email, givenName, picture);
         } catch (e) {
           document.getElementById("login-error").textContent =
             "Erreur de connexion : " + e.message;
@@ -1211,6 +1252,7 @@
       }
 
       function signOut() {
+        clearSession();
         _idToken = null;
         if (window.google && google.accounts)
           google.accounts.id.disableAutoSelect();
@@ -3357,6 +3399,14 @@
             `<div class="error">⚠️ Erreur : ${e.message}<br><small>${e.stack || ""}</small></div>`;
         }
       }
+      // ── INIT : tente une restauration de session avant d'afficher le login ──
+      (function initAuth() {
+        const s = loadSession();
+        if (s && s.email) {
+          saveSession(s); // touche la session → fenêtre glissante de 30j
+          bootDashboard(s.email, s.name, s.picture);
+        }
+      })();
     </script>
   </body>
 </html>
