@@ -2768,7 +2768,7 @@
       // calculs dupliqués (bug initial : l'encart "Mois en cours" restait câblé sur
       // une logique mensuelle même en Trimestre/Semestre/Année).
       function getPeriodProgress(periodMode, period) {
-        const months = period.months;
+        const months = period.fullMonths || period.months;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const todayKey = `${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
@@ -2833,6 +2833,7 @@
               label: `${MONTH_FULL[parseInt(mm)]} ${yy}`,
               shortLabel: `${MONTH_NAMES[parseInt(mm)]} ${yy.slice(2)}`,
               months: [m],
+              fullMonths: [m],
             };
           });
         const seen = new Set(),
@@ -2873,6 +2874,7 @@
               label,
               shortLabel,
               months: allM.filter((m2) => allMois.includes(m2)),
+              fullMonths: allM,
             });
           }
         }
