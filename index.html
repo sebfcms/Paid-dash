@@ -2882,10 +2882,21 @@
       }
 
       function shiftPeriodBack(months, mode) {
-        if (mode === "mois" || mode === "an")
+        if (mode === "an")
           return months.map((m) => {
             const [mm, yy] = m.split("/");
             return `${mm}/${parseInt(yy) - 1}`;
+          });
+        if (mode === "mois")
+          return months.map((m) => {
+            const [mm, yy] = m.split("/").map(Number);
+            let n = mm - 1,
+              y = yy;
+            if (n <= 0) {
+              n += 12;
+              y--;
+            }
+            return `${String(n).padStart(2, "0")}/${y}`;
           });
         const len = mode === "trim" ? 3 : 6;
         return months.map((m) => {
