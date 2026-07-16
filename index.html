@@ -1302,6 +1302,14 @@
   <col style="width:52px"><col style="width:38px"><col style="width:38px">
 </colgroup>`;
 
+      // Mode "année" : pas de colonne "vs M-1" distincte (M-1 = A-1 par construction)
+      const COLGROUP_AN = `<colgroup>
+  <col style="width:88px">
+  <col style="width:52px"><col style="width:58px"><col style="width:78px"><col style="width:46px">
+  <col style="width:54px"><col style="width:46px">
+  <col style="width:58px"><col style="width:46px">
+</colgroup>`;
+
       const CAT_COLORS = {
         SEA: "#2563eb",
         Agrégateurs: "#f97316",
@@ -2091,6 +2099,7 @@
         invertDelta,
         extraHtml = "",
         projHtml = "",
+        isAnnual = false,
       ) {
         return `<div class="kpi-card">
     <div class="kpi-label">${label}</div>
@@ -2099,7 +2108,7 @@
     ${extraHtml}
     <div class="kpi-compare">
       <div class="kpi-compare-line"><span>vs ${a1Label}</span>${fmtDelta(deltaA1, invertDelta)}</div>
-      <div class="kpi-compare-line"><span>vs ${m1Label}</span>${fmtDelta(deltaM1, invertDelta)}</div>
+      ${isAnnual ? "" : `<div class="kpi-compare-line"><span>vs ${m1Label}</span>${fmtDelta(deltaM1, invertDelta)}</div>`}
     </div>
   </div>`;
       }
@@ -2129,6 +2138,7 @@
         m1Label,
         a1Label,
         pctElapsed = 1,
+        isAnnual = false,
       ) {
         // Mini barre % consommé colorée selon rythme vs temps écoulé
         function fmtPctBar(dep, bud) {
@@ -2146,7 +2156,25 @@
     </div>`;
         }
 
-        const theadHtml = `<thead>
+        // En mode annuel, M-1 === A-1 par construction (shiftPeriodBack("an") ===
+        // prevYearMonths) : afficher les deux colonnes reviendrait à dupliquer la même
+        // donnée sous deux libellés identiques ("vs 2025" deux fois). On masque la
+        // colonne "vs M-1" dans ce mode plutôt que de montrer un doublon trompeur.
+        const theadHtml = isAnnual
+          ? `<thead>
+    <tr>
+      <th class="left" rowspan="2">Canal</th>
+      <th class="group" colspan="4">Dépenses</th>
+      <th class="group" colspan="2">${metricLabel}</th>
+      <th class="group" colspan="2">CPA ${metricLabel}</th>
+    </tr>
+    <tr>
+      <th>Budget</th><th>Actuel</th><th>% consommé</th><th class="pre-sep">vs ${a1Label}</th>
+      <th>Actuel</th><th class="pre-sep">vs ${a1Label}</th>
+      <th>Actuel</th><th>vs ${a1Label}</th>
+    </tr>
+  </thead>`
+          : `<thead>
     <tr>
       <th class="left" rowspan="2">Canal</th>
       <th class="group" colspan="5">Dépenses</th>
@@ -2180,14 +2208,14 @@
       <td class="sep">${isOrg ? '<span class="na">—</span>' : fmtEuro(cd.budget)}</td>
       <td class="act">${isOrg ? '<span class="na">—</span>' : fmtEuro(cd.depenses)}</td>
       <td>${isOrg ? '<span class="na">—</span>' : fmtPctBar(cd.depenses, cd.budget)}</td>
-      <td>${isOrg ? "" : fmtDelta(pctDelta(cd.depenses, pro(ad.depenses)))}</td>
-      <td class="pre-sep">${isOrg ? "" : fmtDelta(pctDelta(cd.depenses, pro(md.depenses)))}</td>
+      <td${isAnnual ? ' class="pre-sep"' : ""}>${isOrg ? "" : fmtDelta(pctDelta(cd.depenses, pro(ad.depenses)))}</td>
+      ${isAnnual ? "" : `<td class="pre-sep">${isOrg ? "" : fmtDelta(pctDelta(cd.depenses, pro(md.depenses)))}</td>`}
       <td class="sep act">${fmtK(val)}</td>
-      <td>${fmtDelta(pctDelta(val, pro(aVal)))}</td>
-      <td class="pre-sep">${fmtDelta(pctDelta(val, pro(mVal)))}</td>
+      <td${isAnnual ? ' class="pre-sep"' : ""}>${fmtDelta(pctDelta(val, pro(aVal)))}</td>
+      ${isAnnual ? "" : `<td class="pre-sep">${fmtDelta(pctDelta(val, pro(mVal)))}</td>`}
       <td class="sep act">${isOrg ? '<span class="na">—</span>' : fmtEuroCpa(curCpa)}</td>
       <td>${isOrg ? "" : fmtDelta(pctDelta(curCpa, aCpa), true)}</td>
-      <td>${isOrg ? "" : fmtDelta(pctDelta(curCpa, mCpa), true)}</td>
+      ${isAnnual ? "" : `<td>${isOrg ? "" : fmtDelta(pctDelta(curCpa, mCpa), true)}</td>`}
     </tr>`;
 
           const canals = Object.entries(cur.byCan).filter(
@@ -2208,14 +2236,14 @@
         <td class="sep">${isOrg ? '<span class="na">—</span>' : fmtEuro(lcd.budget)}</td>
         <td class="act">${isOrg ? '<span class="na">—</span>' : fmtEuro(lcd.depenses)}</td>
         <td>${isOrg ? '<span class="na">—</span>' : fmtPctBar(lcd.depenses, lcd.budget)}</td>
-        <td>${isOrg ? "" : fmtDelta(pctDelta(lcd.depenses, pro(lad.depenses)))}</td>
-        <td class="pre-sep">${isOrg ? "" : fmtDelta(pctDelta(lcd.depenses, pro(lmd.depenses)))}</td>
+        <td${isAnnual ? ' class="pre-sep"' : ""}>${isOrg ? "" : fmtDelta(pctDelta(lcd.depenses, pro(lad.depenses)))}</td>
+        ${isAnnual ? "" : `<td class="pre-sep">${isOrg ? "" : fmtDelta(pctDelta(lcd.depenses, pro(lmd.depenses)))}</td>`}
         <td class="sep act">${fmtK(lVal)}</td>
-        <td>${fmtDelta(pctDelta(lVal, pro(laVal)))}</td>
-        <td class="pre-sep">${fmtDelta(pctDelta(lVal, pro(lmVal)))}</td>
+        <td${isAnnual ? ' class="pre-sep"' : ""}>${fmtDelta(pctDelta(lVal, pro(laVal)))}</td>
+        ${isAnnual ? "" : `<td class="pre-sep">${fmtDelta(pctDelta(lVal, pro(lmVal)))}</td>`}
         <td class="sep act">${isOrg ? '<span class="na">—</span>' : fmtEuroCpa(lCurCpa)}</td>
         <td>${isOrg ? "" : fmtDelta(pctDelta(lCurCpa, laCpa), true)}</td>
-        <td>${isOrg ? "" : fmtDelta(pctDelta(lCurCpa, lmCpa), true)}</td>
+        ${isAnnual ? "" : `<td>${isOrg ? "" : fmtDelta(pctDelta(lCurCpa, lmCpa), true)}</td>`}
       </tr>`;
           }
         }
@@ -2237,17 +2265,17 @@
     <td class="sep">${fmtEuro(tc.budget)}</td>
     <td class="act">${fmtEuro(tc.depenses)}</td>
     <td>${fmtPctBar(tc.depenses, tc.budget)}</td>
-    <td>${fmtDelta(pctDelta(tc.depenses, pro(ta1.depenses)))}</td>
-    <td class="pre-sep">${fmtDelta(pctDelta(tc.depenses, pro(tm1.depenses)))}</td>
+    <td${isAnnual ? ' class="pre-sep"' : ""}>${fmtDelta(pctDelta(tc.depenses, pro(ta1.depenses)))}</td>
+    ${isAnnual ? "" : `<td class="pre-sep">${fmtDelta(pctDelta(tc.depenses, pro(tm1.depenses)))}</td>`}
     <td class="sep act">${fmtK(totMetric)}</td>
-    <td>${fmtDelta(pctDelta(totMetric, pro(a1TotMetric)))}</td>
-    <td class="pre-sep">${fmtDelta(pctDelta(totMetric, pro(m1TotMetric)))}</td>
+    <td${isAnnual ? ' class="pre-sep"' : ""}>${fmtDelta(pctDelta(totMetric, pro(a1TotMetric)))}</td>
+    ${isAnnual ? "" : `<td class="pre-sep">${fmtDelta(pctDelta(totMetric, pro(m1TotMetric)))}</td>`}
     <td class="sep act">${fmtEuroCpa(totCpa2)}</td>
     <td>${fmtDelta(pctDelta(totCpa2, a1TotCpa2), true)}</td>
-    <td>${fmtDelta(pctDelta(totCpa2, m1TotCpa2), true)}</td>
+    ${isAnnual ? "" : `<td>${fmtDelta(pctDelta(totCpa2, m1TotCpa2), true)}</td>`}
   </tr>`;
 
-        return `${toggleBar()}<div class="table-wrap"><table>${COLGROUP}${theadHtml}<tbody>${rows}</tbody></table></div>`;
+        return `${toggleBar()}<div class="table-wrap"><table>${isAnnual ? COLGROUP_AN : COLGROUP}${theadHtml}<tbody>${rows}</tbody></table></div>`;
       }
 
       // ═══════════════════════════════════════════════
@@ -2303,6 +2331,7 @@
             : "";
 
         let html = "";
+        const isAnnual = periodMode === "an";
 
         // ── KPI grid ──
         html += `<div class="kpi-grid">
@@ -2316,6 +2345,7 @@
       false,
       "",
       pj(projDep, fmtEuro),
+      isAnnual,
     )}
     ${kpiCard(
       "Rdm (candidatures)",
@@ -2327,6 +2357,7 @@
       false,
       "",
       pj(projRdm, fmtK),
+      isAnnual,
     )}
     ${kpiCard(
       "Alertistes",
@@ -2338,6 +2369,7 @@
       false,
       "",
       pj(projAlrt, fmtK),
+      isAnnual,
     )}
     ${kpiCard(
       "CV déposés",
@@ -2349,6 +2381,7 @@
       false,
       "",
       pj(projCv, fmtK),
+      isAnnual,
     )}
     ${kpiCard(
       "CPA Rdm global",
@@ -2360,6 +2393,7 @@
       true,
       "",
       pjCpaHtml,
+      isAnnual,
     )}
   </div>`;
 
@@ -2386,6 +2420,7 @@
           m1Label,
           a1Label,
           pctElapsed,
+          periodMode === "an",
         );
 
         // ── Branding cumulatif (si actif) ──
@@ -2411,6 +2446,7 @@
         workingDaysElapsed,
         m1Label,
         a1Label,
+        periodMode = "mois",
       ) {
         const cur = aggregate(rows, curMois);
         const m1 = aggregate(rows, m1Mois);
@@ -2446,6 +2482,7 @@
           v != null ? `<div class="kpi-proj">↗ Projeté ${fmt(v)}</div>` : "";
 
         let html = "";
+        const isAnnual = periodMode === "an";
 
         html += `<div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
     ${kpiCard(
@@ -2460,6 +2497,7 @@
         ? `<div style="font-size:11px;color:#64748b;margin:5px 0 2px">Budget <strong>${fmtEuro(cur.total.budget)}</strong> · ${fmtPct(kpiDep, cur.total.budget)} dépensé</div>`
         : "",
       pj(projDep, fmtEuro),
+      isAnnual,
     )}
     ${kpiCard(
       metricLabel,
@@ -2471,6 +2509,7 @@
       false,
       "",
       pj(projM, fmtK),
+      isAnnual,
     )}
     ${kpiCard(
       "CPA " + metricLabel,
@@ -2484,6 +2523,7 @@
       projCpa != null
         ? `<div class="kpi-proj neutral">⟳ Projeté ${fmtEuroCpaRaw(projCpa)}</div>`
         : "",
+      isAnnual,
     )}
   </div>`;
 
@@ -2498,6 +2538,7 @@
           m1Label,
           a1Label,
           pctElapsed,
+          periodMode === "an",
         );
         document.getElementById(tabId).innerHTML = html;
       }
@@ -3069,6 +3110,7 @@
           workingDaysElapsed,
           m1Label,
           a1Label,
+          mode,
         );
         renderConvTab(
           rows,
@@ -3083,9 +3125,18 @@
           workingDaysElapsed,
           m1Label,
           a1Label,
+          mode,
         );
         renderSidebar(curMonths, mode);
-        renderFreshnessChip(curMonths[curMonths.length - 1]);
+        // Fraîcheur (mois en cours) / Clôture (mois passé) : uniquement en mode
+        // Mois — en trim./sem./année la granularité ne correspond à aucun état
+        // de mise à jour ponctuel exploitable.
+        if (mode === "mois") {
+          renderFreshnessChip(curMonths[curMonths.length - 1], isCurrent);
+        } else {
+          const chip = document.getElementById("freshness-chip");
+          if (chip) chip.style.display = "none";
+        }
       }
 
       // ═══════════════════════════════════════════════
@@ -3224,7 +3275,7 @@
         return Math.floor((today - d) / 86400000);
       }
 
-      function renderFreshnessChip(selMois) {
+      function renderFreshnessChip(selMois, isCurrent = true) {
         const chip = document.getElementById("freshness-chip");
         if (!chip) return;
 
@@ -3254,6 +3305,17 @@
               : days === 1
                 ? "hier"
                 : `il y a ${days}j`;
+        // Libellé clôture : position de la MAJ par rapport à la fin du mois concerné
+        // (et non par rapport à aujourd'hui — un mois clos "vieillit" chaque jour
+        // sans que ça signifie quoi que ce soit d'anormal).
+        const fmtClotureLbl = (diff) =>
+          diff === null
+            ? "—"
+            : diff === 0
+              ? "jour de clôture"
+              : diff > 0
+                ? `+${diff}j après clôture`
+                : `${diff}j avant clôture`;
         const dot = (cls) => `<span class="fr-dot ${cls}"></span>`;
 
         // ── Helper config : une plateforme est-elle active pour perf/branding ?
@@ -3272,6 +3334,26 @@
           return found ? found.brandingActif : true;
         };
 
+        // ── Écart (en jours) entre une date de MAJ et la fin du mois sélectionné ──
+        const [selMM, selYY] = (selMois || "").split("/").map(Number);
+        const selMonthEnd = selMM && selYY ? new Date(selYY, selMM, 0) : null;
+        const diffFromMonthEnd = (str) => {
+          const d = parseExactDate(str);
+          if (!d || !selMonthEnd) return null;
+          return Math.round((d - selMonthEnd) / 86400000);
+        };
+        // Statut clôture : ok si la MAJ arrive dans la fenêtre normale après fin de
+        // mois ; warn si limite ; err si la MAJ s'est arrêtée nettement avant la fin
+        // du mois (canal probablement incomplet) ou n'est jamais arrivée après.
+        function clotureStatus(diff, graceOk, graceWarn) {
+          if (diff === null) return "na";
+          if (diff < -graceWarn) return "err";
+          if (diff < 0) return "warn";
+          if (diff <= graceOk) return "ok";
+          if (diff <= graceWarn) return "warn";
+          return "err";
+        }
+
         // ── Acquisition ──
         const acqByCanal = {};
         for (const r of _rows || []) {
@@ -3283,16 +3365,26 @@
             acqByCanal[r.canal] = { date: d, str: r.derniereMAJ };
         }
         const acqStatuses = Object.entries(acqByCanal).map(([label, info]) => {
-          const days = daysSince(info.str);
-          const status =
-            days === null
-              ? "na"
-              : days <= 1
-                ? "ok"
-                : days <= 2
-                  ? "warn"
-                  : "err";
-          return { label, days, str: info.str, status };
+          if (isCurrent) {
+            const days = daysSince(info.str);
+            const status =
+              days === null
+                ? "na"
+                : days <= 1
+                  ? "ok"
+                  : days <= 2
+                    ? "warn"
+                    : "err";
+            return { label, days, diff: null, str: info.str, status };
+          }
+          const diff = diffFromMonthEnd(info.str);
+          return {
+            label,
+            days: null,
+            diff,
+            str: info.str,
+            status: clotureStatus(diff, 2, 5),
+          };
         });
 
         // ── Branding ──
@@ -3306,16 +3398,26 @@
             byPlat[r.plateforme] = { date: d, str: r.derniereMAJ };
         }
         const brandStatuses = Object.entries(byPlat).map(([label, info]) => {
-          const days = daysSince(info.str);
-          const status =
-            days === null
-              ? "na"
-              : days <= 3
-                ? "ok"
-                : days <= 7
-                  ? "warn"
-                  : "err";
-          return { label, days, str: info.str, status };
+          if (isCurrent) {
+            const days = daysSince(info.str);
+            const status =
+              days === null
+                ? "na"
+                : days <= 3
+                  ? "ok"
+                  : days <= 7
+                    ? "warn"
+                    : "err";
+            return { label, days, diff: null, str: info.str, status };
+          }
+          const diff = diffFromMonthEnd(info.str);
+          return {
+            label,
+            days: null,
+            diff,
+            str: info.str,
+            status: clotureStatus(diff, 5, 10),
+          };
         });
 
         // ── Helper : construit le bloc de dots pour une section ──
@@ -3334,7 +3436,9 @@
         // ── Helper : tooltip rows ──
         const makeRows = (statuses) =>
           statuses
-            .sort((a, b) => (b.days ?? -1) - (a.days ?? -1))
+            .sort(
+              (a, b) => (b.days ?? b.diff ?? -999) - (a.days ?? a.diff ?? -999),
+            )
             .map((s) => {
               const dotC =
                 s.status === "ok"
@@ -3342,9 +3446,12 @@
                   : s.status === "err"
                     ? "fr-dot-err"
                     : "fr-dot-warn";
+              const rightLbl = isCurrent
+                ? `${fmtDay(s.str)} <em style="color:#cbd5e1">(${fmtDaysLbl(s.days)})</em>`
+                : `${fmtDay(s.str)} <em style="color:#cbd5e1">(${fmtClotureLbl(s.diff)})</em>`;
               return `<div class="fr-tooltip-row">
         <span style="display:flex;align-items:center;gap:5px">${dot(dotC)} ${s.label}</span>
-        <span style="color:#94a3b8;white-space:nowrap">${fmtDay(s.str)} <em style="color:#cbd5e1">(${fmtDaysLbl(s.days)})</em></span>
+        <span style="color:#94a3b8;white-space:nowrap">${rightLbl}</span>
       </div>`;
             })
             .join("");
@@ -3353,9 +3460,10 @@
         const hasBrand = brandStatuses.length > 0;
         const [smm] = (selMois || "").split("/");
         const moisLbl = smm ? MONTH_NAMES[parseInt(smm)] : "";
+        const chipTitle = isCurrent ? "Fraîcheur" : "Clôture";
 
         // ── Inner chip HTML ──
-        let innerHtml = `<span style="color:#94a3b8;font-size:11px;margin-right:2px">Fraîcheur ·</span>`;
+        let innerHtml = `<span style="color:#94a3b8;font-size:11px;margin-right:2px">${chipTitle} ·</span>`;
         if (hasAcq) innerHtml += sectionInner(acqStatuses, "Acq.");
         if (hasAcq && hasBrand)
           innerHtml += ` <span class="fr-sep-pipe">|</span> `;
@@ -3365,11 +3473,14 @@
         }
 
         // ── Tooltip HTML ──
+        const tooltipHdr = isCurrent
+          ? `📈 Acquisition — ${moisLbl}`
+          : `📈 Acquisition — clôture ${moisLbl}`;
         let tooltipHtml = "";
         if (hasAcq) {
-          tooltipHtml += `<div class="fr-tooltip-hdr">📈 Acquisition — ${moisLbl}</div>${makeRows(acqStatuses)}`;
+          tooltipHtml += `<div class="fr-tooltip-hdr">${tooltipHdr}</div>${makeRows(acqStatuses)}`;
         } else {
-          tooltipHtml += `<div class="fr-tooltip-hdr">📈 Acquisition — ${moisLbl}</div>
+          tooltipHtml += `<div class="fr-tooltip-hdr">${tooltipHdr}</div>
       <div class="fr-tooltip-row"><span style="color:#94a3b8;font-style:italic">Colonne MàJ non renseignée dans le Sheet</span></div>`;
         }
         if (hasBrand) {
