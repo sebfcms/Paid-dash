@@ -3387,9 +3387,11 @@
           };
         });
 
-        // ── Branding ──
+        // ── Branding ── (uniquement les campagnes actives sur le mois affiché,
+        // même logique que renderPlanComStrip/renderBrandingBlock)
+        const activePlanCom = getActivePlanCom(selMois);
         const byPlat = {};
-        for (const r of _plancom || []) {
+        for (const r of activePlanCom) {
           if (!r.derniereMAJ) continue;
           if (!isBrandingActif(r.plateforme)) continue; // plateforme pausée → ignorée
           const d = parseExactDate(r.derniereMAJ);
@@ -3485,7 +3487,7 @@
         }
         if (hasBrand) {
           tooltipHtml += `<div class="fr-tooltip-hdr">📡 Branding</div>${makeRows(brandStatuses)}`;
-        } else if (_plancom && _plancom.length) {
+        } else if (activePlanCom.length) {
           tooltipHtml += `<div class="fr-tooltip-hdr">📡 Branding</div>
       <div class="fr-tooltip-row"><span style="color:#94a3b8;font-style:italic">Colonne MàJ non renseignée dans PlanCom</span></div>`;
         }
