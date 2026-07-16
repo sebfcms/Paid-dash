@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard Paid Performance · v1.8 · juin 2026</title>
+    <title>Dashboard Paid Performance</title>
     <script src="https://accounts.google.com/gsi/client" async></script>
     <style>
       :root {
@@ -1517,7 +1517,8 @@
       }
 
       // ── Plan de com strip (entre les blocs budget et le tableau) ──
-      function renderPlanComStrip(selMois) {
+      function renderPlanComStrip(selMois, isComplete = false) {
+        if (isComplete) return "";
         const active = _plancom && _plancom.length ? _plancom : [];
         if (!active.length) return "";
 
@@ -1908,7 +1909,13 @@
       // ═══════════════════════════════════════════════
       // BUDGET BLOCKS
       // ═══════════════════════════════════════════════
-      function renderBudgetBlocks(t, pctElapsed) {
+      function renderBudgetBlocks(
+        t,
+        pctElapsed,
+        periodEndLabel = "fin de mois",
+        isComplete = false,
+      ) {
+        if (isComplete) return "";
         if (!t.budget || t.budget <= 0) return "";
         const dep = t.depenses || 0;
         const bud = t.budget;
@@ -1952,7 +1959,7 @@
       <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#64748b">
         <span><strong>Budget ${fmtEuroRaw(bud)} ·</strong> ${pctDep.toFixed(0)}% consommé</span>${restantHtml}
       </div>
-      ${projDep ? `<div style="font-size:10px;color:#94a3b8;margin-top:5px">Projeté fin de mois : ${fmtEuroRaw(projDep)} sur ${fmtEuroRaw(bud)}</div>` : ""}
+      ${projDep ? `<div style="font-size:10px;color:#94a3b8;margin-top:5px">Projeté ${periodEndLabel} : ${fmtEuroRaw(projDep)} sur ${fmtEuroRaw(bud)}</div>` : ""}
     </div>
     <div class="budget-block">
       <div class="bb-label">Rythme de dépense</div>
@@ -1961,7 +1968,7 @@
         <span>Ratio dépensé / temps : ${rythme ? (rythme * 100).toFixed(0) + "%" : "—"}</span>
         <strong style="color:${rythmeColor}">${rythmeLabel}</strong>
       </div>
-      ${projDep ? `<div style="font-size:10px;color:#94a3b8;margin-top:5px">Projection fin de mois : ${fmtEuroRaw(projDep)}</div>` : ""}
+      ${projDep ? `<div style="font-size:10px;color:#94a3b8;margin-top:5px">Projection ${periodEndLabel} : ${fmtEuroRaw(projDep)}</div>` : ""}
     </div>
   </div>
   </div>`;
@@ -2256,6 +2263,8 @@
         workingDaysElapsed,
         m1Label,
         a1Label,
+        periodMode = "mois",
+        isComplete = false,
       ) {
         const cur = aggregate(rows, curMois);
         const m1 = aggregate(rows, m1Mois);
@@ -2355,10 +2364,15 @@
   </div>`;
 
         // ── Blocs budget ──
-        html += renderBudgetBlocks(t, pctElapsed);
+        html += renderBudgetBlocks(
+          t,
+          pctElapsed,
+          PERIOD_END_LABEL[periodMode],
+          isComplete,
+        );
 
         // ── Plan de com (si actif) ──
-        html += renderPlanComStrip(curMois);
+        html += renderPlanComStrip(curMois, isComplete);
 
         // ── Tableau canaux & leviers ──
         html += `<div class="section-title">Canaux &amp; leviers</div>`;
@@ -2718,6 +2732,12 @@
         sem: "semestre",
         an: "année",
       };
+      const PERIOD_END_LABEL = {
+        mois: "fin de mois",
+        trim: "fin de trimestre",
+        sem: "fin de semestre",
+        an: "fin d'année",
+      };
 
       function renderSidebar(mois, mode = "mois") {
         const moisArr = Array.isArray(mois) ? mois : [mois];
@@ -2979,16 +2999,18 @@
               }
             : periodOrMois;
         const curMonths = period.months,
+          fullMonths = period.fullMonths || period.months,
           mode = _periodMode || "mois";
         const progress = getPeriodProgress(mode, period);
         const {
           pct: pctElapsed,
           joursEcoules: daysElapsed,
           isCurrent,
+          isComplete,
         } = progress;
         const workingDaysElapsed = 0; // non utilisé (dead code hérité, countWorkingDays jamais branché à l'affichage)
-        const m1Months = shiftPeriodBack(curMonths, mode),
-          a1Months = prevYearMonths(curMonths);
+        const m1Months = shiftPeriodBack(fullMonths, mode),
+          a1Months = prevYearMonths(fullMonths);
         let m1Label, a1Label;
         if (mode === "mois") {
           const [m1mm, m1yy] = m1Months[0].split("/"),
@@ -3023,7 +3045,7 @@
           _periodIdx === _allPeriods.length - 1;
         renderMois(
           rows,
-          curMonths,
+          fullMonths,
           pctElapsed,
           m1Months,
           a1Months,
@@ -3031,13 +3053,15 @@
           workingDaysElapsed,
           m1Label,
           a1Label,
+          mode,
+          isComplete,
         );
         renderConvTab(
           rows,
           "tab-alertistes",
           "alertiste",
           "Alertistes",
-          curMonths,
+          fullMonths,
           pctElapsed,
           m1Months,
           a1Months,
@@ -3051,7 +3075,7 @@
           "tab-cv",
           "cv",
           "CV déposés",
-          curMonths,
+          fullMonths,
           pctElapsed,
           m1Months,
           a1Months,
@@ -3389,10 +3413,15 @@
             return `${yy}-${mm}`;
           };
           const todayKey = toKey(todayMoisStr);
+          const MIN_MOIS_KEY = "2026-01"; // ne pas remonter avant ce mois dans la navigation
           // Filtrer les mois futurs (budget rempli à l'avance mais pas encore arrivés)
+          // et les mois antérieurs au plancher défini
           const allMois = sortMois([
             ...new Set(rows.map((r) => r.mois)),
-          ]).filter((m) => toKey(m) <= todayKey);
+          ]).filter((m) => {
+            const k = toKey(m);
+            return k <= todayKey && k >= MIN_MOIS_KEY;
+          });
           // Défaut = mois en cours, sinon dernier mois disponible
           const curIdx = allMois.indexOf(todayMoisStr);
           _rows = rows;
